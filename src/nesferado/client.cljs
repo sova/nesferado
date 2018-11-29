@@ -216,6 +216,28 @@
                           :comment "ur coment"
                           }]}))
 
+(rum/defc fb-sdk [app-id]
+  [:script {:type "text/javascript"}
+   (str "window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '" app-id "',
+      cookie     : true,
+      xfbml      : true,
+      version    : '3.2'
+    });
+
+    FB.AppEvents.logPageView();
+
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = 'https://connect.facebook.net/en_US/sdk.js';
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));")])
+
 (rum/defc link [address]
   [:a {:href address} address])
 
@@ -247,7 +269,8 @@
    [:ol.loginbar
     [:li.fbfb [:a {:href "/facebook"} "fb login"]]
     [:li.gogo [:a {:href "/gogole"} "gogole loign"]]
-    [:li.nfnf [:a {:href "/nflogin"} "nonforum login"]]]])
+    [:li.nfnf [:a {:href "/nflogin"} "nonforum login"]]]
+   (fb-sdk 1417763311691300)])
 
 (rum/defc tv-cell [td]
   [:li [:div.tile {:id (str "tile" (:priority td))}

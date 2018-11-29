@@ -59,7 +59,9 @@
   ;; connect to with Cider+emacs or your IDE of choice:
   :aliases
   {"start-repl" ["do" "clean," "cljsbuild" "once," "repl" ":headless"]
-   "start"      ["do" "clean," "cljsbuild" "once," "run"]}
+   "start"      ["do" "clean," "cljsbuild" "once," "run"]
+   "nojs"       ["run"]
+   "js"         ["do" "cljsbuild" "once," "run"]}
 
   :repositories
   {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"})
