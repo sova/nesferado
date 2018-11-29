@@ -278,12 +278,12 @@
                                      (.log js/console (.getElementById js/document "aft"))
                                    ;submit to server here!
 
-                                   ; (let [new-post-map {:title (get-in @input-state [:inputs 0 :title])
-                                     ;                                            :contents (get-in @input-state [:inputs 0 :contents])
-                                      ;                                           :priority 10
-                                       ;                                          :posted-by "x@nonforum.com"
-                                        ;                                         :timestamp 80008
-                                   ;                                              :parent nil}]
+                                    (let [new-post-map {:title (get-in @input-state [:inputs 0 :title])
+                                                                                 :contents (get-in @input-state [:inputs 0 :contents])
+                                                                                 :priority 10
+                                                                                 :posted-by "x@nonforum.com"
+                                                                                 :timestamp 80008
+                                                                                 :parent nil}]
                                     ;   (POST "/send-message"
                                      ;   {:body {:title (:title new-post-map)
                                       ;            :posted-by "x@nonforum.com"
