@@ -64,6 +64,7 @@
 
 (defn landing-pg-handler [ring-req]
   (hiccup/html
+    [:head [:link {:rel "stylesheet" :href "/css/nesferado.css"}]]
     [:h1 "Sente reference example"]
     [:p "An Ajax/WebSocket" [:strong " (random choice!)"] " has been configured for this example"]
     [:hr]
@@ -91,6 +92,9 @@
     [:hr]
     [:h2 "Step 4: want to re-randomize Ajax/WebSocket connection type?"]
     [:p "Hit your browser's reload/refresh button"]
+
+    [:div#start]
+    [:div#inputs]
     [:script {:src "main.js"}] ; Include our cljs target
     ))
 

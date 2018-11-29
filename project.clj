@@ -15,6 +15,9 @@
    [com.taoensso/sente        "1.11.0"] ; <--- Sente
    [com.taoensso/timbre       "4.7.4"]
 
+   [rum "0.11.2"]
+   [alandipert/storage-atom "1.2.4"]
+
    ;;; TODO Choose (uncomment) a supported web server -----------------------
    [http-kit                             "2.2.0"] ; Default
    ;; [org.immutant/web                  "2.1.4"]
