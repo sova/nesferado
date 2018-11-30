@@ -38,7 +38,8 @@
    [com.cognitect/transit-cljs "0.8.239"]]
 
   :plugins
-  [[lein-pprint         "1.1.2"]
+  [[lein-figwheel "0.5.16"]
+   [lein-pprint         "1.1.2"]
    [lein-ancient        "0.6.10"]
    [com.cemerick/austin "0.1.6"]
    [lein-cljsbuild      "1.1.4"]
@@ -49,8 +50,14 @@
   {:builds
    [{:id :cljs-client
      :source-paths ["src"]
-     :compiler {:output-to "target/main.js"
-                :optimizations :whitespace #_:advanced
+     :figwheel {:on-jsload nesferado.client/js-reload}
+
+
+     :compiler {:output-to "resources/public/js/nesferado.js"
+                :output-dir "resources/public/js/"
+                :main nesferado.client
+                :asset-path "js/"
+                :optimizations :none
                 :pretty-print true}}]}
 
   :main nesferado.server
@@ -63,5 +70,6 @@
    "nojs"       ["run"]
    "js"         ["do" "cljsbuild" "once," "run"]}
 
+  :profiles {:dev {:dependecies [figwheel-sidecar "0.5.16"]}}
   :repositories
   {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"})

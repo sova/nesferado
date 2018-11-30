@@ -1,0 +1,27 @@
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 23.212 seconds.[0m
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 27.883 seconds.[0m
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 6.192 seconds.[0m
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 23.247 seconds.[0m
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 5.975 seconds.[0m
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 19.121 seconds.[0m
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  resources/public/js/nesferado/client.js

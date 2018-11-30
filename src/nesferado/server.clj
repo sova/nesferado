@@ -95,7 +95,7 @@
 
     [:div#start]
     [:div#inputs]
-    [:script {:src "main.js"}] ; Include our cljs target
+    [:script {:src "js/nesferado.js" :type "text/javascript"}]
     ))
 
 (defn login-handler
@@ -108,9 +108,17 @@
     (debugf "Login request: %s" params)
     {:status 200 :session (assoc session :uid user-id)}))
 
+(defn pp-page-handler
+  "Privacy Policy regarding data collection and login."
+  [ring-req]
+  (hiccup/html
+    [:html
+     [:p "The Nonforum privacy policy regarding login dialogs and site use is as follows: Depending on your configuration, you may allow nonforum to post on your behalf on other media sites.  This can be disabled.  Nonforum uses the Facebook login API to add facebook profiles to the site with ease, and you can unlink facebook anytime (and simply continue using the e-mail address)"]]))
+
 (defroutes ring-routes
   (GET  "/"      ring-req (landing-pg-handler            ring-req))
   (GET  "/chsk"  ring-req (ring-ajax-get-or-ws-handshake ring-req))
+  (GET "/pp"     ring-req (pp-page-handler               ring-req)) ;privacy policy
   (POST "/chsk"  ring-req (ring-ajax-post                ring-req))
   (POST "/login" ring-req (login-handler                 ring-req))
   (route/resources "/") ; Static files, notably public/main.js (our cljs target)
