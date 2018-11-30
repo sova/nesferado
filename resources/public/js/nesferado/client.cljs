@@ -271,10 +271,10 @@
 (rum/defc login-bar []
   [:div#loginbar
    [:ol.loginbar
-    [:li.fbfb [:a {:href "/facebook"} "fb login"]]
-    [:li.gogo [:a {:href "/gogole"} "gogole loign TESEt"]]
-    [:li.twtw [:a {:href "/twitter"} "twittteeettar loign"]]
-    [:li.nfnf [:a {:href "/nflogin"} "nonnnnforum login"]]]
+    [:li.fbfb [:a {:href "/facebook"} "Continue with Facebook as ___"]]
+    [:li.gogo [:a {:href "/gogole"} "Google Login"]]
+    [:li.twtw [:a {:href "/twitter"} "Twitter Login"]]
+    [:li.nfnf [:a {:href "/nflogin"} "Nonforum Login"]]]
    (fb-sdk 1417763311691300) ;nonforum app id
    ])
 
@@ -344,11 +344,63 @@
    [:button.fullwidth {:type "submit"} "post comment"]])
 
 
+(def ps
+  ;posts
+  (atom { :posts [{:parent-id 777
+                   :this-id 555
+                   :child-id [444 333 222 8888]}
+                  {:parent-id 334
+                   :this-id 5353
+                   :child-id 225}]}))
+
+(def ant { {:tid 7
+            :c [{:tid 8
+                 :contents "challenges-accepted"}
+                 :c [{:tid 9
+                      :contents "howdyrowdydoo"}
+                     {:tid 10
+                      :contents "supercreativeom"}]]}
+           {:tid 8
+            :contents "befreeyo"
+            :c {:tid 3
+                :contents "capturelove?"}}})
+
+
+(defn nest [m]
+  (for [[k v] m]
+    (list* (str [:li k (nest v)]))))
+
+(rum/defc nestit []
+  [:div (nest @ant)])
+
+
+
+
+
+
+
+
+
+
+
+
+
 (rum/defc nf-login-input []
   [:form#nflogin
    [:input.fullwidth {:place-holder "username"}]
    [:input.fullwidth {:place-holder "password" :type "password"}]
    [:button.fullwidth {:type "submit"} "login"]])
+
+
+
+
+
+
+
+
+
+
+
 
 (rum/defc input-fields []
   [:div#inputs-contain
@@ -358,6 +410,7 @@
 
 (rum/defc start []
   [:div#maincontain
+   ;(nestit)
    (top-bar)
    (side-bar)
    (login-bar)

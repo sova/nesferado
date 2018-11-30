@@ -25,3 +25,91 @@ Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"].
 notifying browser that file changed:  resources/public/js/goog/deps.js
 notifying browser that file changed:  resources/public/js/cljs_deps.js
 notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 4.34 seconds.[0m
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[31mFailed to compile build :cljs-client from ["src"] in 35.277 seconds.[0m
+[36m----  Could not Read  src/nesferado/client.cljs   line:356  column:4  ----[0m
+
+  [1mEOF while reading, starting at line 356 and column 4[0m
+
+  [36m354[0m  [36m(rum/defc parent-w-inputs [pid][0m
+  [36m355[0m  [36m  [:div.pwi[0m
+  [33m356[0m  [1m   [:form#parent[0m
+  [0m   [0m  [33m   ^--- EOF while reading, starting at line 356 and column 4[0m
+
+[36m----  Reader Error : Please see src/nesferado/client.cljs  ----[0m
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[31mFailed to compile build :cljs-client from ["src"] in 10.624 seconds.[0m
+[36m----  Could not Read  src/nesferado/client.cljs   line:356  column:4  ----[0m
+
+  [1mEOF while reading, starting at line 356 and column 4[0m
+
+  [36m354[0m  [36m(rum/defc parent-w-inputs [pid][0m
+  [36m355[0m  [36m  [:div.pwi[0m
+  [33m356[0m  [1m   [:form#parent[0m
+  [0m   [0m  [33m   ^--- EOF while reading, starting at line 356 and column 4[0m
+
+[36m----  Reader Error : Please see src/nesferado/client.cljs  ----[0m
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[31mFailed to compile build :cljs-client from ["src"] in 5.118 seconds.[0m
+[36m----  Could not Read  src/nesferado/client.cljs   line:361  column:4  ----[0m
+
+  [1mEOF while reading, starting at line 361 and column 4[0m
+
+  [36m359[0m  [36m(rum/defc parent-w-inputs [pid][0m
+  [36m360[0m  [36m  [:div.pwi[0m
+  [33m361[0m  [1m   [:form#parent[0m
+  [0m   [0m  [33m   ^--- EOF while reading, starting at line 361 and column 4[0m
+
+[36m----  Reader Error : Please see src/nesferado/client.cljs  ----[0m
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[31mFailed to compile build :cljs-client from ["src"] in 3.577 seconds.[0m
+[36m----  Could not Read  src/nesferado/client.cljs   line:359  column:4  ----[0m
+
+  [1mEOF while reading, starting at line 359 and column 4[0m
+
+  [36m357[0m  [36m(rum/defc parent-w-inputs [pid][0m
+  [36m358[0m  [36m  [:div.pwi[0m
+  [33m359[0m  [1m   [:form#parent[0m
+  [0m   [0m  [33m   ^--- EOF while reading, starting at line 359 and column 4[0m
+
+[36m----  Reader Error : Please see src/nesferado/client.cljs  ----[0m
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 20.016 seconds.[0m
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[31mFailed to compile build :cljs-client from ["src"] in 19.0 seconds.[0m
+[36m----  Could not Read  src/nesferado/client.cljs   line:357  column:16  ----[0m
+
+  [1mEOF while reading, starting at line 357 and column 16[0m
+
+  [36m356[0m  [36m(def ant { {:tid 7[0m
+  [33m357[0m  [1m            :c {{:tid 8[0m
+  [0m   [0m  [33m               ^--- EOF while reading, starting at line 357 and column 16[0m
+  [36m358[0m  [36m                 :contents "challenges-accepted"}[0m
+  [36m359[0m  [36m                :c [{:tid 9[0m
+  [36m360[0m  [36m                             :contents "howdyrowdydoo"}[0m
+
+[36m----  Reader Error : Please see src/nesferado/client.cljs  ----[0m
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 34.369 seconds.[0m
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 31.62 seconds.[0m
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 6.159 seconds.[0m
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 10.035 seconds.[0m
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 16.227 seconds.[0m
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 4.983 seconds.[0m
+notifying browser that file changed:  resources/public/js/nesferado/client.js
