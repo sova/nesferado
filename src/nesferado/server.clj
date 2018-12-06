@@ -5,13 +5,17 @@
   (:require
    [clojure.string     :as str]
    [ring.middleware.defaults]
+   [ring.util.response :refer [response redirect content-type]]
    [compojure.core     :as comp :refer (defroutes GET POST)]
+   [compojure.response :refer [render]]
    [compojure.route    :as route]
    [hiccup.core        :as hiccup]
    [clojure.core.async :as async  :refer (<! <!! >! >!! put! chan go go-loop)]
    [taoensso.encore    :as encore :refer (have have?)]
    [taoensso.timbre    :as timbre :refer (tracef debugf infof warnf errorf)]
    [taoensso.sente     :as sente]
+   [buddy.auth :refer [authenticated? throw-unauthorized]]
+   [buddy.auth.backends.session :refer [session-backend]]
    [buddy.auth.backends :as backends]
    [buddy.auth.middleware :refer [wrap-authentication]]
 
@@ -149,7 +153,7 @@
             updated-session (assoc session :identity (keyword username))]
         (-> (redirect next-url)
             (assoc :session updated-session)))
-      (let [content (slurp (io/resource "login.html"))]
+      (let [content landing-pg-handler]
         (render content request)))))
 
 (defn logout
@@ -165,6 +169,27 @@
   (POST "/login" ring-req (login-authenticate            ring-req))
   (route/resources "/") ; Static files, notably public/main.js (our cljs target)
   (route/not-found "<h1>Page not found</h1>"))
+
+
+;; User defined unauthorized handler
+;;
+;; This function is responsible for handling
+;; unauthorized requests (when unauthorized exception
+;; is raised by some handler)
+
+(defn unauthorized-handler
+  [request metadata]
+  (cond
+    ;; If request is authenticated, raise 403 instead
+    ;; of 401 (because user is authenticated but permission
+    ;; denied is raised).
+    (authenticated? request)
+    (-> (render (slurp (io/resource "error.html")) request)
+        (assoc :status 403))
+    ;; In other cases, redirect the user to login page.
+    :else
+    (let [current-url (:uri request)]
+      (redirect (format "/login?next=%s" current-url)))))
 
 
 (def main-ring-handler
