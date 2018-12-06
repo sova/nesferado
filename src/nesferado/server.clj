@@ -12,6 +12,8 @@
    [taoensso.encore    :as encore :refer (have have?)]
    [taoensso.timbre    :as timbre :refer (tracef debugf infof warnf errorf)]
    [taoensso.sente     :as sente]
+   [buddy.auth.backends :as backends]
+   [buddy.auth.middleware :refer [wrap-authentication]]
 
    ;;; TODO Choose (uncomment) a supported web server + adapter -------------
    [org.httpkit.server :as http-kit]
@@ -60,6 +62,18 @@
     (when (not= old new)
       (infof "Connected uids change: %s" new))))
 
+
+
+;; buddy-auth
+;; Create an instance
+(def backend (backends/session))
+(def authdata
+  "Global var that stores valid users with their
+   respective passwords."
+  {:username "lopez"
+   :password "giant"})
+
+
 ;;;; Ring handlers
 
 (defn landing-pg-handler [ring-req]
@@ -93,6 +107,8 @@
     [:h2 "Step 4: want to re-randomize Ajax/WebSocket connection type?"]
     [:p "Hit your browser's reload/refresh button"]
 
+    [:div#loginfields]
+
     [:div#start]
     [:div#inputs]
     [:script {:src "js/nesferado.js" :type "text/javascript"}]
@@ -115,22 +131,52 @@
     [:html
      [:p "The Nonforum privacy policy regarding login dialogs and site use is as follows: Depending on your configuration, you may allow nonforum to post on your behalf on other media sites.  This can be disabled.  Nonforum uses the Facebook login API to add facebook profiles to the site with ease, and you can unlink facebook anytime (and simply continue using the e-mail address)"]]))
 
+
+(defn login-authenticate
+  "Check request username and password against authdata
+  username and passwords.
+  On successful authentication, set appropriate user
+  into the session and redirect to the value of
+  (:next (:query-params request)). On failed
+  authentication, renders the login page."
+  [request]
+  (let [username (get-in request [:form-params "username"])
+        password (get-in request [:form-params "password"])
+        session (:session request)
+        found-password (get authdata (keyword username))]
+    (if (and found-password (= found-password password))
+      (let [next-url (get-in request [:query-params :next] "/")
+            updated-session (assoc session :identity (keyword username))]
+        (-> (redirect next-url)
+            (assoc :session updated-session)))
+      (let [content (slurp (io/resource "login.html"))]
+        (render content request)))))
+
+(defn logout
+  [request]
+  (-> (redirect "/login")
+      (assoc :session {})))
+
 (defroutes ring-routes
   (GET  "/"      ring-req (landing-pg-handler            ring-req))
   (GET  "/chsk"  ring-req (ring-ajax-get-or-ws-handshake ring-req))
   (GET "/pp"     ring-req (pp-page-handler               ring-req)) ;privacy policy
   (POST "/chsk"  ring-req (ring-ajax-post                ring-req))
-  (POST "/login" ring-req (login-handler                 ring-req))
+  (POST "/login" ring-req (login-authenticate            ring-req))
   (route/resources "/") ; Static files, notably public/main.js (our cljs target)
   (route/not-found "<h1>Page not found</h1>"))
+
 
 (def main-ring-handler
   "**NB**: Sente requires the Ring `wrap-params` + `wrap-keyword-params`
   middleware to work. These are included with
   `ring.middleware.defaults/wrap-defaults` - but you'll need to ensure
   that they're included yourself if you're not using `wrap-defaults`."
-  (ring.middleware.defaults/wrap-defaults
-    ring-routes ring.middleware.defaults/site-defaults))
+  (let [my-handler (ring.middleware.defaults/wrap-defaults
+    ring-routes ring.middleware.defaults/site-defaults)]
+      ;; Wrap the ring handler.
+      (def app (-> my-handler
+             (wrap-authentication backend)))))
 
 ;;;; Some server>user async push examples
 

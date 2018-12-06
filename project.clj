@@ -17,6 +17,7 @@
 
    [rum "0.11.2"]
    [alandipert/storage-atom "1.2.4"]
+   [buddy/buddy-auth "2.1.0"] ;atuhentication  | https://funcool.github.io/buddy-auth/latest/#example-session
 
    ;;; TODO Choose (uncomment) a supported web server -----------------------
    [http-kit                             "2.2.0"] ; Default
