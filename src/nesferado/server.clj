@@ -14,10 +14,13 @@
    [taoensso.encore    :as encore :refer (have have?)]
    [taoensso.timbre    :as timbre :refer (tracef debugf infof warnf errorf)]
    [taoensso.sente     :as sente]
+<<<<<<< HEAD
    [buddy.auth :refer [authenticated? throw-unauthorized]]
    [buddy.auth.backends.session :refer [session-backend]]
    [buddy.auth.backends :as backends]
    [buddy.auth.middleware :refer [wrap-authentication]]
+=======
+>>>>>>> parent of 5f49b26... working on the serverside.  buddy-auth
 
    ;;; TODO Choose (uncomment) a supported web server + adapter -------------
    [org.httpkit.server :as http-kit]
@@ -66,18 +69,6 @@
     (when (not= old new)
       (infof "Connected uids change: %s" new))))
 
-
-
-;; buddy-auth
-;; Create an instance
-(def backend (backends/session))
-(def authdata
-  "Global var that stores valid users with their
-   respective passwords."
-  {:username "lopez"
-   :password "giant"})
-
-
 ;;;; Ring handlers
 
 (defn landing-pg-handler [ring-req]
@@ -111,8 +102,6 @@
     [:h2 "Step 4: want to re-randomize Ajax/WebSocket connection type?"]
     [:p "Hit your browser's reload/refresh button"]
 
-    [:div#loginfields]
-
     [:div#start]
     [:div#inputs]
     [:script {:src "js/nesferado.js" :type "text/javascript"}]
@@ -135,6 +124,7 @@
     [:html
      [:p "The Nonforum privacy policy regarding login dialogs and site use is as follows: Depending on your configuration, you may allow nonforum to post on your behalf on other media sites.  This can be disabled.  Nonforum uses the Facebook login API to add facebook profiles to the site with ease, and you can unlink facebook anytime (and simply continue using the e-mail address)"]]))
 
+<<<<<<< HEAD
 
 (defn login-authenticate
   "Check request username and password against authdata
@@ -161,15 +151,18 @@
   (-> (redirect "/login")
       (assoc :session {})))
 
+=======
+>>>>>>> parent of 5f49b26... working on the serverside.  buddy-auth
 (defroutes ring-routes
   (GET  "/"      ring-req (landing-pg-handler            ring-req))
   (GET  "/chsk"  ring-req (ring-ajax-get-or-ws-handshake ring-req))
   (GET "/pp"     ring-req (pp-page-handler               ring-req)) ;privacy policy
   (POST "/chsk"  ring-req (ring-ajax-post                ring-req))
-  (POST "/login" ring-req (login-authenticate            ring-req))
+  (POST "/login" ring-req (login-handler                 ring-req))
   (route/resources "/") ; Static files, notably public/main.js (our cljs target)
   (route/not-found "<h1>Page not found</h1>"))
 
+<<<<<<< HEAD
 
 ;; User defined unauthorized handler
 ;;
@@ -192,16 +185,15 @@
       (redirect (format "/login?next=%s" current-url)))))
 
 
+=======
+>>>>>>> parent of 5f49b26... working on the serverside.  buddy-auth
 (def main-ring-handler
   "**NB**: Sente requires the Ring `wrap-params` + `wrap-keyword-params`
   middleware to work. These are included with
   `ring.middleware.defaults/wrap-defaults` - but you'll need to ensure
   that they're included yourself if you're not using `wrap-defaults`."
-  (let [my-handler (ring.middleware.defaults/wrap-defaults
-    ring-routes ring.middleware.defaults/site-defaults)]
-      ;; Wrap the ring handler.
-      (def app (-> my-handler
-             (wrap-authentication backend)))))
+  (ring.middleware.defaults/wrap-defaults
+    ring-routes ring.middleware.defaults/site-defaults))
 
 ;;;; Some server>user async push examples
 

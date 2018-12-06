@@ -399,19 +399,14 @@
 
 
 
-(rum/defc login-fields []
- [:h1 "Login"]
-  [:form {:method "post"}
-   [:input {:type "text" :place-holder "username:" name="username"}]
-   [:input {:type "password" :place-holder "Password:" name="password"}]
-   [:input {:type "submit" value="Submit"}]])
 
 
 
 (rum/defc input-fields []
   [:div#inputs-contain
    (post-input)
-   (post-comment-input)])
+   (post-comment-input)
+   (nf-login-input)])
 
 (rum/defc start []
   [:div#maincontain
@@ -427,9 +422,6 @@
 
 (rum/mount (input-fields)
            (. js/document (getElementById "inputs")))
-
-(rum/mount (login-fields)
-           (. js/document (getElementById "loginfields")))
 
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on
