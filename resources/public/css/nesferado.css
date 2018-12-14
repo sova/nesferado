@@ -1,16 +1,208 @@
 /* some style */
 
-#tv { border: 1px solid gray;}
+@import url('https://fonts.googleapis.com/css?family=Assistant:300');
+
+
+* { font-family: 'Assistant', sans-serif;}
+
+a:hover { color: #fff; }
+
+a { transition: color 0.5s ease;}
+#tv { border: 1px solid gray;
+      float: left;
+      clear: left;
+      display: block;}
 .heading {
   font-size: 26px;
   color: hsl(180, 90%, 20%);
 }
+.topbar {
+  font-size: 25px;
+  min-height: 40px;
+  margin-top: 0;
+  margin-left: 0;
+  background-color: hsla(240, 50%, 77%, 1.0);
+  color: #fff;
+  display: inline-block;
+  width: 100%;
+  border-radius: 3px;
+}
+
+.topbar>li {  display: inline-block; margin-right: 5%; }
+
+
+.topbar>li>a {color: hsla(240, 50%, 85%, 1.0); text-decoration: none;}
+.topbar>li>a:visited {color: hsla(240, 90%, 67%, 1.0);}
+.topbar>li>a:hover { color: #fff; }
+
+
+.sidebar {
+  border: 1px solid green;
+  float: left;
+  clear: left;
+  display: block;
+  height: 300px;
+  width: 250px;
+  padding: 0;
+  background-color: #eee;
+  margin-right: 25px;
+}
+.sidebar>li {
+  float: left;
+  clear: none;
+  height: 45px;
+  width: 249px;
+  font-size: 35px;
+  background-color: #ccc;
+  border: 1px solid white;
+  border-width: 1px 0 1px 1px;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+#loginbar {
+  height: 300px;
+  border: 1px solid blue;
+  width: 470px;
+  float: left;
+  display: block;
+}
+#loginbar>ol>li {
+  float: left;
+  clear: left;}
+
+#footer {
+  margin: auto;
+  margin-bottom: 1em;
+  float: left;
+  clear: left;
+  background-color: hsla(210, 50%, 50%, 0.1);
+width: 100%;}
+
+
 .fullwidth {
   width: 100%;
   float: left;
   clear: left;
 }
 
+.padleft {
+  padding-left: +5%;
+
+}
+
+.rate {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  border: 1px solid purple;
+  float: right;
+  clear: none;
+  overflow: hidden;
+  margin-right: 4px;
+  margin-top: 6px;
+  z-index: 108;
+}
+
+.item-rate-doubleplus {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 10px;
+  width: 30px;
+  opacity: 0.5;
+  z-index: 109;
+}
+.item-rate-doubleplus:hover { background-color: green;}
+.item-rate-plus {
+  position: absolute;
+  top: 10px;
+  left: 0;
+  height: 10px;
+  width: 30px;
+  opacity: 0.5;
+
+  z-index: 109;
+}
+.item-rate-plus:hover {  background-color: blue;}
+.item-rate-minus {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  height: 10px;
+  width: 30px;
+  opacity: 0.5;
+
+  z-index: 109;
+}
+.item-rate-minus:hover {  background-color: pink;}
+
+
+.item-rating {
+  position: absolute;
+  top: 0;
+  right: 0;
+  float: left;
+  font-size: 32px;
+}
+
+.item-contents {
+  clear: left;
+  position: relative;
+  z-index: 100;
+  display: block;
+  min-height: 35px;
+  margin-right: 35px; /*accomodate rating*/
+
+}
+
+.item-author {
+  clear: left;
+  display: block;
+}
+
+.nocomments {
+  border: 1px solid #eee;
+  border-width: 0px;
+  border-radius: 3px;
+  padding-bottom: 3px;
+
+}
+
+.hascomments {
+  border: 1px solid hsl(120, 70%, 30%, 0.2);
+  border-width: 0px;
+  border-radius: 5px;
+}
+
+.justMounted {
+    -webkit-animation: fade 0.5s;
+    animation: fade 0.5s;
+    opacity: 1;
+}
+
+
+.genpost {
+    padding: 3px;
+  border-radius: 3px;}
+
+.selectedParent {
+  background-color: hsla(310, 70%, 30%, .35);
+}
+
+.replySelected {
+  background-color: hsla(310, 70%, 30%, .35);}
+
+.selectedChild {
+  background-color: hsl(250, 50%, 50%, 0.1);
+}
+
+.freshPost {
+  background-color: hsla(117, 50%, 50%, 0.3);
+}
 .fbfb {
   background-color: lightblue;
 }
@@ -29,10 +221,39 @@
   border: 1px solid blue;
 }
 
+#inputs {
+  display: block;
+  padding-bottom: 200px;
+}
 #postinput {
+  float: left;
+  clear: left;
+  width: 100%;
   border: 1px solid orange;
+  display: block;
+}
+
+#postinput>input {
+  width: 98%;
 }
 
 #postcommentinput {
+  display: block;
   border: 1px solid lightblue;
 }
+
+#maincontain {
+  float: left;
+  clear: left;
+}
+
+
+@-webkit-keyframes fade {
+    from {opacity: 0}
+    to {opacity: 1}
+}@keyframes fade {
+    from {opacity: 0}
+    to {opacity: 1}
+}
+
+

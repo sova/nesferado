@@ -1,6 +1,6 @@
 (ns nesferado.server
-  "Official Sente reference example: server"
-  {:author "Peter Taoussanis (@ptaoussanis)"}
+  "nonforum server based on sente"
+  {:author "@_vaso"}
 
   (:require
    [clojure.string     :as str]
@@ -96,7 +96,9 @@
     [:p "Hit your browser's reload/refresh button"]
 
     [:div#start]
+    [:div#thread]
     [:div#inputs]
+    [:div#footing]
     [:script {:src "js/nesferado.js" :type "text/javascript"}]
     ))
 
@@ -117,35 +119,32 @@
     [:html
      [:p "The Nonforum privacy policy regarding login dialogs and site use is as follows: Depending on your configuration, you may allow nonforum to post on your behalf on other media sites.  This can be disabled.  Nonforum uses the Facebook login API to add facebook profiles to the site with ease, and you can unlink facebook anytime (and simply continue using the e-mail address)"]]))
 
-<<<<<<< HEAD
-
-(defn login-authenticate
-  "Check request username and password against authdata
-  username and passwords.
-  On successful authentication, set appropriate user
-  into the session and redirect to the value of
-  (:next (:query-params request)). On failed
-  authentication, renders the login page."
-  [request]
-  (let [username (get-in request [:form-params "username"])
-        password (get-in request [:form-params "password"])
-        session (:session request)
-        found-password (get authdata (keyword username))]
-    (if (and found-password (= found-password password))
-      (let [next-url (get-in request [:query-params :next] "/")
-            updated-session (assoc session :identity (keyword username))]
-        (-> (redirect next-url)
-            (assoc :session updated-session)))
-      (let [content landing-pg-handler]
-        (render content request)))))
+;(defn login-authenticate
+;  "Check request username and password against authdata
+;  username and passwords.
+;  On successful authentication, set appropriate user
+;  into the session and redirect to the value of
+;  (:next (:query-params request)). On failed
+;  authentication, renders the login page."
+;  [request]
+;  (let [username (get-in request [:form-params "username"])
+;        password (get-in request [:form-params "password"])
+;        session (:session request)
+;        found-password (get authdata (keyword username))]
+;    (if (and found-password (= found-password password))
+;      (let [next-url (get-in request [:query-params :next] "/")
+;            updated-session (assoc session :identity (keyword username))]
+;        (-> (redirect next-url)
+;            (assoc :session updated-session)))
+;      (let [content landing-pg-handler]
+;        (render content request)))))
+;from buddy auht
 
 (defn logout
   [request]
   (-> (redirect "/login")
       (assoc :session {})))
 
-=======
->>>>>>> parent of 5f49b26... working on the serverside.  buddy-auth
 (defroutes ring-routes
   (GET  "/"      ring-req (landing-pg-handler            ring-req))
   (GET  "/chsk"  ring-req (ring-ajax-get-or-ws-handshake ring-req))
@@ -155,31 +154,27 @@
   (route/resources "/") ; Static files, notably public/main.js (our cljs target)
   (route/not-found "<h1>Page not found</h1>"))
 
-<<<<<<< HEAD
-
 ;; User defined unauthorized handler
 ;;
 ;; This function is responsible for handling
 ;; unauthorized requests (when unauthorized exception
 ;; is raised by some handler)
+;;buudy auth provided unauth handler
+;(defn unauthorized-handler
+;  [request metadata]
+;  (cond
+;    ;; If request is authenticated, raise 403 instead
+;    ;; of 401 (because user is authenticated but permission
+;    ;; denied is raised).
+;    (authenticated? request)
+;    (-> (render (slurp (io/resource "error.html")) request)
+;        (assoc :status 403))
+;    ;; In other cases, redirect the user to login page.
+;    :else
+;    (let [current-url (:uri request)]
+;      (redirect (format "/login?next=%s" current-url)))))
 
-(defn unauthorized-handler
-  [request metadata]
-  (cond
-    ;; If request is authenticated, raise 403 instead
-    ;; of 401 (because user is authenticated but permission
-    ;; denied is raised).
-    (authenticated? request)
-    (-> (render (slurp (io/resource "error.html")) request)
-        (assoc :status 403))
-    ;; In other cases, redirect the user to login page.
-    :else
-    (let [current-url (:uri request)]
-      (redirect (format "/login?next=%s" current-url)))))
 
-
-=======
->>>>>>> parent of 5f49b26... working on the serverside.  buddy-auth
 (def main-ring-handler
   "**NB**: Sente requires the Ring `wrap-params` + `wrap-keyword-params`
   middleware to work. These are included with

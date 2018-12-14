@@ -1,6 +1,6 @@
 (ns nesferado.client
-  "Official Sente reference example: client"
-  {:author "Peter Taoussanis (@ptaoussanis)"}
+  "nonforum client based on sente"
+  {:author "@_vaso"}
 
   (:require
    [clojure.string  :as str]
@@ -173,6 +173,17 @@
 
 
  ;define your app data so that it doesn't get over-written on reload
+
+
+
+
+ (def auth-db (atom [{:username "lopez"
+                    :password "great"}
+                   {:username "vas"
+                    :password "haxor5"}]))
+
+
+
 
 (defn err0r []
   (println "err0r"))
