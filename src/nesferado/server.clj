@@ -14,13 +14,6 @@
    [taoensso.encore    :as encore :refer (have have?)]
    [taoensso.timbre    :as timbre :refer (tracef debugf infof warnf errorf)]
    [taoensso.sente     :as sente]
-<<<<<<< HEAD
-   [buddy.auth :refer [authenticated? throw-unauthorized]]
-   [buddy.auth.backends.session :refer [session-backend]]
-   [buddy.auth.backends :as backends]
-   [buddy.auth.middleware :refer [wrap-authentication]]
-=======
->>>>>>> parent of 5f49b26... working on the serverside.  buddy-auth
 
    ;;; TODO Choose (uncomment) a supported web server + adapter -------------
    [org.httpkit.server :as http-kit]

@@ -1,0 +1,28 @@
+Revert "working on the serverside.  buddy-auth"
+
+This reverts commit 5f49b26e30b2cc5ca4af8cad9b64d8b6f36af853.
+Yes, buddy seems to do nothing useful for me aside from authenticateD?  so i'll just roll my own i think.
+
+# Conflicts:
+#	resources/public/js/nesferado/client.cljs.cache.json
+#	resources/public/js/nesferado/client.js
+#	resources/public/js/nesferado/client.js.map
+#	src/nesferado/server.clj
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch is up-to-date with 'origin/master'.
+#
+# You are currently reverting commit 5f49b26.
+#
+# Changes to be committed:
+#	modified:   project.clj
+#	modified:   resources/public/js/cljs_deps.js
+#	modified:   resources/public/js/nesferado.js
+#	modified:   resources/public/js/nesferado/client.cljs.cache.json
+#	modified:   resources/public/js/nesferado/client.js
+#	modified:   resources/public/js/nesferado/client.js.map
+#	modified:   src/nesferado/client.cljs
+#	modified:   src/nesferado/server.clj
+#
