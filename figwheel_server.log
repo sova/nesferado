@@ -113,3 +113,8 @@ notifying browser that file changed:  resources/public/js/nesferado/client.js
 Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
 [32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 4.983 seconds.[0m
 notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 56.474 seconds.[0m
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  resources/public/js/nesferado/client.js

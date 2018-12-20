@@ -17,6 +17,7 @@
 
    [rum "0.11.2"]
    [alandipert/storage-atom "1.2.4"]
+   [crypto-password "0.2.0"]
 
    ;;; TODO Choose (uncomment) a supported web server -----------------------
    [http-kit                             "2.2.0"] ; Default

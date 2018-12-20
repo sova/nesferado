@@ -5,6 +5,19 @@
 
 * { font-family: 'Assistant', sans-serif;}
 
+.showing {
+  display: visible;
+  height: auto;
+  transition: height ease 0.5s;
+}
+
+.notshowing {
+  height: 20px;
+  background-color: darkblue;
+  overflow: hidden;
+  transition: height ease 0.5s;
+}
+
 a:hover { color: #fff; }
 
 a { transition: color 0.5s ease;}
@@ -59,6 +72,11 @@ a { transition: color 0.5s ease;}
   list-style-type: none;
   margin: 0;
   padding: 0;
+}
+
+.comments-area {
+  display: block;
+  height: auto;
 }
 
 #loginbar {

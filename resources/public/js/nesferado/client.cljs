@@ -175,8 +175,6 @@
  ;define your app data so that it doesn't get over-written on reload
 
 
-
-
  (def auth-db (atom [{:username "lopez"
                     :password "great"}
                    {:username "vas"
@@ -256,6 +254,7 @@
                            :priority 1
                            :posted-by "v@nonforum.com"
                            :timestamp 808080808
+                           :comments [69]
                            :parent nil}
                           {:title "Let's Put Sun Panels on the Roof"
                            :contents "Put a powerplant on your home and be free of your electric bill"
@@ -290,6 +289,7 @@
                           :create-username ""
                           :create-password ""
                           :create-password2 ""
+                          :showing []
                           }]}))
 
 (defn js-reload []
@@ -603,6 +603,12 @@
     [:li.nfca "Create a Nonforum account:" (create-account-input)]]]
    ;(fb-sdk 1417763311691300) ;nonforum app id
    )
+
+(defn check-if-showing [id]
+  (let [showsters (get-in @input-state [:inputs 0 :showing])]
+    (if (contains? showsters id)
+      "showing"
+      "notshowing")))
 
 (rum/defc tv-cell [td]
   [:li [:div.tile {:id (str "tile" (:priority td))}

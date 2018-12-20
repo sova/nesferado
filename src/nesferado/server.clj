@@ -14,6 +14,7 @@
    [taoensso.encore    :as encore :refer (have have?)]
    [taoensso.timbre    :as timbre :refer (tracef debugf infof warnf errorf)]
    [taoensso.sente     :as sente]
+   [crypto.password.pbkdf2 :as password]
 
    ;;; TODO Choose (uncomment) a supported web server + adapter -------------
    [org.httpkit.server :as http-kit]
@@ -108,37 +109,41 @@
   with whatever user-id they provided in the auth request."
   [ring-req]
   (let [{:keys [session params]} ring-req
-        {:keys [user-id]} params]
+        {:keys [user-id]} params
+        login-time (quot (System/currentTimeMillis) 1)]
     (debugf "Login request: %s" params)
-    {:status 200 :session (assoc session :uid user-id)}))
 
-(defn pp-page-handler
-  "Privacy Policy regarding data collection and login."
-  [ring-req]
-  (hiccup/html
-    [:html
-     [:p "The Nonforum privacy policy regarding login dialogs and site use is as follows: Depending on your configuration, you may allow nonforum to post on your behalf on other media sites.  This can be disabled.  Nonforum uses the Facebook login API to add facebook profiles to the site with ease, and you can unlink facebook anytime (and simply continue using the e-mail address)"]]))
+    {:status 200 :session (assoc session {:uid user-id
+                                          :login-time login-time
+                                          :auth-key (password/encrypt (str user-id login-time))})}))
 
-;(defn login-authenticate
-;  "Check request username and password against authdata
-;  username and passwords.
-;  On successful authentication, set appropriate user
-;  into the session and redirect to the value of
-;  (:next (:query-params request)). On failed
-;  authentication, renders the login page."
-;  [request]
-;  (let [username (get-in request [:form-params "username"])
-;        password (get-in request [:form-params "password"])
-;        session (:session request)
-;        found-password (get authdata (keyword username))]
-;    (if (and found-password (= found-password password))
-;      (let [next-url (get-in request [:query-params :next] "/")
-;            updated-session (assoc session :identity (keyword username))]
-;        (-> (redirect next-url)
-;            (assoc :session updated-session)))
-;      (let [content landing-pg-handler]
-;        (render content request)))))
-;from buddy auht
+
+(password/encrypt "userpass")
+(quot (System/currentTimeMillis) 1)
+
+(let [login-time (System/currentTimeMillis)
+      user-email "stan@southpark.co.us"
+      encrypted (password/encrypt (str user-email login-time))]
+
+  (password/check (str user-email login-time) encrypted))
+
+
+(defn create-auth-token-map [user-email]
+  (let [login-time (System/currentTimeMillis)
+        encrypted (password/encrypt (str user-email login-time))]
+    {:auth-token  encrypted
+     :login-time login-time}))
+
+(defn is-good-auth-token [user-email login-time]
+  (let [encrypted (password/encrypt (str user-email login-time))]
+    (password/check (str user-email login-time) encrypted)))
+
+
+(let [user "vas@nonforum.com"
+      auth-map (create-auth-token-map user)
+      token (:auth-token auth-map)
+      login-time (:login-time auth-map)]
+  (is-good-auth-token user login-time))
 
 (defn logout
   [request]
@@ -303,6 +308,6 @@
 
 (defn -main "For `lein run`, etc." [] (start!))
 
-(comment
+;(comment
   (start!)
-  (test-fast-server>user-pushes))
+  (test-fast-server>user-pushes);)
