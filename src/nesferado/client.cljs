@@ -165,6 +165,42 @@
 
               (fn [ajax-resp]
                 (->output! "Ajax login response: %s" ajax-resp)
+                (.log js/console ajax-resp)
+                (let [login-successful? true ; Your logic here
+                      ]
+                  (if-not login-successful?
+                    (->output! "Login failed")
+                    (do
+                      (->output! "Login successful")
+                      (sente/chsk-reconnect! chsk))))))))))))
+
+
+(when-let [target-el (.getElementById js/document "crsubmit")]
+  (.addEventListener target-el "click"
+    (fn [ev]
+      (let [user-id (.-value (.getElementById js/document "cruser"))
+            pw      (.-value (.getElementById js/document "crpass"))
+            pw2     (.-value (.getElementById js/document "crpass2"))]
+        (if (str/blank? user-id)
+          (js/alert "Please enter a user-id first")
+          (do
+            (->output! "Creating account %s" user-id)
+
+            ;;; Use any login procedure you'd like. Here we'll trigger an Ajax
+            ;;; POST request that resets our server-side session. Then we ask
+            ;;; our channel socket to reconnect, thereby picking up the new
+            ;;; session.
+
+            (sente/ajax-lite "/create-account"
+              {:method :post
+               :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
+               :params  {:user-id (str user-id)
+                         :password (str pw)
+                         :password2 (str pw2)}}
+
+              (fn [ajax-resp]
+                (->output! "Account creation response: %s" ajax-resp)
+                (.log js/console ajax-resp)
                 (let [login-successful? true ; Your logic here
                       ]
                   (if-not login-successful?
@@ -526,19 +562,19 @@
 
  (rum/defc create-account-fields []
   [:form#nfcreate
-   [:input.fullwidth {:place-holder "username" :name "username"
+   [:input#cruser.fullwidth {:place-holder "username" :name "username"
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :create-username] (.-value (.-target e)))
                                               (.log js/console (get-in @input-state [:inputs 0 :create-username]))))}]
-   [:input.fullwidth {:place-holder "password" :type "password" :name "password"
+   [:input#crpass.fullwidth {:place-holder "password" :type "password" :name "password"
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :create-password] (.-value (.-target e)))
                                               (.log js/console (get-in @input-state [:inputs 0 :create-password]))))}]
-   [:input.fullwidth {:place-holder "pw confirm" :type "password" :name "password2"
+   [:input#crpass2.fullwidth {:place-holder "pw confirm" :type "password" :name "password2"
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :create-password2] (.-value (.-target e)))
                                               (.log js/console (get-in @input-state [:inputs 0 :create-password2]))))}]
-   [:button.fullwidth {:type "button"
+   [:button#crsubmit.fullwidth {:type "button"
                        :on-click (fn [e] (let [username  (get-in @input-state [:inputs 0 :create-username])
                                                password  (get-in @input-state [:inputs 0 :create-password])
                                                password2 (get-in @input-state [:inputs 0 :create-password2])]

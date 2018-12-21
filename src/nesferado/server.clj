@@ -14,6 +14,7 @@
    [taoensso.encore    :as encore :refer (have have?)]
    [taoensso.timbre    :as timbre :refer (tracef debugf infof warnf errorf)]
    [taoensso.sente     :as sente]
+   [rum.core :as rum]
    [crypto.password.pbkdf2 :as password]
    [org.httpkit.server :as http-kit]
    [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
@@ -63,12 +64,6 @@
 (add-user "nelly" "18")
 
 
-
-(filter #(= "nelly" (:username %)) @auth-db)
-
-auth-db
-
-
 (defn check-login-against-db [useremail password]
   (let [user-map (first (filter #(= useremail (:username %)) @auth-db))
         username (:username user-map)
@@ -77,6 +72,19 @@ auth-db
     check-pass-bool))
 
 (check-login-against-db "nelly" "18")
+
+
+
+(defn username-not-taken [user-id]
+  (let [user-map (first (filter #(= user-id (:username %)) @auth-db))]
+    (if (empty? user-map)
+      true
+      false)))
+
+(username-not-taken "vasx")
+
+
+
 ;;;; Ring handlers
 
 (defn landing-pg-handler [ring-req]
@@ -118,6 +126,7 @@ auth-db
     [:script {:src "js/nesferado.js" :type "text/javascript"}]
     ))
 
+
 (defn login-handler
   "Here's where you'll add your server-side login/auth procedure (Friend, etc.).
   In our simplified example we'll just always successfully authenticate the user
@@ -128,11 +137,35 @@ auth-db
         login-time (quot (System/currentTimeMillis) 1)]
     (println "nf login req: %s" user-id)
     (if (check-login-against-db user-id password)
-      {:status 200 :session (merge session  {:uid user-id
-                                            :login-time login-time
-                                            :auth-key (password/encrypt (str user-id login-time))})}
+      {:status 200
+       :session (merge session  {:uid user-id
+                                  :login-time login-time
+                                  :auth-key (password/encrypt (str user-id login-time))})
+       }
       ;else
       {:status 302 :session {}})))
+
+
+(defn create-account-handler
+  "Here's where you'll add your server-side login/auth procedure (Friend, etc.).
+  In our simplified example we'll just always successfully authenticate the user
+  with whatever user-id they provided in the auth request."
+  [ring-req]
+  (let [{:keys [session params]} ring-req
+        {:keys [user-id password password2]} params
+        login-time (quot (System/currentTimeMillis) 1)]
+    (println "nf create account req: %s" user-id)
+    (if (= password password2)
+      (if (username-not-taken user-id)
+        (do
+          (add-user user-id password)
+          {:status 200
+           :session (merge session  {:uid user-id
+                                     :login-time login-time
+                                     :auth-key (password/encrypt (str user-id login-time))})}))
+      ;else
+      {:status 302 :session {}})))
+
 
 
 (password/encrypt "userpass")
@@ -146,20 +179,34 @@ auth-db
 
 
 (defn create-auth-token-map [user-email]
-  (let [login-time (quot (System/currentTimeMillis) 1000)
+  (let [login-time  (quot (System/currentTimeMillis) 1000)
+        encrypted (password/encrypt (str user-email login-time))]
+    {:auth-token  encrypted
+     :login-time login-time}))
+
+(defn create-old-auth-token-map [user-email]
+  (let [login-time  (+ (quot (System/currentTimeMillis) 1000) 1400000)
         encrypted (password/encrypt (str user-email login-time))]
     {:auth-token  encrypted
      :login-time login-time}))
 
 (defn is-good-auth-key [auth-key user-email login-time]
-    (password/check (str user-email login-time) auth-key))
+  (let [now (quot (System/currentTimeMillis) 1000)
+        phase (- login-time now)
+        shift 1300000 ;1.3 mil seconds = 2 weeks
+
+        valid? (< phase shift)]
+      (and valid? (password/check (str user-email login-time) auth-key))))
 
 
 (let [user "vas@nonform.com"
-      auth-map (create-auth-token-map user)
+      auth-map (create-old-auth-token-map user)
       token (:auth-token auth-map)
       login-time (:login-time auth-map)]
+     (println login-time)
   (is-good-auth-key token user login-time))
+
+
 
 (defn logout
   [request]
@@ -171,6 +218,7 @@ auth-db
   (GET  "/chsk"  ring-req (ring-ajax-get-or-ws-handshake ring-req))
   (POST "/chsk"  ring-req (ring-ajax-post                ring-req))
   (POST "/login" ring-req (login-handler                 ring-req))
+  (POST "/create-account" ring-req (create-account-handler ring-req))
   (route/resources "/") ; Static files, notably public/main.js (our cljs target)
   (route/not-found "<h1>Page not found</h1>"))
 
@@ -281,6 +329,18 @@ auth-db
     (println auth-key)
     (println (is-good-auth-key auth-key uid login-time))))
 
+(defmethod -event-msg-handler
+  :clientsent/newpost ; Default/fallback case (no other matching handler)
+  [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
+  (let [session (:session ring-req)
+        uid     (:uid     session)
+        auth-key (:auth-key session)
+        login-time (:login-time session)]
+    ;(println  session)
+    (println uid)
+    (println auth-key)
+    (println (is-good-auth-key auth-key uid login-time))))
+
    ; (when ?reply-fn
     ;  (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
 
@@ -302,27 +362,12 @@ auth-db
 (defn  stop-web-server! [] (when-let [stop-fn @web-server_] (stop-fn)))
 (defn start-web-server! [& [port]]
   (stop-web-server!)
-  (let [port (or port 0) ; 0 => Choose any available port
+  (let [port (or port 3773) ; 0 => Choose any available port
         ring-handler (var main-ring-handler)
 
         [port stop-fn]
-        ;;; TODO Choose (uncomment) a supported web server ------------------
         (let [stop-fn (http-kit/run-server ring-handler {:port port})]
           [(:local-port (meta stop-fn)) (fn [] (stop-fn :timeout 100))])
-        ;;
-        ;; (let [server (immutant/run ring-handler :port port)]
-        ;;   [(:port server) (fn [] (immutant/stop server))])
-        ;;
-        ;; (let [port (nginx-clojure/run-server ring-handler {:port port})]
-        ;;   [port (fn [] (nginx-clojure/stop-server))])
-        ;;
-        ;; (let [server (aleph/start-server ring-handler {:port port})
-        ;;       p (promise)]
-        ;;   (future @p) ; Workaround for Ref. https://goo.gl/kLvced
-        ;;   ;; (aleph.netty/wait-for-close server)
-        ;;   [(aleph.netty/port server)
-        ;;    (fn [] (.close ^java.io.Closeable server) (deliver p nil))])
-        ;; ------------------------------------------------------------------
 
         uri (format "http://localhost:%s/" port)]
 
