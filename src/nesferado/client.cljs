@@ -103,7 +103,7 @@
   (.addEventListener target-el "click"
     (fn [ev]
       (->output! "Button 1 was clicked (won't receive any reply from server)")
-      (chsk-send! [:example/button1 {:had-a-callback? "nope"}]))))
+      (chsk-send! [:clientsent/ping]))))
 
 (when-let [target-el (.getElementById js/document "btn2")]
   (.addEventListener target-el "click"

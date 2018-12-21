@@ -113,9 +113,9 @@
         login-time (quot (System/currentTimeMillis) 1)]
     (debugf "Login request: %s" params)
 
-    {:status 200 :session (assoc session {:uid user-id
-                                          :login-time login-time
-                                          :auth-key (password/encrypt (str user-id login-time))})}))
+    {:status 200 :session (merge session  {:uid user-id
+                                           :login-time login-time
+                                           :auth-key (password/encrypt (str user-id login-time))})}))
 
 
 (password/encrypt "userpass")
@@ -134,16 +134,15 @@
     {:auth-token  encrypted
      :login-time login-time}))
 
-(defn is-good-auth-token [user-email login-time]
-  (let [encrypted (password/encrypt (str user-email login-time))]
-    (password/check (str user-email login-time) encrypted)))
+(defn is-good-auth-key [auth-key user-email login-time]
+    (password/check (str user-email login-time) auth-key))
 
 
 (let [user "vas@nonforum.com"
       auth-map (create-auth-token-map user)
       token (:auth-token auth-map)
       login-time (:login-time auth-map)]
-  (is-good-auth-token user login-time))
+  (is-good-auth-key user login-time token))
 
 (defn logout
   [request]
@@ -153,7 +152,6 @@
 (defroutes ring-routes
   (GET  "/"      ring-req (landing-pg-handler            ring-req))
   (GET  "/chsk"  ring-req (ring-ajax-get-or-ws-handshake ring-req))
-  (GET "/pp"     ring-req (pp-page-handler               ring-req)) ;privacy policy
   (POST "/chsk"  ring-req (ring-ajax-post                ring-req))
   (POST "/login" ring-req (login-handler                 ring-req))
   (route/resources "/") ; Static files, notably public/main.js (our cljs target)
@@ -253,6 +251,21 @@
   [{:as ev-msg :keys [?reply-fn]}]
   (let [loop-enabled? (swap! broadcast-enabled?_ not)]
     (?reply-fn loop-enabled?)))
+
+(defmethod -event-msg-handler
+  :clientsent/ping ; Default/fallback case (no other matching handler)
+  [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
+  (let [session (:session ring-req)
+        uid     (:uid     session)
+        auth-key (:auth-key session)
+        login-time (:login-time session)]
+    ;(println  session)
+    (println uid)
+    (println auth-key)
+    (println (is-good-auth-key uid login-time auth-key))))
+
+   ; (when ?reply-fn
+    ;  (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
 
 ;; TODO Add your (defmethod -event-msg-handler <event-id> [ev-msg] <body>)s here...
 
