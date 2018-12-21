@@ -145,7 +145,8 @@
 (when-let [target-el (.getElementById js/document "btn-login")]
   (.addEventListener target-el "click"
     (fn [ev]
-      (let [user-id (.-value (.getElementById js/document "input-login"))]
+      (let [user-id (.-value (.getElementById js/document "input-login"))
+            pw      (.-value (.getElementById js/document "input-pw"))]
         (if (str/blank? user-id)
           (js/alert "Please enter a user-id first")
           (do
@@ -159,7 +160,8 @@
             (sente/ajax-lite "/login"
               {:method :post
                :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
-               :params  {:user-id (str user-id)}}
+               :params  {:user-id (str user-id)
+                         :password (str pw)}}
 
               (fn [ajax-resp]
                 (->output! "Ajax login response: %s" ajax-resp)

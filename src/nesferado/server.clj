@@ -51,6 +51,32 @@
     (when (not= old new)
       (infof "Connected uids change: %s" new))))
 
+
+
+(def auth-db (atom []))
+
+
+(defn add-user [user-email pw]
+  (swap! auth-db conj {:username user-email :password (password/encrypt pw)}))
+
+(add-user "vas" "l337")
+(add-user "nelly" "18")
+
+
+
+(filter #(= "nelly" (:username %)) @auth-db)
+
+auth-db
+
+
+(defn check-login-against-db [useremail password]
+  (let [user-map (first (filter #(= useremail (:username %)) @auth-db))
+        username (:username user-map)
+        hash-pass (:password user-map)
+      check-pass-bool (password/check password hash-pass)]
+    check-pass-bool))
+
+(check-login-against-db "nelly" "18")
 ;;;; Ring handlers
 
 (defn landing-pg-handler [ring-req]
@@ -78,7 +104,8 @@
     [:p  "The server can use this id to send events to *you* specifically."]
     [:p
      [:input#input-login {:type :text :placeholder "User-id"}]
-     [:button#btn-login {:type "button"} "Secure login!"]]
+     [:input#input-pw {:type :password :placeholder "password"}]
+     [:button#btn-login {:type "button"} "Login!"]]
     ;;
     [:hr]
     [:h2 "Step 4: want to re-randomize Ajax/WebSocket connection type?"]
@@ -97,13 +124,15 @@
   with whatever user-id they provided in the auth request."
   [ring-req]
   (let [{:keys [session params]} ring-req
-        {:keys [user-id]} params
+        {:keys [user-id password]} params
         login-time (quot (System/currentTimeMillis) 1)]
-    (debugf "Login request: %s" params)
-
-    {:status 200 :session (merge session  {:uid user-id
-                                           :login-time login-time
-                                           :auth-key (password/encrypt (str user-id login-time))})}))
+    (println "nf login req: %s" user-id)
+    (if (check-login-against-db user-id password)
+      {:status 200 :session (merge session  {:uid user-id
+                                            :login-time login-time
+                                            :auth-key (password/encrypt (str user-id login-time))})}
+      ;else
+      {:status 302 :session {}})))
 
 
 (password/encrypt "userpass")
@@ -250,7 +279,7 @@
     ;(println  session)
     (println uid)
     (println auth-key)
-    (println (is-good-auth-key uid login-time auth-key))))
+    (println (is-good-auth-key auth-key uid login-time))))
 
    ; (when ?reply-fn
     ;  (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
