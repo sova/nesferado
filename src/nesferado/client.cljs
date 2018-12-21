@@ -175,42 +175,8 @@
                       (sente/chsk-reconnect! chsk))))))))))))
 
 
-(when-let [target-el (.getElementById js/document "crsubmit")]
-  (.addEventListener target-el "click"
-    (fn [ev]
-      (let [user-id (.-value (.getElementById js/document "cruser"))
-            pw      (.-value (.getElementById js/document "crpass"))
-            pw2     (.-value (.getElementById js/document "crpass2"))]
-        (if (str/blank? user-id)
-          (js/alert "Please enter a user-id first")
-          (do
-            (->output! "Creating account %s" user-id)
-
-            ;;; Use any login procedure you'd like. Here we'll trigger an Ajax
-            ;;; POST request that resets our server-side session. Then we ask
-            ;;; our channel socket to reconnect, thereby picking up the new
-            ;;; session.
-
-            (sente/ajax-lite "/create-account"
-              {:method :post
-               :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
-               :params  {:user-id (str user-id)
-                         :password (str pw)
-                         :password2 (str pw2)}}
-
-              (fn [ajax-resp]
-                (->output! "Account creation response: %s" ajax-resp)
-                (.log js/console ajax-resp)
-                (let [login-successful? true ; Your logic here
-                      ]
-                  (if-not login-successful?
-                    (->output! "Login failed")
-                    (do
-                      (->output! "Login successful")
-                      (sente/chsk-reconnect! chsk))))))))))))
 
 
- ;define your app data so that it doesn't get over-written on reload
 
 
  (def auth-db (atom [{:username "lopez"
@@ -763,6 +729,43 @@
 
 (rum/mount (footer)
            (. js/document (getElementById "footing")))
+
+
+(when-let [target-el (.getElementById js/document "crsubmit")]
+  (.addEventListener target-el "click"
+    (fn [ev]
+      (let [user-id (.-value (.getElementById js/document "cruser"))
+            pw      (.-value (.getElementById js/document "crpass"))
+            pw2     (.-value (.getElementById js/document "crpass2"))]
+        (if (str/blank? user-id)
+          (js/alert "Please enter a user-id first")
+          (do
+            (->output! "Creating account %s" user-id)
+
+            ;;; Use any login procedure you'd like. Here we'll trigger an Ajax
+            ;;; POST request that resets our server-side session. Then we ask
+            ;;; our channel socket to reconnect, thereby picking up the new
+            ;;; session.
+
+            (sente/ajax-lite "/create-account"
+              {:method :post
+               :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
+               :params  {:user-id (str user-id)
+                         :password (str pw)
+                         :password2 (str pw2)}}
+
+              (fn [ajax-resp]
+                (->output! "Account creation response: %s" ajax-resp)
+                (let [http-status (:?status ajax-resp)
+                      account-create-successful? (= 200 http-status)]
+                  (if-not account-create-successful?
+                    (->output! "Account Creation Failed.")
+                    (do
+                      (->output! "Account Creation Success!  Now Logged in.")
+                      (sente/chsk-reconnect! chsk))))))))))))
+
+
+
 (defn on-js-reload []
   ;; optionally touch your app-state to force rerendering depending on
   ;; your application
