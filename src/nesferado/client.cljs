@@ -28,13 +28,13 @@
     (aset output-el "value" (str "• " (.-value output-el) "\n" msg))
     (aset output-el "scrollTop" (.-scrollHeight output-el))))
 
-(->output! "ClojureScript appears to have loaded correctly.")
+(->output! "Welcome to Nonforum")
 
 ;;;; Define our Sente channel socket (chsk) client
 
 (let [;; For this example, select a random protocol:
       rand-chsk-type (if (>= (rand) 0.5) :ajax :auto)
-      _ (->output! "Randomly selected chsk type: %s" rand-chsk-type)
+      ;_ (->output! "Randomly selected chsk type: %s" rand-chsk-type)
 
       ;; Serializtion format, must use same val for client + server:
       packer :edn ; Default packer, a good choice in most cases
@@ -78,7 +78,7 @@
 
 (defmethod -event-msg-handler :chsk/recv
   [{:as ev-msg :keys [?data]}]
-  (->output! "Push event from server: %s" ?data))
+ ; (->output! "Push event from server: %s" ?data))
 
 (defmethod -event-msg-handler :chsk/handshake
   [{:as ev-msg :keys [?data]}]
@@ -755,7 +755,7 @@
                          :password2 (str pw2)}}
 
               (fn [ajax-resp]
-                (->output! "Account creation response: %s" ajax-resp)
+                ;(->output! "Account creation response: " ajax-resp)
                 (let [http-status (:?status ajax-resp)
                       account-create-successful? (= 200 http-status)]
                   (if-not account-create-successful?

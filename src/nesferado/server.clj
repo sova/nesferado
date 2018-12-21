@@ -85,6 +85,37 @@
 
 
 
+(defn create-auth-token-map [user-email]
+  (let [login-time  (quot (System/currentTimeMillis) 1000)
+        encrypted (password/encrypt (str user-email login-time))]
+    {:auth-token  encrypted
+     :login-time login-time}))
+
+(defn create-old-auth-token-map [user-email]
+  (let [login-time  (+ (quot (System/currentTimeMillis) 1000) 1400000)
+        encrypted (password/encrypt (str user-email login-time))]
+    {:auth-token  encrypted
+     :login-time login-time}))
+
+(defn is-good-auth-key [auth-key user-email login-time]
+  (let [now (quot (System/currentTimeMillis) 1000)
+        phase (- login-time now)
+        shift 1300000 ;1.3 mil seconds = 2 weeks
+
+        valid? (< phase shift)]
+      (and valid? (password/check (str user-email login-time) auth-key))))
+
+
+(let [user "vas@nonform.com"
+      auth-map (create-auth-token-map user)
+      token (:auth-token auth-map)
+      login-time (:login-time auth-map)]
+     (println login-time)
+  (is-good-auth-key token user login-time))
+
+
+
+
 ;;;; Ring handlers
 
 (defn landing-pg-handler [ring-req]
@@ -137,13 +168,14 @@
         login-time (quot (System/currentTimeMillis) 1)]
     (println "nf login req: %s" user-id)
     (if (check-login-against-db user-id password)
-      {:status 200
-       :session (merge session  {:uid user-id
-                                  :login-time login-time
-                                  :auth-key (password/encrypt (str user-id login-time))})
-       }
+      (let [auth-map (create-auth-token-map user-id)]
+        {:status 200
+         :session (merge session  {:uid user-id
+                                   :login-time (:login-time auth-map)
+                                   :auth-token (:auth-token auth-map)})
+         })
       ;else
-      {:status 302 :session {}})))
+      {:status 302 :session session})))
 
 
 (defn create-account-handler
@@ -152,19 +184,19 @@
   with whatever user-id they provided in the auth request."
   [ring-req]
   (let [{:keys [session params]} ring-req
-        {:keys [user-id password password2]} params
-        login-time (quot (System/currentTimeMillis) 1)]
+        {:keys [user-id password password2]} params]
     (println "nf create account req: %s" user-id)
     (if (= password password2)
       (if (username-not-taken user-id)
         (do
           (add-user user-id password)
-          {:status 200
-           :session (merge session  {:uid user-id
-                                     :login-time login-time
-                                     :auth-key (password/encrypt (str user-id login-time))})}))
-      ;else
-      {:status 302 :session {}})))
+          (let [auth-map (create-auth-token-map user-id)]
+            {:status 200
+             :session (merge session  {:uid user-id
+                                       :login-time (:login-time auth-map)
+                                       :auth-token (:auth-token auth-map)})}))
+        ;else
+        {:status 302 :session session}))))
 
 
 
@@ -176,35 +208,6 @@
       encrypted (password/encrypt (str user-email login-time))]
 
   (password/check (str user-email login-time) encrypted))
-
-
-(defn create-auth-token-map [user-email]
-  (let [login-time  (quot (System/currentTimeMillis) 1000)
-        encrypted (password/encrypt (str user-email login-time))]
-    {:auth-token  encrypted
-     :login-time login-time}))
-
-(defn create-old-auth-token-map [user-email]
-  (let [login-time  (+ (quot (System/currentTimeMillis) 1000) 1400000)
-        encrypted (password/encrypt (str user-email login-time))]
-    {:auth-token  encrypted
-     :login-time login-time}))
-
-(defn is-good-auth-key [auth-key user-email login-time]
-  (let [now (quot (System/currentTimeMillis) 1000)
-        phase (- login-time now)
-        shift 1300000 ;1.3 mil seconds = 2 weeks
-
-        valid? (< phase shift)]
-      (and valid? (password/check (str user-email login-time) auth-key))))
-
-
-(let [user "vas@nonform.com"
-      auth-map (create-old-auth-token-map user)
-      token (:auth-token auth-map)
-      login-time (:login-time auth-map)]
-     (println login-time)
-  (is-good-auth-key token user login-time))
 
 
 
@@ -263,7 +266,7 @@
 
 (comment (test-fast-server>user-pushes))
 
-(defonce broadcast-enabled?_ (atom true))
+(defonce broadcast-enabled?_ (atom false))
 
 (defn start-example-broadcaster!
   "As an example of server>user async pushes, setup a loop to broadcast an
@@ -322,24 +325,25 @@
   [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
   (let [session (:session ring-req)
         uid     (:uid     session)
-        auth-key (:auth-key session)
+        auth-token (:auth-token session)
         login-time (:login-time session)]
     ;(println  session)
     (println uid)
-    (println auth-key)
-    (println (is-good-auth-key auth-key uid login-time))))
+    (println auth-token)
+    (println login-time)
+    (println (is-good-auth-key auth-token uid login-time))))
 
 (defmethod -event-msg-handler
   :clientsent/newpost ; Default/fallback case (no other matching handler)
   [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
   (let [session (:session ring-req)
         uid     (:uid     session)
-        auth-key (:auth-key session)
+        auth-token (:auth-token session)
         login-time (:login-time session)]
     ;(println  session)
     (println uid)
-    (println auth-key)
-    (println (is-good-auth-key auth-key uid login-time))))
+    (println auth-token)
+    (println (is-good-auth-key auth-token uid login-time))))
 
    ; (when ?reply-fn
     ;  (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
