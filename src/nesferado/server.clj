@@ -15,20 +15,8 @@
    [taoensso.timbre    :as timbre :refer (tracef debugf infof warnf errorf)]
    [taoensso.sente     :as sente]
    [crypto.password.pbkdf2 :as password]
-
-   ;;; TODO Choose (uncomment) a supported web server + adapter -------------
    [org.httpkit.server :as http-kit]
    [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
-   ;;
-   ;; [immutant.web :as immutant]
-   ;; [taoensso.sente.server-adapters.immutant :refer (get-sch-adapter)]
-   ;;
-   ;; [nginx.clojure.embed :as nginx-clojure]
-   ;; [taoensso.sente.server-adapters.nginx-clojure :refer (get-sch-adapter)]
-   ;;
-   ;; [aleph.http :as aleph]
-   ;; [taoensso.sente.server-adapters.aleph :refer (get-sch-adapter)]
-   ;; -----------------------------------------------------------------------
 
    ;; Optional, for Transit encoding:
    [taoensso.sente.packers.transit :as sente-transit]))
@@ -129,7 +117,7 @@
 
 
 (defn create-auth-token-map [user-email]
-  (let [login-time (System/currentTimeMillis)
+  (let [login-time (quot (System/currentTimeMillis) 1000)
         encrypted (password/encrypt (str user-email login-time))]
     {:auth-token  encrypted
      :login-time login-time}))
@@ -138,11 +126,11 @@
     (password/check (str user-email login-time) auth-key))
 
 
-(let [user "vas@nonforum.com"
+(let [user "vas@nonform.com"
       auth-map (create-auth-token-map user)
       token (:auth-token auth-map)
       login-time (:login-time auth-map)]
-  (is-good-auth-key user login-time token))
+  (is-good-auth-key token user login-time))
 
 (defn logout
   [request]
