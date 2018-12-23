@@ -398,24 +398,23 @@
                :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
                :params  {:user-id (str username)
                          :password (str pw)}
-               :resp-type :edn}
+               :resp-type :text}
 
               (fn [ajax-resp]
                 (->output! (str "Ajax login response: " ajax-resp))
                 (.log js/console (first ajax-resp))
                 (.log js/console (:success? ajax-resp))
                 (let [{:keys [success? ?status ?error ?content ?content-type]} ajax-resp
-                      login-successful? success?]
+                      login-successful? success?
+                      stuff (cljs.reader/read-string ?content)]
                   (if-not login-successful?
                     (->output! "Login failed")
                     (do
                       (->output! "Login successful")
                       (js/alert ajax-resp)
-                      (->output! (str "type of response " (type ajax-resp)))
+                      (->output! (str "auth token is" (:auth-token stuff)))
 
-                      (->output! (str "auth token is" (:auth-token ?content)))
-
-                      (->output! (str "login time is" (:login-time ?content)))
+                      (->output! (str "login time is" (:login-time stuff)))
 
                       ;assoc auth hash
                       (swap! input-state assoc-in [:inputs 0 :token] "hash-this--shiz")
