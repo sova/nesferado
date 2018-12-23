@@ -412,13 +412,15 @@
                     (do
                       (->output! "Login successful")
                       (js/alert ajax-resp)
+                      (->output! (str "uid is " username))
                       (->output! (str "auth token is" (:auth-token stuff)))
 
                       (->output! (str "login time is" (:login-time stuff)))
 
                       ;assoc auth hash
-                      (swap! input-state assoc-in [:inputs 0 :token] "hash-this--shiz")
-                      (swap! input-state assoc-in [:inputs 0 :username] username) ;'log user in' on client
+                      (swap! input-state assoc-in [:inputs 0 :token] (:auth-token stuff))
+                      (swap! input-state assoc-in [:inputs 0 :login-time] (:login-time stuff))
+                      (swap! input-state assoc-in [:inputs 0 :username] (:uid stuff)) ;'log user in' on client
                       (sente/chsk-reconnect! chsk)))))))))
 ;(filter #(= "vas" (:username %)) @auth-db)
 ;(create-user "hap" "5" "5")
