@@ -75,7 +75,7 @@
   [{:as ev-msg :keys [?data]}]
   (let [[old-state-map new-state-map] (have vector? ?data)]
     (if (:first-open? new-state-map)
-      (.log js/console ".NF. " new-statemap)
+      (.log js/console ".NF. " new-state-map)
       ;(->output! "Channel socket successfully established!: %s" new-state-map)
       ;(->output! "Channel socket state change: %s"              new-state-map)
       )
@@ -151,7 +151,7 @@
                        (->output! "Reconnecting")
                        (sente/chsk-reconnect! chsk))))
 
-(when-let [target-el (.getElementById js/document "btn-login")]
+(when-let [target-el (.getElementById js/document "logsin")]
   (.addEventListener target-el "click"
     (fn [ev]
       (let [user-id (.-value (.getElementById js/document "input-login"))
@@ -425,32 +425,40 @@
 
 
 
-(defn try-login [username password]
-  (let [results (first (filter #(= username (:username %)) @auth-db))
-        stored-pw (:password results)]
-    (if (empty? results)
-      (.log js/console "<user not found")
-    ;else
-      (if (= password stored-pw)
-        (do
-          (.log js/console "passwords match")
-          (.log js/console "generating login token")
-          (swap! input-state assoc-in [:inputs 0 :token] "hash-this--shiz")
-          (swap! input-state assoc-in [:inputs 0 :username] username))
-      ;else
-        (.log js/console stored-pw)))))
+(defn try-login [username pw]
+  (if (str/blank? username)
+        (js/alert "Please enter a user-id first")
+      (do
+        (->output! (str "Logging in with username " username))
 
+            ;;; Use any login procedure you'd like. Here we'll trigger an Ajax
+            ;;; POST request that resets our server-side session. Then we ask
+            ;;; our channel socket to reconnect, thereby picking up the new
+            ;;; session.
 
-(try-login "vas" "haxor5")
+            (sente/ajax-lite "/login"
+              {:method :post
+               :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
+               :params  {:user-id (str username)
+                         :password (str pw)}}
 
-(filter #(= "vas" (:username %)) @auth-db)
-
-(try-login "vas" "haxor5")
-
-(create-user "hap" "5" "5")
-(try-login "hap" "5")
-
-(filter #(= "hap" (:username %)) @auth-db)
+              (fn [ajax-resp]
+                (->output! "Ajax login response: %s" ajax-resp)
+                (.log js/console ajax-resp)
+                (let [login-successful? true ; Your logic here
+                      ]
+                  (if-not login-successful?
+                    (->output! "Login failed")
+                    (do
+                      (->output! "Login successful")
+                      (->output! (str "auth token is" (:auth-token ajax-resp)))
+                      ;assoc auth hash
+                      (swap! input-state assoc-in [:inputs 0 :token] "hash-this--shiz")
+                      (swap! input-state assoc-in [:inputs 0 :username] username) ;'log user in' on client
+                      (sente/chsk-reconnect! chsk)))))))))
+;(filter #(= "vas" (:username %)) @auth-db)
+;(create-user "hap" "5" "5")
+;(filter #(= "hap" (:username %)) @auth-db)
 
 ;(sort-by :number-of-ratings > @posts)
 
@@ -527,7 +535,7 @@
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :password] (.-value (.-target e)))
                                               (.log js/console (get-in @input-state [:inputs 0 :password]))))}]
-   [:button.fullwidth {:type "button"
+   [:button.fullwidth#logsin {:type "button"
                        :on-click (fn [e] (let [username (get-in @input-state [:inputs 0 :username])
                                                password (get-in @input-state [:inputs 0 :password])]
                                            (do
