@@ -585,9 +585,7 @@
     [:li.gogo [:a {:href "/gogole"} "Google Login"]]
     [:li.twtw [:a {:href "/twitter"} "Twitter Login"]]
     [:li.nfnf "Nonforum Login:" (nf-login-input)]
-    [:li.nfca "Create a Nonforum account:" (create-account-input)]]]
-   ;(fb-sdk 1417763311691300) ;nonforum app id
-   )
+    [:li.nfca "Create a Nonforum account:" (create-account-input)]]])
 
 (defn check-if-showing [id]
   (let [showsters (get-in @input-state [:inputs 0 :showing])]
@@ -695,7 +693,7 @@
   [:div#maincontain
    (top-bar)
    (side-bar)
-   (login-bar)
+   ;(login-bar)
    (post-input)
    (television)])
 
@@ -710,6 +708,10 @@
 
 (rum/mount (footer)
            (. js/document (getElementById "footing")))
+
+
+;hydrate server-mounted component ^_^
+(rum/hydrate (nf-login-input) js/document.body)
 
 
 (when-let [target-el (.getElementById js/document "crsubmit")]

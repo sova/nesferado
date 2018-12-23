@@ -15,7 +15,7 @@
    [com.taoensso/sente        "1.11.0"] ; <--- Sente
    [com.taoensso/timbre       "4.7.4"]
 
-   [rum "0.11.3" :exclusions [cljsjs/react cljsjs/react-dom sablono]]
+   [rum "0.11.3"]; :exclusions [cljsjs/react cljsjs/react-dom sablono]]
    [alandipert/storage-atom "1.2.4"]
    [crypto-password "0.2.0"]
 

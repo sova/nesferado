@@ -116,11 +116,13 @@
 
 
 
-;;;; Ring handlers
+;;rum components
 
-(defn landing-pg-handler [ring-req]
-  (hiccup/html
-    [:head [:link {:rel "stylesheet" :href "/css/nesferado.css"}]]
+
+
+(rum/defc landing-page []
+ [:html
+  [:head [:link {:rel "stylesheet" :href "/css/nesferado.css"}]]
     [:h1 "Sente reference example"]
     [:p "An Ajax/WebSocket" [:strong " (random choice!)"] " has been configured for this example"]
     [:hr]
@@ -128,34 +130,32 @@
     [:p
      [:button#btn1 {:type "button"} "chsk-send! (w/o reply)"]
      [:button#btn2 {:type "button"} "chsk-send! (with reply)"]]
-    [:p
-     [:button#btn3 {:type "button"} "Test rapid server>user async pushes"]
-     [:button#btn4 {:type "button"} "Toggle server>user async broadcast push loop"]]
-    [:p
-     [:button#btn5 {:type "button"} "Disconnect"]
-     [:button#btn6 {:type "button"} "Reconnect"]]
-    ;;
-    [:p [:strong "Step 2: "] " observe std-out (for server output) and below (for client output):"]
-    [:textarea#output]
-    ;;
-    [:hr]
-    [:h2 "Step 3: try login with a user-id"]
-    [:p  "The server can use this id to send events to *you* specifically."]
-    [:p
-     [:input#input-login {:type :text :placeholder "User-id"}]
-     [:input#input-pw {:type :password :placeholder "password"}]
-     [:button#btn-login {:type "button"} "Login!"]]
-    ;;
-    [:hr]
-    [:h2 "Step 4: want to re-randomize Ajax/WebSocket connection type?"]
-    [:p "Hit your browser's reload/refresh button"]
-
+  [:textarea#output]
+  ;nf-login-input
+  [:form#nflogin
+   [:input.fullwidth {:place-holder "username" :name "username"}]
+   [:input.fullwidth {:place-holder "password" :type "password" :name "password"}]
+   [:button.fullwidth {:type "button"} "login"]]
     [:div#start]
     [:div#thread]
     [:div#inputs]
     [:div#footing]
-    [:script {:src "js/nesferado.js" :type "text/javascript"}]
-    ))
+    [:script {:src "js/nesferado.js" :type "text/javascript"}]])
+
+
+(rum/render-html (landing-page))
+
+;;;; Ring handlers
+
+(defn landing-pg-handler [ring-req]
+  [ring-req]
+  (let [{:keys [session params]} ring-req
+        {:keys [user-id password]} params
+        lp (rum/render-html (landing-page))]
+    {:status 200
+     :session session
+     :headers {"Content-Type" "text/html"}
+     :body lp}))
 
 
 (defn login-handler
