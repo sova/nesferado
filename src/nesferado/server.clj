@@ -257,6 +257,9 @@
           (add-user user-id password)
           (let [auth-map (create-auth-token-map user-id)]
             {:status 200
+             :body (prn-str {:uid user-id
+                             :login-time (:login-time auth-map)
+                             :auth-token (:auth-token auth-map)})
              :session (merge session  {:uid user-id
                                        :login-time (:login-time auth-map)
                                        :auth-token (:auth-token auth-map)})}))

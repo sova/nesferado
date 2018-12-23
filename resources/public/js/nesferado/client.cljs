@@ -252,14 +252,17 @@
                           :comment "ur coment"
                           :selected-parent 77
                           :selected-child [33 53]
-                          :username ""
-                          :password ""
+                          :username "" ;input/mutable
+                          :password "" ;input/mutable
+
+                          :current-user ""
                           :token ""
-                          :token-timestamp ""
+                          :login-time ""
                           :create-username ""
                           :create-password ""
                           :create-password2 ""
                           :showing []
+
                           }]}))
 
 (defn js-reload []
@@ -401,9 +404,9 @@
                :resp-type :text}
 
               (fn [ajax-resp]
-                (->output! (str "Ajax login response: " ajax-resp))
-                (.log js/console (first ajax-resp))
-                (.log js/console (:success? ajax-resp))
+                ;(->output! (str "Ajax login response: " ajax-resp))
+                ;(.log js/console (first ajax-resp))
+                ;(.log js/console (:success? ajax-resp))
                 (let [{:keys [success? ?status ?error ?content ?content-type]} ajax-resp
                       login-successful? success?
                       stuff (cljs.reader/read-string ?content)]
@@ -411,16 +414,16 @@
                     (->output! "Login failed")
                     (do
                       (->output! "Login successful")
-                      (js/alert ajax-resp)
-                      (->output! (str "uid is " username))
-                      (->output! (str "auth token is" (:auth-token stuff)))
+                      ;(js/alert ajax-resp)
+                     ; (->output! (str "uid is " username))
+                      ;(->output! (str "auth token is" (:auth-token stuff)))
 
-                      (->output! (str "login time is" (:login-time stuff)))
+                      ;(->output! (str "login time is" (:login-time stuff)))
 
                       ;assoc auth hash
                       (swap! input-state assoc-in [:inputs 0 :token] (:auth-token stuff))
                       (swap! input-state assoc-in [:inputs 0 :login-time] (:login-time stuff))
-                      (swap! input-state assoc-in [:inputs 0 :username] (:uid stuff)) ;'log user in' on client
+                      (swap! input-state assoc-in [:inputs 0 :current-user] (:uid stuff)) ;'log user in' on client
                       (sente/chsk-reconnect! chsk)))))))))
 ;(filter #(= "vas" (:username %)) @auth-db)
 ;(create-user "hap" "5" "5")
@@ -544,14 +547,16 @@
 (rum/defc link [address]
   [:a {:href address} address])
 
-(rum/defc top-bar []
-  [:div#topbar
-   [:ol.topbar
-    [:li [:a {:href "/"} "nonforum"]]
-    [:li (link "top")]
-    [:li (link "latest")]
-    [:li (link "submit")]
-    [:li (link "feed")]]])
+(rum/defc top-bar < rum/reactive []
+  (let [current-user (get-in (rum/react input-state) [:inputs 0 :current-user])]
+    [:div#topbar
+     [:ol.topbar
+      [:li [:a {:href "/"} "nonforum"]]
+      [:li (link "top")]
+      [:li (link "latest")]
+      [:li (link "submit")]
+      [:li (link "feed")]
+      [:li current-user]]]))
 
 (rum/defc side-bar []
   [:div#sidebar
@@ -725,17 +730,23 @@
                :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
                :params  {:user-id (str user-id)
                          :password (str pw)
-                         :password2 (str pw2)}}
+                         :password2 (str pw2)}
+               :type :text}
 
               (fn [ajax-resp]
                 (->output! "Account creation response: " ajax-resp)
-                (let [http-status (:?status ajax-resp)
-                      account-create-successful? (= 200 http-status)]
+                (let [{:keys [success? ?status ?error ?content ?content-type]} ajax-resp
+                      http-status (:?status ajax-resp)
+                      account-create-successful? (= 200 http-status)
+                      stuff (cljs.reader/read-string ?content)]
                   (if-not account-create-successful?
                     (->output! "Account Creation Failed.")
                     (do
                       (->output! "Account Creation Success!")
                       (->output! (str "Now logged in as " user-id))
+                      (swap! input-state assoc-in [:inputs 0 :token] (:auth-token stuff))
+                      (swap! input-state assoc-in [:inputs 0 :login-time] (:login-time stuff))
+                      (swap! input-state assoc-in [:inputs 0 :current-user] (:uid stuff))
                       )))))))))))
 
 
