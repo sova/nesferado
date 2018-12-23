@@ -25,10 +25,10 @@
 (defn ->output! [fmt & args]
   (let [msg (apply encore/format fmt args)]
     (timbre/debug msg)
-    (aset output-el "value" (str "• " (.-value output-el) "\n" msg))
+    (aset output-el "value" (str "_ " (.-value output-el) "\n" msg))
     (aset output-el "scrollTop" (.-scrollHeight output-el))))
 
-(->output! "Welcome to Nonforum")
+(->output! " • Welcome to Nonforum •")
 
 ;;;; Define our Sente channel socket (chsk) client
 
@@ -443,15 +443,21 @@
                          :password (str pw)}}
 
               (fn [ajax-resp]
-                (->output! "Ajax login response: %s" ajax-resp)
-                (.log js/console ajax-resp)
-                (let [login-successful? true ; Your logic here
-                      ]
+                (->output! (str "Ajax login response: " ajax-resp))
+                (.log js/console (first ajax-resp))
+                (.log js/console (:success? ajax-resp))
+                (let [{:keys [success? ?status ?error ?content ?content-type]} ajax-resp
+                      login-successful? success?]
                   (if-not login-successful?
                     (->output! "Login failed")
                     (do
                       (->output! "Login successful")
-                      (->output! (str "auth token is" (:auth-token ajax-resp)))
+                      (->output! "contents of success map: " ?content)
+
+                      (->output! (str "auth token is" (:auth-token ?content)))
+
+                      (->output! (str "login time is" (:login-time ?content)))
+
                       ;assoc auth hash
                       (swap! input-state assoc-in [:inputs 0 :token] "hash-this--shiz")
                       (swap! input-state assoc-in [:inputs 0 :username] username) ;'log user in' on client

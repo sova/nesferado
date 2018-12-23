@@ -65,13 +65,16 @@
 
 
 (defn check-login-against-db [useremail password]
-  (let [user-map (first (filter #(= useremail (:username %)) @auth-db))
-        username (:username user-map)
-        hash-pass (:password user-map)
-      check-pass-bool (password/check password hash-pass)]
-    check-pass-bool))
+  (let [user-map (first (filter #(= useremail (:username %)) @auth-db))]
+    (if (not (empty? user-map))
+      (let [ username (:username user-map)
+             hash-pass (:password user-map)
+             check-pass-bool (password/check password hash-pass)]
+         check-pass-bool)
+      ;user not found in db
+      false)))
 
-(check-login-against-db "nelly" "18")
+;(check-login-against-db "nelly" "18")
 
 
 
@@ -227,6 +230,7 @@
     (if (check-login-against-db user-id password)
       (let [auth-map (create-auth-token-map user-id)]
         {:status 200
+         :body auth-map
          :session (merge session  {:uid user-id
                                    :login-time (:login-time auth-map)
                                    :auth-token (:auth-token auth-map)})
