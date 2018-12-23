@@ -119,10 +119,66 @@
 ;;rum components
 
 
+(rum/defc nf-login-input []
+  [:form#nflogin
+   [:input.fullwidth {:place-holder "username" :name "username"}]
+   ;                   :on-change (fn [e] (do
+   ;                                           (swap! input-state assoc-in [:inputs 0 :username] (.-value (.-target e)))
+   ;                                           (.log js/console (get-in @input-state [:inputs 0 :username]))))}]
+   [:input.fullwidth {:place-holder "password" :type "password" :name "password"}]
+   ;                   :on-change (fn [e] (do
+   ;                                           (swap! input-state assoc-in [:inputs 0 :password] (.-value (.-target e)))
+   ;                                           (.log js/console (get-in @input-state [:inputs 0 :password]))))}]
+   [:button.fullwidth {:type "button"} "login"]
+   ;                    :on-click (fn [e] (let [username (get-in @input-state [:inputs 0 :username])
+   ;                                            password (get-in @input-state [:inputs 0 :password])]
+   ;                                        (do
+   ;                                          (.log js/console "login button pressed")
+   ;                                          (try-login username password))))} "login"]])
+   ])
+
+
+ (rum/defc create-account-fields []
+  [:form#nfcreate
+   [:input#cruser.fullwidth {:place-holder "username" :name "username"}]
+   ;                   :on-change (fn [e] (do
+   ;                                           (swap! input-state assoc-in [:inputs 0 :create-username] (.-value (.-target e)))
+   ;                                           (.log js/console (get-in @input-state [:inputs 0 :create-username]))))}]
+   [:input#crpass.fullwidth {:place-holder "password" :type "password" :name "password"}]
+   ;                   :on-change (fn [e] (do
+   ;                                           (swap! input-state assoc-in [:inputs 0 :create-password] (.-value (.-target e)))
+   ;                                           (.log js/console (get-in @input-state [:inputs 0 :create-password]))))}]
+   [:input#crpass2.fullwidth {:place-holder "pw confirm" :type "password" :name "password2"}]
+   ;                   :on-change (fn [e] (do
+   ;                                           (swap! input-state assoc-in [:inputs 0 :create-password2] (.-value (.-target e)))
+   ;                                           (.log js/console (get-in @input-state [:inputs 0 :create-password2]))))}]
+   [:button#crsubmit.fullwidth {:type "button"} "create account"]
+   ;                    :on-click (fn [e] (let [username  (get-in @input-state [:inputs 0 :create-username])
+   ;                                            password  (get-in @input-state [:inputs 0 :create-password])
+   ;                                            password2 (get-in @input-state [:inputs 0 :create-password2])]
+   ;                                        (do
+   ;                                          (.log js/console "create account button pressed")
+   ;                                          (create-user username password password2))))} "create account"]])
+   ])
+
+
+(rum/defc create-account-input []
+  [:div#create-account-contain
+   (create-account-fields)])
+
+
+(rum/defc login-bar []
+  [:div#loginbar
+   [:ol.loginbar
+    [:li.fbfb [:a {:href "/facebook"} "Continue with Facebook as Vaso Veneliciukuosoeus"]]
+    [:li.gogo [:a {:href "/gogole"} "Google Login"]]
+    [:li.twtw [:a {:href "/twitter"} "Twitter Login"]]
+    [:li.nfnf "Nonforum Login:" (nf-login-input)]
+    [:li.nfca "Create a Nonforum account:" (create-account-input)]]])
+
 
 (rum/defc landing-page []
- [:html
-  [:head [:link {:rel "stylesheet" :href "/css/nesferado.css"}]]
+  [:div
     [:h1 "Sente reference example"]
     [:p "An Ajax/WebSocket" [:strong " (random choice!)"] " has been configured for this example"]
     [:hr]
@@ -130,16 +186,16 @@
     [:p
      [:button#btn1 {:type "button"} "chsk-send! (w/o reply)"]
      [:button#btn2 {:type "button"} "chsk-send! (with reply)"]]
+
   [:textarea#output]
-  ;nf-login-input
-  [:form#nflogin
-   [:input.fullwidth {:place-holder "username" :name "username"}]
-   [:input.fullwidth {:place-holder "password" :type "password" :name "password"}]
-   [:button.fullwidth {:type "button"} "login"]]
+
+  (login-bar)
+
     [:div#start]
     [:div#thread]
     [:div#inputs]
     [:div#footing]
+    [:link {:rel "stylesheet" :href "/css/nesferado.css"}]
     [:script {:src "js/nesferado.js" :type "text/javascript"}]])
 
 
@@ -152,10 +208,11 @@
   (let [{:keys [session params]} ring-req
         {:keys [user-id password]} params
         lp (rum/render-html (landing-page))]
-    {:status 200
-     :session session
-     :headers {"Content-Type" "text/html"}
-     :body lp}))
+    lp))
+    ;{:status 200
+    ; :session session
+    ; :headers {"Content-Type" "text/html"}
+    ; :body lp}))
 
 
 (defn login-handler
@@ -185,7 +242,7 @@
   [ring-req]
   (let [{:keys [session params]} ring-req
         {:keys [user-id password password2]} params]
-    (println "nf create account req: %s" user-id)
+    (println "nf create account request: " user-id)
     (if (= password password2)
       (if (username-not-taken user-id)
         (do
@@ -366,7 +423,7 @@
 (defn  stop-web-server! [] (when-let [stop-fn @web-server_] (stop-fn)))
 (defn start-web-server! [& [port]]
   (stop-web-server!)
-  (let [port (or port 3773) ; 0 => Choose any available port
+  (let [port (or port 37773) ; 0 => Choose any available port
         ring-handler (var main-ring-handler)
 
         [port stop-fn]

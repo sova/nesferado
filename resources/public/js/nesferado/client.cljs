@@ -67,24 +67,31 @@
 (defmethod -event-msg-handler
   :default ; Default/fallback case (no other matching handler)
   [{:as ev-msg :keys [event]}]
-  (->output! "Unhandled event: %s" event))
+  (.log js/console ".NF. unhandled:" event)
+  ;(->output! "Unhandled event: %s" event)
+  )
 
 (defmethod -event-msg-handler :chsk/state
   [{:as ev-msg :keys [?data]}]
   (let [[old-state-map new-state-map] (have vector? ?data)]
     (if (:first-open? new-state-map)
-      (->output! "Channel socket successfully established!: %s" new-state-map)
-      (->output! "Channel socket state change: %s"              new-state-map))))
+      (.log js/console ".NF. " new-statemap)
+      ;(->output! "Channel socket successfully established!: %s" new-state-map)
+      ;(->output! "Channel socket state change: %s"              new-state-map)
+      )
+    ))
 
 (defmethod -event-msg-handler :chsk/recv
   [{:as ev-msg :keys [?data]}]
-  (->output! "Push event from server: %s" ?data)
+    (.log js/console ".NF. push from serv: " ?data)
+    ;(->output! "Push event from server: %s" ?data)
   )
 
 (defmethod -event-msg-handler :chsk/handshake
   [{:as ev-msg :keys [?data]}]
   (let [[?uid ?csrf-token ?handshake-data] ?data]
-    (->output! "Handshake: %s" ?data)
+    (.log js/console "Handshake: %s" ?data)
+    ;(->output! "Handshake: %s" ?data)
     ))
 
 ;; TODO Add your (defmethod -event-msg-handler <event-id> [ev-msg] <body>)s here...
@@ -697,6 +704,12 @@
    (post-input)
    (television)])
 
+;hydrate server-mounted component ^_^
+(rum/hydrate (login-bar)
+             (. js/document (getElementById "loginbar")))
+
+
+;mount rum components on clientside
 (rum/mount (render-item 69)
            (. js/document (getElementById "thread")))
 
@@ -710,8 +723,9 @@
            (. js/document (getElementById "footing")))
 
 
-;hydrate server-mounted component ^_^
-(rum/hydrate (nf-login-input) js/document.body)
+
+
+
 
 
 (when-let [target-el (.getElementById js/document "crsubmit")]
@@ -723,7 +737,7 @@
         (if (str/blank? user-id)
           (js/alert "Please enter a user-id first")
           (do
-            (->output! "Creating account %s" user-id)
+            (->output! "Creating account" user-id)
 
             ;;; Use any login procedure you'd like. Here we'll trigger an Ajax
             ;;; POST request that resets our server-side session. Then we ask
@@ -744,8 +758,9 @@
                   (if-not account-create-successful?
                     (->output! "Account Creation Failed.")
                     (do
-                      (->output! "Account Creation Success!  Now Logged in.")
-                      (sente/chsk-reconnect! chsk))))))))))))
+                      (->output! "Account Creation Success!")
+                      (->output! (str "Now logged in as " user-id))
+                      )))))))))))
 
 
 
@@ -755,6 +770,8 @@
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
 )
 
+;hax
+(defn hax [] )
 
 
 ;;;; Init stuff

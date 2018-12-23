@@ -32,10 +32,11 @@ a { transition: color 0.5s ease;}
 
 #output {
   position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 888px;
-  height: 50px;
+  top: 0;
+  right: 0;
+  width: 408px;
+  height: 250px;
+  font-size: 24px;
   border: 1px solid #ccc;
 }
 .topbar {
@@ -57,6 +58,11 @@ a { transition: color 0.5s ease;}
 .topbar>li>a:visited {color: hsla(240, 90%, 67%, 1.0);}
 .topbar>li>a:hover { color: #fff; }
 
+
+#nflogin {
+  min-width: 400px;
+  border: 1px solid gray;
+}
 
 .sidebar {
   border: 1px solid green;
