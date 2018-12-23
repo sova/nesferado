@@ -4,6 +4,7 @@
 
   (:require
    [clojure.string  :as str]
+   [cognitect.transit :as t]
    [cljs.core.async :as async  :refer (<! >! put! chan)]
    [taoensso.encore :as encore :refer-macros (have have?)]
    [taoensso.timbre :as timbre :refer-macros (tracef debugf infof warnf errorf)]
@@ -150,50 +151,6 @@
                      (fn [ev]
                        (->output! "Reconnecting")
                        (sente/chsk-reconnect! chsk))))
-
-(when-let [target-el (.getElementById js/document "logsin")]
-  (.addEventListener target-el "click"
-    (fn [ev]
-      (let [user-id (.-value (.getElementById js/document "input-login"))
-            pw      (.-value (.getElementById js/document "input-pw"))]
-        (if (str/blank? user-id)
-          (js/alert "Please enter a user-id first")
-          (do
-            (->output! "Logging in with user-id %s" user-id)
-
-            ;;; Use any login procedure you'd like. Here we'll trigger an Ajax
-            ;;; POST request that resets our server-side session. Then we ask
-            ;;; our channel socket to reconnect, thereby picking up the new
-            ;;; session.
-
-            (sente/ajax-lite "/login"
-              {:method :post
-               :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
-               :params  {:user-id (str user-id)
-                         :password (str pw)}}
-
-              (fn [ajax-resp]
-                (->output! "Ajax login response: %s" ajax-resp)
-                (.log js/console ajax-resp)
-                (let [login-successful? true ; Your logic here
-                      ]
-                  (if-not login-successful?
-                    (->output! "Login failed")
-                    (do
-                      (->output! "Login successful")
-                      (sente/chsk-reconnect! chsk))))))))))))
-
-
-
-
-
-
- (def auth-db (atom [{:username "lopez"
-                    :password "great"}
-                   {:username "vas"
-                    :password "haxor5"}]))
-
-
 
 
 (defn err0r []
@@ -410,16 +367,16 @@
 (map sort-the-comments-of! (map :id @posts))
 
 
-(defn create-user [username password password2]
-  (if (not (= password password2))
-    (.log js/console "passwords do not match")
-  ;else
-    (if (not (empty? (filter #(= username (:username %)) @auth-db)))
-      (.log js/console "username in use")
-    ;else
-      (do
-        (swap! auth-db conj {:username username :password password})
-        (.log js/console "n<>n user added to db" username)))))
+;(defn create-user [username password password2]
+;  (if (not (= password password2))
+;    (.log js/console "passwords do not match")
+;  ;else
+;    (if (not (empty? (filter #(= username (:username %)) @auth-db)))
+;      (.log js/console "username in use")
+;    ;else
+;      (do
+;        (swap! auth-db conj {:username username :password password})
+;        (.log js/console "n<>n user added to db" username)))))
 
 
 
@@ -440,7 +397,8 @@
               {:method :post
                :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
                :params  {:user-id (str username)
-                         :password (str pw)}}
+                         :password (str pw)}
+               :resp-type :edn}
 
               (fn [ajax-resp]
                 (->output! (str "Ajax login response: " ajax-resp))
@@ -452,7 +410,8 @@
                     (->output! "Login failed")
                     (do
                       (->output! "Login successful")
-                      (->output! "contents of success map: " ?content)
+                      (js/alert ajax-resp)
+                      (->output! (str "type of response " (type ajax-resp)))
 
                       (->output! (str "auth token is" (:auth-token ?content)))
 
@@ -569,7 +528,9 @@
                                                password2 (get-in @input-state [:inputs 0 :create-password2])]
                                            (do
                                              (.log js/console "create account button pressed")
-                                             (create-user username password password2))))} "create account"]])
+
+                                             ;(create-user username password password2)
+                                             )))} "create account"]])
 
 
 

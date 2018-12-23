@@ -230,7 +230,11 @@
     (if (check-login-against-db user-id password)
       (let [auth-map (create-auth-token-map user-id)]
         {:status 200
-         :body auth-map
+         ;:headers {"Content-Type" "application/transit+json"}
+         :body {:uid user-id
+                :login-time (:login-time auth-map)
+                :auth-token (:auth-token auth-map)}
+
          :session (merge session  {:uid user-id
                                    :login-time (:login-time auth-map)
                                    :auth-token (:auth-token auth-map)})
@@ -427,7 +431,7 @@
 (defn  stop-web-server! [] (when-let [stop-fn @web-server_] (stop-fn)))
 (defn start-web-server! [& [port]]
   (stop-web-server!)
-  (let [port (or port 37773) ; 0 => Choose any available port
+  (let [port (or port 0) ; 0 => Choose any available port
         ring-handler (var main-ring-handler)
 
         [port stop-fn]
