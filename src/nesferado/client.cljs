@@ -78,12 +78,14 @@
 
 (defmethod -event-msg-handler :chsk/recv
   [{:as ev-msg :keys [?data]}]
- ; (->output! "Push event from server: %s" ?data))
+  (->output! "Push event from server: %s" ?data)
+  )
 
 (defmethod -event-msg-handler :chsk/handshake
   [{:as ev-msg :keys [?data]}]
   (let [[?uid ?csrf-token ?handshake-data] ?data]
-    (->output! "Handshake: %s" ?data)))
+    (->output! "Handshake: %s" ?data)
+    ))
 
 ;; TODO Add your (defmethod -event-msg-handler <event-id> [ev-msg] <body>)s here...
 
@@ -466,7 +468,7 @@
                   )
                 state) })
 
- (rum/defc render-item < rum/reactive show-fresh [pid]
+(rum/defc render-item < rum/reactive show-fresh [pid]
 
   (let [post-coll   (rum/react posts) ;atom
         input-coll (rum/react input-state)
@@ -555,27 +557,6 @@
   [:div#create-account-contain
    (create-account-fields)])
 
-(rum/defc fb-sdk [app-id]
-  [:script {:type "text/javascript"}
-   (str "window.fbAsyncInit = function() {
-    FB.init({
-      appId      : '" app-id "',
-      cookie     : true,
-      xfbml      : true,
-      version    : '3.2'
-    });
-
-    FB.AppEvents.logPageView();
-
-  };
-
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = 'https://connect.facebook.net/en_US/sdk.js';
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));")])
 
 (rum/defc link [address]
   [:a {:href address} address])
@@ -755,7 +736,7 @@
                          :password2 (str pw2)}}
 
               (fn [ajax-resp]
-                ;(->output! "Account creation response: " ajax-resp)
+                (->output! "Account creation response: " ajax-resp)
                 (let [http-status (:?status ajax-resp)
                       account-create-successful? (= 200 http-status)]
                   (if-not account-create-successful?
