@@ -170,16 +170,6 @@
    (create-account-fields)])
 
 
-(rum/defc login-bar []
-  [:div#loginbar
-   [:ol.loginbar
-    [:li.fbfb [:a {:href "/facebook"} "Continue with Facebook as Vaso Veneliciukuosoeus"]]
-    [:li.gogo [:a {:href "/gogole"} "Google Login"]]
-    [:li.twtw [:a {:href "/twitter"} "Twitter Login"]]
-    [:li.nfnf "Nonforum Login:" (nf-login-input)]
-    [:li.nfca "Create a Nonforum account:" (create-account-input)]]])
-
-
 (rum/defc landing-page []
   [:div
     [:textarea#output]
@@ -201,10 +191,6 @@
         {:keys [user-id password]} params
         lp (rum/render-html (landing-page))]
     lp))
-    ;{:status 200
-    ; :session session
-    ; :headers {"Content-Type" "text/html"}
-    ; :body lp}))
 
 
 (defn login-handler
@@ -423,7 +409,7 @@
 (defn  stop-web-server! [] (when-let [stop-fn @web-server_] (stop-fn)))
 (defn start-web-server! [& [port]]
   (stop-web-server!)
-  (let [port (or port 37373) ; 0 => Choose any available port
+  (let [port (or port 0) ; 0 => Choose any available port
         ring-handler (var main-ring-handler)
 
         [port stop-fn]
@@ -444,6 +430,6 @@
 
 (defn -main "For `lein run`, etc." [] (start!))
 
-;(comment
+(comment
   (start!)
-  (test-fast-server>user-pushes);)
+  (test-fast-server>user-pushes))

@@ -561,30 +561,29 @@
   (let [current-user (get-in (rum/react input-state) [:inputs 0 :current-user])]
     [:div#topbar
      [:ol.topbar
-      [:li [:a {:href "/"} "nonforum"]]
+      [:li [:a {:href "/"} "n⊜nforum"]]
       [:li [:span {:on-click
                  (fn [e] (do
                            (.stopPropagation e)
-                           (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "sidebar"]]
+                           (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} " ∴ preferences"]]
 
-      [:li (link "top")]
-      ;[:li (link "latest")]
-      [:li (link "submit")]
-      ;[:li (link "feed")]
-      [:li [:a {:href "/my/profile"} current-user]]
+      [:li (link "ψ top")]
+      [:li (link "Δ latest")]
+      [:li (link "Ξ submit")]
+      [:li (link "ϡ feed")]
+      [:li [:a {:href "/my/profile"} (str " ϟ " current-user)]]
       [:li [:span {
               :on-click (fn [e] (do
                                   (.stopPropagation e)
                                   (swap! input-state assoc-in [:inputs 0 :logged-in] false)))
-          } "logout"]]]]))
+          } "⇏ logout"]]]]))
 
 (rum/defc side-bar []
   [:div#sidebar
    [:ol.sidebar
     [:li (link "profile")]
     [:li (link  "settings & pls omg no moar hax")]
-    [:li (link "feedback & hax")]
-    [:li (link "logout")]]])
+    [:li (link "feedback & hax")]]])
 
 (rum/defc login-bar []
   [:div#loginbar
@@ -730,7 +729,15 @@
         show-sidebar (get-in (rum/react input-state) [:inputs 0 :show-sidebar])
         curr-view (get-in (rum/react input-state) [:inputs 0 :current-view])]
     (.log js/console "curr comments " curr-comments)
+
+    (when-let [target-el (.getElementById js/document "output")]
+       (if (= true logged-in)
+         (set! (.-classList target-el) "hideMe")
+         (set! (.-classList target-el) "justMounted")))
   [:div#maincontain
+
+
+
    (if (= false logged-in)
      (non-buzz-placeholder))
    (if (= false logged-in)
