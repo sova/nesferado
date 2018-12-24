@@ -261,7 +261,16 @@
                           :create-username ""
                           :create-password ""
                           :create-password2 ""
-                          :showing []
+
+                          :tv-title ""
+                          :tv-contents ""
+                          :tv-link ""
+                          :tv-priority 4
+                          :tv-posted-by ""
+                          :tv-timestamp 808
+                          :tv-comments [69]
+                          :tv-current {}
+                          :logged-in false
 
                           }]}))
 
@@ -370,16 +379,6 @@
 (map sort-the-comments-of! (map :id @posts))
 
 
-;(defn create-user [username password password2]
-;  (if (not (= password password2))
-;    (.log js/console "passwords do not match")
-;  ;else
-;    (if (not (empty? (filter #(= username (:username %)) @auth-db)))
-;      (.log js/console "username in use")
-;    ;else
-;      (do
-;        (swap! auth-db conj {:username username :password password})
-;        (.log js/console "n<>n user added to db" username)))))
 
 
 
@@ -452,11 +451,14 @@
                   )
                 state) })
 
-(rum/defc render-item < rum/reactive show-fresh [pid]
+ (rum/defcs render-item < rum/reactive
+                         (rum/local -1 ::hidecomments)
+                         show-fresh [state pid]
 
   (let [post-coll   (rum/react posts) ;atom
         input-coll (rum/react input-state)
-        cids (return-comment-ids pid)]
+        cids (return-comment-ids pid)
+        local-atom (::hidecomments state)]
     ;(prn cids)
     (if (empty? (return-comment-ids pid))
       (let [noc-post  (first (filter  #(= pid (:id %)) post-coll))]
@@ -490,7 +492,14 @@
                [:div.item-rate-plus  {:on-click (fn [e] (rate :plus pid))} "+"]
                [:div.item-rate-minus {:on-click (fn [e] (rate :minus pid))} "-"]
                [:div.item-rating   (/ (:ratings-total com-post) (:number-of-ratings com-post))]]]
-           (map render-item cids)]]))))
+
+           [:button.commentog {:on-click (fn [_] (swap! local-atom #(* -1 %)))}
+              (if (= @local-atom -1)
+                "hide" ;hide comments
+                "show")] ;show comments
+           (if (= @local-atom -1)
+             (map render-item cids))]]))))
+
 
 
 
@@ -552,11 +561,21 @@
     [:div#topbar
      [:ol.topbar
       [:li [:a {:href "/"} "nonforum"]]
+      [:li [:span {:on-click
+                 (fn [e] (do
+                           (.stopPropagation e)
+                           (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "sidebar"]]]
+
       [:li (link "top")]
-      [:li (link "latest")]
+      ;[:li (link "latest")]
       [:li (link "submit")]
-      [:li (link "feed")]
-      [:li current-user]]]))
+      ;[:li (link "feed")]
+      [:li current-user]
+      [:li [:span {
+              :on-click (fn [e] (do
+                                  (.stopPropagation e)
+                                  (swap! input-state assoc-in [:inputs 0 :logged-in] false)))
+          } "logout"]]]))
 
 (rum/defc side-bar []
   [:div#sidebar
@@ -569,9 +588,9 @@
 (rum/defc login-bar []
   [:div#loginbar
    [:ol.loginbar
-    [:li.fbfb [:a {:href "/facebook"} "Continue with Facebook as Vaso Veneliciukuosoeus"]]
-    [:li.gogo [:a {:href "/gogole"} "Google Login"]]
-    [:li.twtw [:a {:href "/twitter"} "Twitter Login"]]
+    ;[:li.fbfb [:a {:href "/facebook"} "Continue with Facebook as Vaso Veneliciukuosoeus"]]
+    ;[:li.gogo [:a {:href "/gogole"} "Google Login"]]
+    ;[:li.twtw [:a {:href "/twitter"} "Twitter Login"]]
     [:li.nfnf "Nonforum Login:" (nf-login-input)]
     [:li.nfca "Create a Nonforum account:" (create-account-input)]]])
 
@@ -582,10 +601,25 @@
       "notshowing")))
 
 (rum/defc tv-cell [td]
-  [:li [:div.tile {:id (str "tile" (:priority td))}
-        [:div.heading (:title td)]
-        [:div.contents (:contents td)]
-        [:div.priority (:priority td)]]])
+  (let [title (:title td)
+        contents (:contents td)
+        comments (:comments td)
+        id (:priority td)
+        posted-by (:posted-by td)
+        timestamp (:timestamp td)]
+    [:li [:div.tile {:on-click (fn [e] (do
+                                         (.log js/console "link to post" id " + comments disp, " td)
+                                         (swap! input-state assoc-in [:inputs 0 :tv-title] title)
+                                         (swap! input-state assoc-in [:inputs 0 :tv-contents] contents)
+                                         (swap! input-state assoc-in [:inputs 0 :tv-posted-by] posted-by)
+                                         (swap! input-state assoc-in [:inputs 0 :tv-timestamp] timestamp)
+                                         (swap! input-state assoc-in [:inputs 0 :tv-comments] comments)
+                                         (swap! input-state assoc-in [:inputs 0 :tv-current] td)))
+                     :id (str "tile" id)}
+        [:div.heading title]
+        [:div.contents contents]
+        [:div.priority id]]]))
+
 
 (rum/defc television  < rum/reactive []
   [:div#tv
@@ -673,21 +707,62 @@
     [:div#foot7 "For complete information on how to use nonforum most effectively, please check out the "[:a {:href "/faq"} "F.A.Q"]]])
 
 
+(rum/defc non-buzz-placeholder []
+  [:div.nonbuzz "nonforum"])
+
+(rum/defc go-back-button []
+  (let [active-state "all"]
+    [:div.goback {:on-click (fn [e]
+                              (do
+                                (.stopPropagation e)
+                                (swap! input-state assoc-in [:inputs 0 :tv-current] "")))}
+                                  "back to " active-state ]))
+
 (rum/defc input-fields []
   [:div#inputs-contain
    (post-comment-input)])
 
-(rum/defc start []
+(rum/defc start < rum/reactive []
+  (let [logged-in (get-in (rum/react input-state) [:inputs 0 :logged-in])
+        tv-current (get-in (rum/react input-state) [:inputs 0 :tv-current])
+        curr-comments (get-in (rum/react input-state) [:inputs 0 :tv-comments])
+        show-sidebar (get-in (rum/react input-state) [:inputs 0 :show-sidebar])
+        curr-view (get-in (rum/react input-state) [:inputs 0 :current-view])]
+    (.log js/console "curr comments " curr-comments)
   [:div#maincontain
-   (top-bar)
-   (side-bar)
-   ;(login-bar)
-   (post-input)
-   (television)])
+   (if (= false logged-in)
+     (non-buzz-placeholder))
+   (if (= false logged-in)
+     (login-bar))
 
+
+
+   (if (= true logged-in)
+     (top-bar))
+   (if (= true show-sidebar)
+     (if (= true logged-in)
+       (side-bar)))
+   (if (= true logged-in)
+     (if (not (empty? tv-current))
+       (go-back-button)))
+
+   (if  (empty? tv-current)
+    (if (= true logged-in)
+     (television)))
+
+   ;active tv-cell
+   (if (= true logged-in)
+     (tv-cell tv-current))
+
+   ;comments (rendered recursively)
+   (if (= true logged-in)
+     (map render-item curr-comments))
+   (if (= true logged-in)
+     (input-fields))
+   ]))
 ;hydrate server-mounted component ^_^
-(rum/hydrate (login-bar)
-             (. js/document (getElementById "loginbar")))
+;(rum/hydrate (login-bar)
+;             (. js/document (getElementById "loginbar")))
 
 
 ;mount rum components on clientside
@@ -746,6 +821,7 @@
                       (->output! (str "Now logged in as " user-id))
                       (swap! input-state assoc-in [:inputs 0 :token] (:auth-token stuff))
                       (swap! input-state assoc-in [:inputs 0 :login-time] (:login-time stuff))
+                      (swap! input-state assoc-in [:inputs 0 :logged-in] true)
                       (swap! input-state assoc-in [:inputs 0 :current-user] (:uid stuff))
                       )))))))))))
 
