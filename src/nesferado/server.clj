@@ -430,6 +430,6 @@
 
 (defn -main "For `lein run`, etc." [] (start!))
 
-(comment
+;(comment
   (start!)
-  (test-fast-server>user-pushes))
+  (test-fast-server>user-pushes);)

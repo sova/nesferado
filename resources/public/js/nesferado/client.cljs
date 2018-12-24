@@ -577,15 +577,23 @@
       [:li [:span {
               :on-click (fn [e] (do
                                   (.stopPropagation e)
-                                  (swap! input-state assoc-in [:inputs 0 :logged-in] false)))
-          } "⇏ logout"]]]]))
+                                  (swap! input-state assoc-in [:inputs 0 :logged-in] false)
+                                  (swap! input-state assoc-in [:inputs 0 :username] "")
+                                  (swap! input-state assoc-in [:inputs 0 :auth-token] "")
+                                  (swap! input-state assoc-in [:inputs 0 :login-time] "")
+                                  (->output! (str "Logout Successful"))))} "⇏ logout"]]]]))
 
 (rum/defc side-bar []
   [:div#sidebar
    [:ol.sidebar
-    [:li (link "profile")]
-    [:li (link  "settings & pls omg no moar hax")]
-    [:li (link "feedback & hax")]]])
+    [:li (link "edit profile")]
+    [:li (link "view profile")]
+    [:li (link "stats")]
+    [:li (link "set password")]
+    [:li (link "set email")]
+    [:li (link "invite friends")]
+    [:li (link "give feedback")]
+    [:li (link "$upport nonforum")]]])
 
 (rum/defc login-bar []
   [:div#loginbar
