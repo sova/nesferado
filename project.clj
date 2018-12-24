@@ -25,8 +25,7 @@
    [ring/ring-defaults        "0.2.1"] ; Includes `ring-anti-forgery`, etc.
    ;; [ring-anti-forgery      "1.0.0"]
 
-   [compojure                 "1.5.1"] ; Or routing lib of your choice
-   [hiccup                    "1.0.5"] ; Optional, just for HTML
+   [compojure                 "1.5.1"]
 
    ;;; Transit deps optional; may be used to aid perf. of larger data payloads
    ;;; (see reference example for details):
@@ -36,11 +35,8 @@
   :plugins
   [[lein-figwheel "0.5.16"]
    [lein-pprint         "1.1.2"]
-   [lein-ancient        "0.6.10"]
-   [com.cemerick/austin "0.1.6"]
    [lein-cljsbuild      "1.1.4"]
-   [cider/cider-nrepl   "0.12.0"] ; Optional, for use with Emacs
-   ]
+   [cider/cider-nrepl   "0.18.0"]]
 
   :cljsbuild
   {:builds
