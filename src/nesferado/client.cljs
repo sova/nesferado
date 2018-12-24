@@ -565,18 +565,18 @@
       [:li [:span {:on-click
                  (fn [e] (do
                            (.stopPropagation e)
-                           (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "sidebar"]]]
+                           (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "sidebar"]]
 
       [:li (link "top")]
       ;[:li (link "latest")]
       [:li (link "submit")]
       ;[:li (link "feed")]
-      [:li current-user]
+      [:li [:a {:href "/my/profile"} current-user]]
       [:li [:span {
               :on-click (fn [e] (do
                                   (.stopPropagation e)
                                   (swap! input-state assoc-in [:inputs 0 :logged-in] false)))
-          } "logout"]]]))
+          } "logout"]]]]))
 
 (rum/defc side-bar []
   [:div#sidebar
