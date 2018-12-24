@@ -507,10 +507,12 @@
  (rum/defc nf-login-input []
   [:form#nflogin
    [:input.fullwidth {:place-holder "username" :name "username"
+                      :autocomplete "username login"
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :username] (.-value (.-target e)))
                                               (.log js/console (get-in @input-state [:inputs 0 :username]))))}]
    [:input.fullwidth {:place-holder "password" :type "password" :name "password"
+                      :autocomplete "password login"
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :password] (.-value (.-target e)))
                                               (.log js/console (get-in @input-state [:inputs 0 :password]))))}]
@@ -600,7 +602,14 @@
       "showing"
       "notshowing")))
 
-(rum/defc tv-cell [td]
+(defn uuid [s]
+  (assert (string? s))
+  (UUID. (.toLowerCase s) nil))
+
+(rum/defc tv-cell  < { :key-fn (fn [td]
+                                    (str (uuid (str (:title td))))) } [td]
+  (if (not (empty? td))
+
   (let [title (:title td)
         contents (:contents td)
         comments (:comments td)
@@ -618,7 +627,7 @@
                      :id (str "tile" id)}
         [:div.heading title]
         [:div.contents contents]
-        [:div.priority id]]]))
+        [:div.priority id]]])))
 
 
 (rum/defc television  < rum/reactive []
@@ -762,9 +771,10 @@
    (if (= true logged-in)
      (tv-cell tv-current))
 
-   ;comments (rendered recursively)
-   (if (= true logged-in)
-     (map render-item curr-comments))
+   (if (not (empty? tv-current))
+     (if (= true logged-in)
+       (map render-item curr-comments)))
+
    (if (= true logged-in)
      (input-fields))
    ]))

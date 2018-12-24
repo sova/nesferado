@@ -118,3 +118,39 @@ Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"].
 notifying browser that file changed:  resources/public/js/goog/deps.js
 notifying browser that file changed:  resources/public/js/cljs_deps.js
 notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 20.762 seconds.[0m
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 3.053 seconds.[0m
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+1545640627
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 13.099 seconds.[0m
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 10.564 seconds.[0m
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[31mFailed to compile build :cljs-client from ["src"] in 7.322 seconds.[0m
+[36m----  Could not Read  src/nesferado/client.cljs   line:847  column:21  ----[0m
+
+  [1mUnmatched delimiter )[0m
+
+  [36m845[0m  [36m(defn start! [] (start-router!))[0m
+  [36m846[0m  [36m[0m
+  [33m847[0m  [1m(defonce _start-once (start!))[0m
+  [0m   [0m  [33m                    ^--- Unmatched delimiter )[0m
+
+[36m----  Reader Error : Please see src/nesferado/client.cljs  ----[0m
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 2.11 seconds.[0m
+notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 20.413 seconds.[0m
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  resources/public/js/nesferado/client.js

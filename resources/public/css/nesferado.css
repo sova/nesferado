@@ -21,10 +21,10 @@
 a:hover { color: #fff; }
 
 a { transition: color 0.5s ease;}
-#tv { border: 1px solid gray;
+#tv {
       float: left;
       clear: left;
-      display: block;}
+      width: 100%;}
 .heading {
   font-size: 26px;
   color: hsl(180, 90%, 20%);
@@ -259,9 +259,15 @@ width: 100%;}
   width: auto;
   height: auto;
   max-height: 180px;
-  font-size: 22px;
-  overflow-y: scroll;
-  border: 1px solid blue;
+  font-size: 24px;
+  background-color: hsla(180, 10%, 50%, .1);
+  margin: 2px;
+  max-width: 1200px;
+  align: center;
+}
+
+.tv > li {
+  list-style-type: none;
 }
 
 #inputs {
