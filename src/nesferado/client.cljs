@@ -567,10 +567,10 @@
                            (.stopPropagation e)
                            (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} " ∴ preferences"]]
 
-      [:li (link "ψ top")]
-      [:li (link "Δ latest")]
-      [:li (link "Ξ submit")]
-      [:li (link "ϡ feed")]
+      [:li "ψ " (link "top")]
+      [:li "Δ " (link "latest")]
+      [:li "Ξ " (link "submit")]
+      [:li "ϡ " (link "feed")]
       [:li [:a {:href "/my/profile"} (str " ϟ " current-user)]]
       [:li [:span {
               :on-click (fn [e] (do

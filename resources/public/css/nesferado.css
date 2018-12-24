@@ -74,8 +74,8 @@ a { transition: color 0.5s ease;}
   height: 300px;
   width: 250px;
   padding: 0;
-  background-color: #eee;
-  margin-right: 25px;
+  margin-right: 1em;
+  margin-bottom: 0.5em;
 }
 .sidebar>li {
   float: left;
@@ -229,7 +229,7 @@ width: 100%;}
 
 .genpost {
     padding: 3px;
-  border-radius: 3px;}
+    border-radius: 3px; }
 
 .selectedParent {
   background-color: hsla(310, 70%, 30%, .35);
@@ -295,6 +295,7 @@ width: 100%;}
   float: left;
   clear: left;
   border: 1px solid hsl(270, 50%, 50%);
+  margin-bottom: 1em;
   border-radius: 3px;
   width: 10em;
   height: 2em;
