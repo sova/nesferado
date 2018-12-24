@@ -11,6 +11,7 @@
    [taoensso.sente  :as sente  :refer (cb-success?)]
    [rum.core :as rum]
    [alandipert.storage-atom :refer [local-storage]]
+   [cemerick.url :as u]
 
    ;; Optional, for Transit encoding:
    [taoensso.sente.packers.transit :as sente-transit])
@@ -25,11 +26,13 @@
 (def output-el (.getElementById js/document "output"))
 (defn ->output! [fmt & args]
   (let [msg (apply encore/format fmt args)]
-    (timbre/debug msg)
+    ;(timbre/debug msg)
     (aset output-el "value" (str "— " (.-value output-el) "\n" msg))
     (aset output-el "scrollTop" (.-scrollHeight output-el))))
 
 (->output! " • Welcome to Nonforum •")
+
+
 
 ;;;; Define our Sente channel socket (chsk) client
 
@@ -506,44 +509,49 @@
 
  (rum/defc nf-login-input []
   [:form#nflogin
-   [:input.fullwidth {:place-holder "username" :name "username"
-                      :autocomplete "username login"
+   [:input.fullwidth {:placeholder "username" :name "username"
+                      :auto-complete "username login"
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :username] (.-value (.-target e)))
-                                              (.log js/console (get-in @input-state [:inputs 0 :username]))))}]
-   [:input.fullwidth {:place-holder "password" :type "password" :name "password"
-                      :autocomplete "password login"
+                                              ;(.log js/console (get-in @input-state [:inputs 0 :username]))
+                                           ))}]
+   [:input.fullwidth {:placeholder "password" :type "password" :name "password"
+                      :auto-complete "password login"
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :password] (.-value (.-target e)))
-                                              (.log js/console (get-in @input-state [:inputs 0 :password]))))}]
+                                              ;(.log js/console (get-in @input-state [:inputs 0 :password]))
+                                           ))}]
    [:button.fullwidth#logsin {:type "button"
                        :on-click (fn [e] (let [username (get-in @input-state [:inputs 0 :username])
                                                password (get-in @input-state [:inputs 0 :password])]
                                            (do
-                                             (.log js/console "login button pressed")
+                                             ;(.log js/console "login button pressed")
                                              (try-login username password))))} "login"]])
 
 
  (rum/defc create-account-fields []
   [:form#nfcreate
-   [:input#cruser.fullwidth {:place-holder "username" :name "username"
+   [:input#cruser.fullwidth {:placeholder "username" :name "username"
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :create-username] (.-value (.-target e)))
-                                              (.log js/console (get-in @input-state [:inputs 0 :create-username]))))}]
-   [:input#crpass.fullwidth {:place-holder "password" :type "password" :name "password"
+                                             ; (.log js/console (get-in @input-state [:inputs 0 :create-username]))
+                                           ))}]
+   [:input#crpass.fullwidth {:placeholder "password" :type "password" :name "password"
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :create-password] (.-value (.-target e)))
-                                              (.log js/console (get-in @input-state [:inputs 0 :create-password]))))}]
-   [:input#crpass2.fullwidth {:place-holder "pw confirm" :type "password" :name "password2"
+                                              ;(.log js/console (get-in @input-state [:inputs 0 :create-password]))
+                                           ))}]
+   [:input#crpass2.fullwidth {:placeholder "pw confirm" :type "password" :name "password2"
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :create-password2] (.-value (.-target e)))
-                                              (.log js/console (get-in @input-state [:inputs 0 :create-password2]))))}]
+                                             ; (.log js/console (get-in @input-state [:inputs 0 :create-password2]))
+                                           ))}]
    [:button#crsubmit.fullwidth {:type "button"
                        :on-click (fn [e] (let [username  (get-in @input-state [:inputs 0 :create-username])
                                                password  (get-in @input-state [:inputs 0 :create-password])
                                                password2 (get-in @input-state [:inputs 0 :create-password2])]
                                            (do
-                                             (.log js/console "create account button pressed")
+                                         ;    (.log js/console "create account button pressed")
 
                                              ;(create-user username password password2)
                                              )))} "create account"]])
@@ -645,11 +653,11 @@
 
 (rum/defc post-input []
   [:form#postinput "Create new post"
-   [:input.fullwidth {:place-holder "title"
+   [:input.fullwidth {:placeholder "title"
                       :on-change (fn [e] (do
                                     (swap! input-state assoc-in [:inputs 0 :title] (.-value (.-target e)))
                                     (.log js/console (get-in @input-state [:inputs 0 :title]))))}]
-   [:input.fullwidth {:place-holder "contents"
+   [:input.fullwidth {:placeholder "contents"
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :contents] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :contents]))))}]
@@ -682,16 +690,18 @@
 (rum/defc post-comment-input []
   [:form#postcommentinput
    [:textarea.fullwidth {:value (get-in @input-state [:inputs 0 :comment])
-                         :place-holder "your comment"
+                         :placeholder "your comment"
                          :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :comment] (.-value (.-target e)))
-                                              (.log js/console (get-in @input-state [:inputs 0 :comment]))))
+                                              ;(.log js/console (get-in @input-state [:inputs 0 :comment]))
+                                              ))
                          }]
    [:input.fullwidth {:value (get-in @input-state [:inputs 0 :username])
-                         :place-holder "username"
+                         :placeholder "username"
                          :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :username] (.-value (.-target e)))
-                                              (.log js/console (get-in @input-state [:inputs 0 :username]))))
+                                              ;(.log js/console (get-in @input-state [:inputs 0 :username]))
+                                              ))
                          }]
    [:button.fullwidth {:type "button"
                        :class "replySelected"
@@ -706,7 +716,7 @@
                                       (let [first-hit (->> @posts
                                                           (keep-indexed #(when (= (:id %2) parent-id) %1))
                                                            first)]
-                                        (.log js/console ">< " (get-in @posts [first-hit :comments]) (:id new-comment-map))
+                                       ; (.log js/console ">< " (get-in @posts [first-hit :comments]) (:id new-comment-map))
                                         (swap! posts conj new-comment-map) ;add new comment
                                         (swap! posts update-in [first-hit :comments] conj (:id new-comment-map))) ;add comment id to parent
                                      (prn posts)
@@ -745,7 +755,7 @@
         curr-comments (get-in (rum/react input-state) [:inputs 0 :tv-comments])
         show-sidebar (get-in (rum/react input-state) [:inputs 0 :show-sidebar])
         curr-view (get-in (rum/react input-state) [:inputs 0 :current-view])]
-    (.log js/console "curr comments " curr-comments)
+    ;(.log js/console "curr comments " curr-comments)
 
     (when-let [target-el (.getElementById js/document "output")]
        (if (= true logged-in)
@@ -854,6 +864,16 @@
 ;hax
 (defn hax [] )
 
+(defn get-url-params []
+  (:query (u/url (-> js/window .-location .-href))))
+
+(.log js/console (str (get-url-params)))
+
+(.log js/console "sup ninja!!!  " (get (get-url-params) "v"))
+
+;;get params works! woo!
+
+(.log js/console (get-url-params))
 
 ;;;; Init stuff
 

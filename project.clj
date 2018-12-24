@@ -18,6 +18,7 @@
    [rum "0.11.3"]; :exclusions [cljsjs/react cljsjs/react-dom sablono]]
    [alandipert/storage-atom "1.2.4"]
    [crypto-password "0.2.0"]
+   [com.cemerick/url "0.1.1"]
 
    ;;; TODO Choose (uncomment) a supported web server -----------------------
    [http-kit                             "2.2.0"] ; Default

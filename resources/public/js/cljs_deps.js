@@ -47,5 +47,7 @@ goog.addDependency("../taoensso/sente/interfaces.js", ['taoensso.sente.interface
 goog.addDependency("../taoensso/timbre/appenders/core.js", ['taoensso.timbre.appenders.core'], ['cljs.core', 'clojure.string', 'taoensso.encore']);
 goog.addDependency("../taoensso/timbre.js", ['taoensso.timbre'], ['cljs.core', 'taoensso.timbre.appenders.core', 'clojure.string', 'taoensso.encore']);
 goog.addDependency("../taoensso/sente.js", ['taoensso.sente'], ['cljs.core', 'taoensso.sente.interfaces', 'cljs.core.async', 'taoensso.timbre', 'clojure.string', 'taoensso.encore']);
+goog.addDependency("../pathetic/core.js", ['pathetic.core'], ['goog.string', 'goog.Uri', 'cljs.core', 'clojure.string']);
+goog.addDependency("../cemerick/url.js", ['cemerick.url'], ['pathetic.core', 'goog.Uri', 'cljs.core', 'clojure.string']);
 goog.addDependency("../taoensso/sente/packers/transit.js", ['taoensso.sente.packers.transit'], ['cljs.core', 'taoensso.sente.interfaces', 'cognitect.transit', 'clojure.string', 'taoensso.encore']);
-goog.addDependency("../nesferado/client.js", ['nesferado.client'], ['rum.core', 'cljs.core', 'alandipert.storage_atom', 'cljs.core.async', 'cognitect.transit', 'taoensso.sente', 'taoensso.sente.packers.transit', 'taoensso.timbre', 'clojure.string', 'taoensso.encore']);
+goog.addDependency("../nesferado/client.js", ['nesferado.client'], ['rum.core', 'cljs.core', 'alandipert.storage_atom', 'cljs.core.async', 'cognitect.transit', 'taoensso.sente', 'cemerick.url', 'taoensso.sente.packers.transit', 'taoensso.timbre', 'clojure.string', 'taoensso.encore']);
