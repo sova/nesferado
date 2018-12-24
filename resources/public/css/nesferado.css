@@ -8,7 +8,7 @@
 .showing {
   display: visible;
   height: auto;
-  transition: height ease 0.5s;
+  transition: height ease 0.25s;
 }
 
 .notshowing {
@@ -34,10 +34,11 @@ a { transition: color 0.5s ease;}
   position: fixed;
   top: 0;
   right: 0;
-  width: 408px;
-  height: 250px;
+  width: 427px;
+  height: 4em;
   font-size: 24px;
   border: 1px solid #ccc;
+  resize: none;
 }
 .topbar {
   font-size: 25px;
@@ -278,6 +279,15 @@ width: 100%;}
 #maincontain {
   float: left;
   clear: left;
+}
+
+.goback {
+  border: 1px solid purple;
+  border-radius: 3px;
+  width: 10em;
+  height: 2em;
+  text-align: center;
+  padding-top: 0.33em;
 }
 
 .commentog {

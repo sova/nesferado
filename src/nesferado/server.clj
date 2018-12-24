@@ -182,18 +182,7 @@
 
 (rum/defc landing-page []
   [:div
-    [:h1 "Sente reference example"]
-    [:p "An Ajax/WebSocket" [:strong " (random choice!)"] " has been configured for this example"]
-    [:hr]
-    [:p [:strong "Step 1: "] " try hitting the buttons:"]
-    [:p
-     [:button#btn1 {:type "button"} "chsk-send! (w/o reply)"]
-     [:button#btn2 {:type "button"} "chsk-send! (with reply)"]]
-
-  [:textarea#output]
-
- ; (login-bar)
-
+    [:textarea#output]
     [:div#start]
     [:div#thread]
     [:div#inputs]
@@ -434,7 +423,7 @@
 (defn  stop-web-server! [] (when-let [stop-fn @web-server_] (stop-fn)))
 (defn start-web-server! [& [port]]
   (stop-web-server!)
-  (let [port (or port 0) ; 0 => Choose any available port
+  (let [port (or port 37373) ; 0 => Choose any available port
         ring-handler (var main-ring-handler)
 
         [port stop-fn]

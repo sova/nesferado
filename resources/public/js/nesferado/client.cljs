@@ -26,7 +26,7 @@
 (defn ->output! [fmt & args]
   (let [msg (apply encore/format fmt args)]
     (timbre/debug msg)
-    (aset output-el "value" (str "_ " (.-value output-el) "\n" msg))
+    (aset output-el "value" (str "— " (.-value output-el) "\n" msg))
     (aset output-el "scrollTop" (.-scrollHeight output-el))))
 
 (->output! " • Welcome to Nonforum •")
@@ -422,6 +422,7 @@
                       ;assoc auth hash
                       (swap! input-state assoc-in [:inputs 0 :token] (:auth-token stuff))
                       (swap! input-state assoc-in [:inputs 0 :login-time] (:login-time stuff))
+                      (swap! input-state assoc-in [:inputs 0 :logged-in] true)
                       (swap! input-state assoc-in [:inputs 0 :current-user] (:uid stuff)) ;'log user in' on client
                       (sente/chsk-reconnect! chsk)))))))))
 ;(filter #(= "vas" (:username %)) @auth-db)
@@ -716,7 +717,7 @@
                               (do
                                 (.stopPropagation e)
                                 (swap! input-state assoc-in [:inputs 0 :tv-current] "")))}
-                                  "back to " active-state ]))
+                                  "< back to " active-state ]))
 
 (rum/defc input-fields []
   [:div#inputs-contain
@@ -764,16 +765,8 @@
 ;(rum/hydrate (login-bar)
 ;             (. js/document (getElementById "loginbar")))
 
-
-;mount rum components on clientside
-(rum/mount (render-item 69)
-           (. js/document (getElementById "thread")))
-
 (rum/mount (start)
            (. js/document (getElementById "start")))
-
-(rum/mount (input-fields)
-           (. js/document (getElementById "inputs")))
 
 (rum/mount (footer)
            (. js/document (getElementById "footing")))
