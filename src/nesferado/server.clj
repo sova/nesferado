@@ -192,7 +192,7 @@
 
   [:textarea#output]
 
-  (login-bar)
+ ; (login-bar)
 
     [:div#start]
     [:div#thread]

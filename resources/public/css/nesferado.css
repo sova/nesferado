@@ -212,8 +212,8 @@ width: 100%;}
 }
 
 .justMounted {
-    -webkit-animation: fade 0.5s;
-    animation: fade 0.5s;
+    -webkit-animation: fade 0.35s;
+    animation: fade 0.35s;
     opacity: 1;
 }
 
@@ -280,6 +280,14 @@ width: 100%;}
   clear: left;
 }
 
+.commentog {
+  outline: none;
+  text-decoration: none;
+  text-align: left;
+  border: none;
+min-width: 500px;
+  width: 90%;
+style: none;}
 
 @-webkit-keyframes fade {
     from {opacity: 0}

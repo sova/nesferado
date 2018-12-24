@@ -761,8 +761,8 @@
      (input-fields))
    ]))
 ;hydrate server-mounted component ^_^
-(rum/hydrate (login-bar)
-             (. js/document (getElementById "loginbar")))
+;(rum/hydrate (login-bar)
+;             (. js/document (getElementById "loginbar")))
 
 
 ;mount rum components on clientside
