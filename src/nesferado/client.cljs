@@ -257,7 +257,7 @@
 (def input-state (atom {:inputs
                        [ {:title ""
                           :contents ""
-                          :comment "ur coment"
+                          :comment ""
                           :selected-parent 0
                           :selected-child []
                           :username "" ;input/mutable
@@ -601,7 +601,7 @@
               :on-click (fn [e] (do
                                   (.stopPropagation e)
                                   (swap! input-state assoc-in [:inputs 0 :logged-in] false)
-                                  (swap! input-state assoc-in [:inputs 0 :username] "")
+                                  (swap! input-state assoc-in [:inputs 0 :current-user] "")
                                   (swap! input-state assoc-in [:inputs 0 :auth-token] "")
                                   (swap! input-state assoc-in [:inputs 0 :login-time] "")
                                   (->output! (str "Logout Successful"))))} "⇏ logout"]]]]))
@@ -637,7 +637,8 @@
   (assert (string? s))
   (UUID. (.toLowerCase s) nil))
 
-(rum/defc tv-cell  < { :key-fn (fn [td]
+(rum/defc tv-cell  < rum/reactive
+                    { :key-fn (fn [td]
                                     (str (uuid (str (:title td))))) } [td]
   (if (not (empty? td))
 
@@ -712,19 +713,20 @@
 (rum/defc post-comment-input < rum/reactive []
   [:form#postcommentinput
    [:textarea.fullwidth {:value (get-in @input-state [:inputs 0 :comment])
-                         :placeholder "your comment"
+                         :placeholder "let us be kind"
                          :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :comment] (.-value (.-target e)))
                                               ;(.log js/console (get-in @input-state [:inputs 0 :comment]))
                                               ))
                          }]
-   [:input.fullwidth {:value (get-in @input-state [:inputs 0 :username])
-                         :placeholder "username"
-                         :on-change (fn [e] (do
-                                              (swap! input-state assoc-in [:inputs 0 :username] (.-value (.-target e)))
-                                              ;(.log js/console (get-in @input-state [:inputs 0 :username]))
-                                              ))
-                         }]
+   ;[:input.fullwidth {:value (get-in @input-state [:inputs 0 :current-user])
+    ;                     :placeholder "username"
+    ;                     :readonly "readonly"
+                         ;:on-change (fn [e] (do
+                         ;                     (swap! input-state assoc-in [:inputs 0 :username] (.-value (.-target e)))
+                         ;                     ;(.log js/console (get-in @input-state [:inputs 0 :username]))
+                         ;                     ))
+     ;                    }]
    [:button.fullwidth {:type "button"
                        :class "replySelected"
                        :on-click (fn [e]
@@ -752,15 +754,16 @@
                                           (do
                                             (swap! posts conj new-comment-map) ;add new comment
                                             (swap! tv-state update-in [second-hit :comments] conj (:id new-comment-map))
+                                            ;alse need to update the [td] object in the atom
+                                            (swap! input-state update-in [:inputs 0 :tv-current :comments] conj (:id new-comment-map))
+                                            (.log js/console (get-in @input-state [:inputs 0 :tv-current :comments]))
                                             (swap! input-state update-in [:inputs 0 :tv-comments] conj (:id new-comment-map)))
                                           ;else
                                           (do
                                             (swap! posts conj new-comment-map) ;add new comment
                                             (swap! posts update-in [first-hit :comments] conj (:id new-comment-map)))) ;add comment id to parent
                                      (.log js/console @posts))
-                                     ))} (if (= parent-id curr-tv)
-                                           "Reply to the original post."
-                                           "Reply to Plum-highlighted Comment")]])
+                                     ))} "Post a comment."]])
 
 
 (rum/defc footer []
@@ -834,8 +837,9 @@
      (if (= true logged-in)
        (map render-item curr-comments)))
 
-   (if (= true logged-in)
-     (input-fields))
+   (if (not (empty? tv-current))
+     (if (= true logged-in)
+       (input-fields)))
    ]))
 ;hydrate server-mounted component ^_^
 ;(rum/hydrate (login-bar)
