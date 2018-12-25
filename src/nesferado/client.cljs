@@ -637,15 +637,13 @@
     [:div#topbar
      [:ol.topbar
       [:li [:div.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "default"))} "n⊜nforum"]]
-      [:li [:span {:on-click
+      [:li [:span.sidebarbutton {:on-click
                  (fn [e] (do
                            (.stopPropagation e)
                            (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} " ∴ preferences"]]
 
-      [:li "ψ " (link "top")]
-      [:li "Δ " (link "latest")]
-      [:li "Ξ " (link "submit")]
-      [:li "ϡ " (link "feed")]
+      [:li "ψ " [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "top"   ))} "top"   ]]
+      [:li "Δ " [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "submit"))} "submit"]]
       [:li [:a {:href "/my/profile"} (str " ϟ " current-user)]]
       [:li [:span {
               :on-click (fn [e] (do
@@ -669,7 +667,7 @@
 
                                                   (swap! input-state assoc-in [:inputs 0 :current-view] "send-feedback")
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "give feedback"]]
-    [:li (link "$upport nonforum")]]])
+    [:li (link "Support nf")]]])
 
 (rum/defc login-bar []
   [:div#loginbar
@@ -833,6 +831,9 @@
 (rum/defc non-buzz-placeholder []
   [:div.nonbuzz "nonforum"])
 
+(rum/defc sponsored-message []
+  [:div#spmsg "Help fund Horne Technologies in their next round of Fusion Research, a 5Tesla reactor [details]"])
+
 (rum/defc go-back-button []
   (let [active-state "all"]
     [:div.goback {:on-click (fn [e]
@@ -885,10 +886,23 @@
 
    (if (= "send-feedback" curr-view) (send-feedback-fields))
 
+   (if (= "submit" curr-view) (post-input))
+
+   (if (= "feed" curr-view) (post-input))
+
+   (if (= "latest" curr-view) (post-input))
+
+   (if (= "top" curr-view) (post-input))
+
    (if (= "default" curr-view)
     (if (= true logged-in)
      (if (not (empty? tv-current))
        (go-back-button))))
+
+  (if (= "default" curr-view)
+    (if (= true logged-in)
+     (if (not (empty? tv-current))
+       (sponsored-message))))
 
    (if (= "default" curr-view)
     (if  (empty? tv-current)
