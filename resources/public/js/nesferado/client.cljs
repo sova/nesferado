@@ -220,11 +220,10 @@
 
 
 (defonce app-state (atom {:text "Hello world!"}))
-(def     tv-state (atom
-                    {:tiles
-                        [ {:title "Fusion Power Imminent"
+(def     tv-state (atom [ {:title "Fusion Power Imminent"
                            :contents "Horne Technologies has developed a working Plasma Containment Prototype for furthering Fusion"
                            :priority 1
+                           :id 108
                            :posted-by "v@nonforum.com"
                            :timestamp 808080808
                            :comments [69]
@@ -232,29 +231,35 @@
                           {:title "Let's Put Sun Panels on the Roof"
                            :contents "Put a powerplant on your home and be free of your electric bill"
                            :priority 2
+                           :id 109
                            :posted-by "v@nonforum.com"
                            :timestamp 808080808
+                           :comments []
                            :parent nil}
                           {:title "Tonsky/rum is excellent for cljs"
                            :contents "the best way to be the best"
                            :priority 3
+                           :id 110
                            :posted-by "v@nonforum.com"
                            :timestamp 808080808
+                           :comments []
                            :parent nil}
                           {:title "Postpostpost"
                            :contents "this is the post!"
                            :link "http://hysterical.com"
                            :priority 4
+                           :id 111
                            :posted-by "v@nonforum.com"
                            :timestamp 808080808
-                           :parent nil}]}))
+                           :comments []
+                           :parent nil}]))
 
 (def input-state (atom {:inputs
                        [ {:title ""
                           :contents ""
                           :comment "ur coment"
-                          :selected-parent 77
-                          :selected-child [33 53]
+                          :selected-parent 0
+                          :selected-child []
                           :username "" ;input/mutable
                           :password "" ;input/mutable
 
@@ -271,8 +276,9 @@
                           :tv-priority 4
                           :tv-posted-by ""
                           :tv-timestamp 808
-                          :tv-comments [69]
+                          :tv-comments []
                           :tv-current {}
+                          :tv-curr-id 0
                           :logged-in false
 
                           }]}))
@@ -362,6 +368,14 @@
 
 (defn return-comment-ids [post-id]
   (let [cids (:comments (first (filter  #(= post-id (:id %)) @posts)))
+        posts (map get-post-by-id cids)
+        post-collection (sort-by #(/ (:ratings-total %) (:number-of-ratings %)) posts)
+        spc  (map :id post-collection)]
+
+    spc))
+
+(defn return-comment-ids-of-tv [tile-id]
+  (let [cids (:comments (first (filter  #(= post-id (:id %)) @tv-state)))
         posts (map get-post-by-id cids)
         post-collection (sort-by #(/ (:ratings-total %) (:number-of-ratings %)) posts)
         spc  (map :id post-collection)]
@@ -462,6 +476,7 @@
   (let [post-coll   (rum/react posts) ;atom
         input-coll (rum/react input-state)
         cids (return-comment-ids pid)
+        __ (rum/react tv-state)
         local-atom (::hidecomments state)]
     ;(prn cids)
     (if (empty? (return-comment-ids pid))
@@ -629,9 +644,11 @@
   (let [title (:title td)
         contents (:contents td)
         comments (:comments td)
-        id (:priority td)
+        priority (:priority td)
+        id (:id td)
         posted-by (:posted-by td)
-        timestamp (:timestamp td)]
+        timestamp (:timestamp td)
+        cids (return-comment-ids-of-tv id) ]
     [:li [:div.tile {:on-click (fn [e] (do
                                          (.log js/console "link to post" id " + comments disp, " td)
                                          (swap! input-state assoc-in [:inputs 0 :tv-title] title)
@@ -639,7 +656,12 @@
                                          (swap! input-state assoc-in [:inputs 0 :tv-posted-by] posted-by)
                                          (swap! input-state assoc-in [:inputs 0 :tv-timestamp] timestamp)
                                          (swap! input-state assoc-in [:inputs 0 :tv-comments] comments)
-                                         (swap! input-state assoc-in [:inputs 0 :tv-current] td)))
+
+                                         (swap! input-state assoc-in [:inputs 0 :selected-parent] id)
+                                         (swap! input-state assoc-in [:inputs 0 :selected-child] cids)
+
+                                         (swap! input-state assoc-in [:inputs 0 :tv-current] td)
+                                         (swap! input-state assoc-in [:inputs 0 :tv-curr-id] id)))
                      :id (str "tile" id)}
         [:div.heading title]
         [:div.contents contents]
@@ -649,7 +671,7 @@
 (rum/defc television  < rum/reactive []
   [:div#tv
    [:ol.tv
-    (map tv-cell (:tiles (rum/react tv-state)))]])
+    (map tv-cell  (rum/react tv-state))]])
 
 (rum/defc post-input []
   [:form#postinput "Create new post"
@@ -687,7 +709,7 @@
 
 (def y (atom 999))
 
-(rum/defc post-comment-input []
+(rum/defc post-comment-input < rum/reactive []
   [:form#postcommentinput
    [:textarea.fullwidth {:value (get-in @input-state [:inputs 0 :comment])
                          :placeholder "your comment"
@@ -708,6 +730,7 @@
                        :on-click (fn [e]
                                    (let [ parent-id (get-in @input-state [:inputs 0 :selected-parent])
                                           username (get-in @input-state [:inputs 0 :username])
+                                          curr-tv (get-in @input-state [:inputs 0 :tv-curr-id])
                                           new-comment-map {:id (swap! y inc)
                                                           :contents (get-in @input-state [:inputs 0 :comment])
                                                           :author username
@@ -715,12 +738,29 @@
 
                                       (let [first-hit (->> @posts
                                                           (keep-indexed #(when (= (:id %2) parent-id) %1))
-                                                           first)]
-                                       ; (.log js/console ">< " (get-in @posts [first-hit :comments]) (:id new-comment-map))
-                                        (swap! posts conj new-comment-map) ;add new comment
-                                        (swap! posts update-in [first-hit :comments] conj (:id new-comment-map))) ;add comment id to parent
-                                     (prn posts)
-                                     ))} "Reply to Plum-highlighted Comment"]])
+                                                           first)
+                                            second-hit (->> @tv-state
+                                                            (keep-indexed #(when (= (:id %2) curr-tv) %1))
+                                                           first)
+                                            ]
+                                        (.log js/console ">< " (get-in @posts [first-hit :comments]) (:id new-comment-map))
+
+                                         (.log js/console ">< "  first-hit " | " second-hit)
+                                        (.log js/console ">< "  parent-id " || " curr-tv)
+
+                                        (if (= parent-id curr-tv)
+                                          (do
+                                            (swap! posts conj new-comment-map) ;add new comment
+                                            (swap! tv-state update-in [second-hit :comments] conj (:id new-comment-map))
+                                            (swap! input-state update-in [:inputs 0 :tv-comments] conj (:id new-comment-map)))
+                                          ;else
+                                          (do
+                                            (swap! posts conj new-comment-map) ;add new comment
+                                            (swap! posts update-in [first-hit :comments] conj (:id new-comment-map)))) ;add comment id to parent
+                                     (.log js/console @posts))
+                                     ))} (if (= parent-id curr-tv)
+                                           "Reply to the original post."
+                                           "Reply to Plum-highlighted Comment")]])
 
 
 (rum/defc footer []
@@ -742,7 +782,8 @@
     [:div.goback {:on-click (fn [e]
                               (do
                                 (.stopPropagation e)
-                                (swap! input-state assoc-in [:inputs 0 :tv-current] "")))}
+                                (swap! input-state assoc-in [:inputs 0 :tv-current] "")
+                                (swap! input-state assoc-in [:inputs 0 :tv-curr-id] "")))}
                                   "< back to " active-state ]))
 
 (rum/defc input-fields []
