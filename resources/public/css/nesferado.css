@@ -20,7 +20,7 @@
 
 a:hover { color: #fff; }
 
-a { transition: color 0.5s ease;}
+a { transition: color 0.35s ease;}
 #tv {
       float: left;
       clear: left;
@@ -67,15 +67,17 @@ a { transition: color 0.5s ease;}
 }
 
 .sidebar {
+  position: absolute;
+  top: 1em;
+  left: 10em;
   border: 1px solid green;
-  float: left;
-  clear: left;
   display: block;
-  height: auto;
+  height: 40px;
   width: 250px;
   padding: 0;
   margin-right: 1em;
   margin-bottom: 0.5em;
+  background-color: #fff;
 }
 .sidebar>li {
   float: left;
@@ -89,6 +91,33 @@ a { transition: color 0.5s ease;}
   list-style-type: none;
   margin: 0;
   padding: 0;
+}
+
+.sidebarbutton {
+  color:purple;
+  text-decoration: underline;
+  transition: color 0.35s ease;
+}
+
+.sidebarbutton:hover {
+  color: #fff;
+}
+
+#sendfeedbackinput {
+  width: 500px;
+  height: 400px;
+  font-size: 24px;}
+
+#sfsubmit {
+  width: 500px;
+  height: 2em;
+}
+
+#bigspacer {
+  width: 500px;
+  height: 500px;
+  float: left;
+  clear: left;
 }
 
 .comments-area {

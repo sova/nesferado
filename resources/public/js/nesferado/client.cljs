@@ -281,6 +281,19 @@
                           :tv-curr-id 0
                           :logged-in false
 
+                          :set-email ""
+                          :current-email ""
+
+                          :change-pass-old-pw ""
+                          :change-pass-new-pw ""
+                          :change-pass-new-pw2 ""
+
+                          :edit-display-name ""
+                          :invite-friends-input ""
+                          :send-feedback-input ""
+                          :send-feedback-extra ""
+
+                          :current-view "default"
                           }]}))
 
 (defn js-reload []
@@ -375,7 +388,7 @@
     spc))
 
 (defn return-comment-ids-of-tv [tile-id]
-  (let [cids (:comments (first (filter  #(= post-id (:id %)) @tv-state)))
+  (let [cids (:comments (first (filter  #(= tile-id (:id %)) @tv-state)))
         posts (map get-post-by-id cids)
         post-collection (sort-by #(/ (:ratings-total %) (:number-of-ratings %)) posts)
         spc  (map :id post-collection)]
@@ -519,8 +532,45 @@
            (if (= @local-atom -1)
              (map render-item cids))]]))))
 
+;;; send-feedback inputs
+
+(rum/defc send-feedback-fields []
+  [:form#sendfeedbackform
+   [:textarea#sendfeedbackinput.fullwidth {:placeholder "Send us some feedback, suggestions, comments, concerns." :name "feedback"
+                      :on-change (fn [e] (do
+                                              (swap! input-state assoc-in [:inputs 0 :send-feedback-input] (.-value (.-target e)))
+                                           ))}]
+
+   [:button#sfsubmit.fullwidth {:type "button"
+                       :on-click (fn [e] (let [feedback  (get-in @input-state [:inputs 0 :send-feedback-input])]
+                                           (do
+                                             (.log js/console "send feedback button pressed")
+
+                                             ;(create-user username password password2)
+                                             )))} "send feedback"]])
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+;;login inputs & create account inputs ui
 
  (rum/defc nf-login-input []
   [:form#nflogin
@@ -586,7 +636,7 @@
   (let [current-user (get-in (rum/react input-state) [:inputs 0 :current-user])]
     [:div#topbar
      [:ol.topbar
-      [:li [:a {:href "/"} "n⊜nforum"]]
+      [:li [:div.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "default"))} "n⊜nforum"]]
       [:li [:span {:on-click
                  (fn [e] (do
                            (.stopPropagation e)
@@ -615,7 +665,10 @@
     [:li (link "set password")]
     [:li (link "set email")]
     [:li (link "invite friends")]
-    [:li (link "give feedback")]
+    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+
+                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "send-feedback")
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "give feedback"]]
     [:li (link "$upport nonforum")]]])
 
 (rum/defc login-bar []
@@ -816,31 +869,49 @@
 
 
 
+
+
+
+
+
+
+
+
    (if (= true logged-in)
      (top-bar))
    (if (= true show-sidebar)
      (if (= true logged-in)
        (side-bar)))
-   (if (= true logged-in)
-     (if (not (empty? tv-current))
-       (go-back-button)))
 
-   (if  (empty? tv-current)
+   (if (= "send-feedback" curr-view) (send-feedback-fields))
+
+   (if (= "default" curr-view)
     (if (= true logged-in)
-     (television)))
+     (if (not (empty? tv-current))
+       (go-back-button))))
+
+   (if (= "default" curr-view)
+    (if  (empty? tv-current)
+     (if (= true logged-in)
+      (television))))
 
    ;active tv-cell
-   (if (= true logged-in)
-     (tv-cell tv-current))
+   (if (= "default" curr-view)
+    (if (= true logged-in)
+     (tv-cell tv-current)))
 
-   (if (not (empty? tv-current))
+   (if (= "default" curr-view)
+    (if (not (empty? tv-current))
      (if (= true logged-in)
-       (map render-item curr-comments)))
+       (map render-item curr-comments))))
 
-   (if (not (empty? tv-current))
-     (if (= true logged-in)
-       (input-fields)))
+   (if (= "default" curr-view)
+     (if (not (empty? tv-current))
+      (if (= true logged-in)
+       (input-fields))))
    ]))
+
+
 ;hydrate server-mounted component ^_^
 ;(rum/hydrate (login-bar)
 ;             (. js/document (getElementById "loginbar")))

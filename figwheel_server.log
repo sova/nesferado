@@ -154,3 +154,41 @@ Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"].
 notifying browser that file changed:  resources/public/js/goog/deps.js
 notifying browser that file changed:  resources/public/js/cljs_deps.js
 notifying browser that file changed:  resources/public/js/nesferado/client.js
+Compiling build :cljs-client to "resources/public/js/nesferado.js" from ["src"]...
+[36m----  Compiler Warning on   src/nesferado/client.cljs   line:391  column:45  ----[0m
+
+  [1mUse of undeclared Var nesferado.client/post-id[0m
+
+  [36m388[0m  [36m    spc))[0m
+  [36m389[0m  [36m[0m
+  [36m390[0m  [36m(defn return-comment-ids-of-tv [tile-id][0m
+  [33m391[0m  [1m  (let [cids (:comments (first (filter  #(= post-id (:id %)) @tv-state)))[0m
+  [0m   [0m  [33m                                            ^--- Use of undeclared Var nesferado.client/post-id[0m
+  [36m392[0m  [36m        posts (map get-post-by-id cids)[0m
+  [36m393[0m  [36m        post-collection (sort-by #(/ (:ratings-total %) (:number-of-ratings %)) posts)[0m
+  [36m394[0m  [36m        spc  (map :id post-collection)][0m
+  [36m395[0m  [36m[0m
+  [36m396[0m  [36m    spc))[0m
+
+[36m----  Compiler Warning : Please see src/nesferado/client.cljs  ----[0m
+[36m----  Compiler Warning on   src/nesferado/client.cljs   line:649  column:1  ----[0m
+
+  [1muuid already refers to: cljs.core/uuid being replaced by: nesferado.client/uuid[0m
+
+  [36m645[0m  [36m    (if (contains? showsters id)[0m
+  [36m646[0m  [36m      "showing"[0m
+  [36m647[0m  [36m      "notshowing")))[0m
+  [36m648[0m  [36m[0m
+  [33m649[0m  [1m(defn uuid [s][0m
+  [0m   [0m  [33m^--- uuid already refers to: cljs.core/uuid being replaced by: nesferado.client/uuid[0m
+  [36m650[0m  [36m  (assert (string? s))[0m
+  [36m651[0m  [36m  (UUID. (.toLowerCase s) nil))[0m
+  [36m652[0m  [36m[0m
+  [36m653[0m  [36m(rum/defc tv-cell  < rum/reactive[0m
+  [36m654[0m  [36m                    { :key-fn (fn [td][0m
+
+[36m----  Compiler Warning : Please see src/nesferado/client.cljs  ----[0m
+[32mSuccessfully compiled build :cljs-client to "resources/public/js/nesferado.js" in 30.459 seconds.[0m
+notifying browser that file changed:  resources/public/js/goog/deps.js
+notifying browser that file changed:  resources/public/js/cljs_deps.js
+notifying browser that file changed:  resources/public/js/nesferado/client.js
