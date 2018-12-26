@@ -785,7 +785,7 @@
                                     (let [new-post-map {:title (get-in @input-state [:inputs 0 :title])
                                                         :contents (get-in @input-state [:inputs 0 :contents])
                                                         :priority 10
-                                                        :posted-by "x@nonforum.com"
+                                                        :posted-by (get-in @input-state [:inputs 0 :current-user])
 
                                                         :timestamp 80008
                                                         :parent nil}]
@@ -821,7 +821,7 @@
                        :class "replySelected"
                        :on-click (fn [e]
                                    (let [ parent-id (get-in @input-state [:inputs 0 :selected-parent])
-                                          username (get-in @input-state [:inputs 0 :username])
+                                          username (get-in @input-state [:inputs 0 :current-user])
                                           curr-tv (get-in @input-state [:inputs 0 :tv-curr-id])
                                           new-comment-map {:id (swap! y inc)
                                                           :contents (get-in @input-state [:inputs 0 :comment])
