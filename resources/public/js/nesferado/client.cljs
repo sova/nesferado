@@ -717,10 +717,10 @@
                            (.stopPropagation e)
                            (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} " ∴ preferences"]]
 
-      [:li "⏦ " [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "top"   ))} "top"   ]]
-      [:li "⌔ " [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "submit"))} "submit"]]
+      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "⏦ top"   ))} "top"   ]]
+      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "⌔ submit"))} "submit"]]
       [:li [:a {:href "/my/profile"} (str " ⌬ " current-user)]]
-      [:li [:span {
+      [:li [:span.sidebarbutton {
               :on-click (fn [e] (do
                                   (.stopPropagation e)
                                   (swap! input-state assoc-in [:inputs 0 :logged-in] false)
