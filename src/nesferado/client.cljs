@@ -1016,10 +1016,17 @@
                     (do
                       (->output! "Account Creation Success!")
                       (->output! (str "Now logged in as " user-id))
+                      (set-item! :auth-key (:auth-token stuff))
+                      (set-item! :login-time (:login-time stuff))
+                      (set-item! :uid (:uid stuff))
+
                       (swap! input-state assoc-in [:inputs 0 :token] (:auth-token stuff))
                       (swap! input-state assoc-in [:inputs 0 :login-time] (:login-time stuff))
                       (swap! input-state assoc-in [:inputs 0 :logged-in] true)
                       (swap! input-state assoc-in [:inputs 0 :current-user] (:uid stuff))
+
+                      ;'log user in' on client
+                      (sente/chsk-reconnect! chsk)
                       )))))))))))
 
 
@@ -1046,6 +1053,7 @@
 
 
 (defn auto-login []
+  (->output! "Attempting auto-login ...")
   (sente/ajax-lite "/check-login"
               {:method :post
                :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
@@ -1075,7 +1083,7 @@
         (if (not (empty? (get-item :auth-key)))
           auto-login))
 
-(.log js/console "auto login?" (get-item :login-time))
+;(.log js/console "auto login?" (get-item :login-time))
 ;;get params works! woo!
 
 (.log js/console (get-url-params))
