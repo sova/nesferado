@@ -18,6 +18,7 @@
    [org.httpkit.server :as http-kit]
    [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
 
+
    ;; Optional, for Transit encoding:
    [taoensso.sente.packers.transit :as sente-transit]))
 
@@ -73,7 +74,11 @@
       ;user not found in db
       false)))
 
+(defn check-creds [uid auth-token login-time]
+  (password/check (str uid login-time) auth-token))
+
 ;(check-login-against-db "nelly" "18")
+
 
 
 
@@ -84,6 +89,14 @@
       false)))
 
 (username-not-taken "vasx")
+
+;(def users-db (e/file-atom
+;                {}
+ ;               "users-db.sova"));
+
+;submsiions
+;comments
+;ratings
 
 
 
@@ -193,14 +206,12 @@
 
 
 (defn login-handler
-  "Here's where you'll add your server-side login/auth procedure (Friend, etc.).
-  In our simplified example we'll just always successfully authenticate the user
-  with whatever user-id they provided in the auth request."
+  "Generates auth-map (login-time, uid, auth-token)"
   [ring-req]
   (let [{:keys [session params]} ring-req
         {:keys [user-id password]} params
         login-time (quot (System/currentTimeMillis) 1)]
-    (println "nf login req: %s" user-id)
+    (println "nf login req: " user-id)
     (if (check-login-against-db user-id password)
       (let [auth-map (create-auth-token-map user-id)]
         {:status 200
@@ -213,6 +224,33 @@
                                    :login-time (:login-time auth-map)
                                    :auth-token (:auth-token auth-map)})
          })
+      ;else
+      {:status 302 :session session})))
+
+
+(defn check-login-handler
+  "Reassures client that they are logged in."
+  [ring-req]
+  (let [{:keys [session params]} ring-req
+        {:keys [uid auth-token login-time]} params]
+    (println "nf re-auth req: " uid)
+    (println uid)
+    (println auth-token)
+    (println login-time)
+    ;(println (is-good-auth-key auth-token uid login-time))
+    (println (check-creds uid auth-token login-time))
+
+    (if (check-creds uid auth-token login-time)
+      {:status 200
+         ;:headers {"Content-Type" "application/transit+json"}
+         :body (prn-str {:uid uid
+                :login-time login-time
+                :auth-token auth-token})
+
+         :session (merge session  {:uid uid
+                                   :login-time login-time
+                                   :auth-token auth-token})
+         }
       ;else
       {:status 302 :session session})))
 
@@ -263,6 +301,7 @@
   (GET  "/chsk"  ring-req (ring-ajax-get-or-ws-handshake ring-req))
   (POST "/chsk"  ring-req (ring-ajax-post                ring-req))
   (POST "/login" ring-req (login-handler                 ring-req))
+  (POST "/check-login" ring-req (check-login-handler      ring-req))
   (POST "/create-account" ring-req (create-account-handler ring-req))
   (route/resources "/") ; Static files, notably public/main.js (our cljs target)
   (route/not-found "<h1>Page not found</h1>"))
@@ -408,7 +447,7 @@
 (defn  stop-web-server! [] (when-let [stop-fn @web-server_] (stop-fn)))
 (defn start-web-server! [& [port]]
   (stop-web-server!)
-  (let [port (or port 10001) ; 0 => Choose any available port
+  (let [port (or port 10221) ; 0 => Choose any available port
         ring-handler (var main-ring-handler)
 
         [port stop-fn]

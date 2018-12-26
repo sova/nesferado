@@ -12,6 +12,8 @@
    [rum.core :as rum]
    [alandipert.storage-atom :refer [local-storage]]
    [cemerick.url :as u]
+   [alandipert.storage-atom :refer [local-storage]]
+   [ajax.core :refer [POST]]
 
    ;; Optional, for Transit encoding:
    [taoensso.sente.packers.transit :as sente-transit])
@@ -55,6 +57,36 @@
   (def chsk-send! send-fn) ; ChannelSocket's send API fn
   (def chsk-state state)   ; Watchable, read-only atom
   )
+
+
+
+;;js localStorage interaction
+(defn set-item!
+  "Set `key' in browser's localStorage to `val`."
+  [key val]
+  (.setItem (.-localStorage js/window) key val))
+
+(defn get-item
+  "Returns value of `key' from browser's localStorage."
+  [key]
+  (.getItem (.-localStorage js/window) key))
+
+(defn remove-item!
+  "Remove the browser's localStorage value for the given `key`"
+  [key]
+  (.removeItem (.-localStorage js/window) key))
+
+
+(.log js/console (get-item :auth-key))
+(.log js/console (get-item :uid))
+
+
+(defn handler [response]
+  (.log js/console (str response)))
+
+(defn error-handler [{:keys [status status-text]}]
+  (.log js/console (str "something bad happened: " status " " status-text)))
+
 
 ;;;; Sente event handlers
 
@@ -449,6 +481,10 @@
 
                       ;(->output! (str "login time is" (:login-time stuff)))
 
+                      (set-item! :auth-key (:auth-token stuff))
+                      (set-item! :login-time (:login-time stuff))
+                      (set-item! :uid (:uid stuff))
+
                       ;assoc auth hash
                       (swap! input-state assoc-in [:inputs 0 :token] (:auth-token stuff))
                       (swap! input-state assoc-in [:inputs 0 :login-time] (:login-time stuff))
@@ -652,6 +688,9 @@
                                   (swap! input-state assoc-in [:inputs 0 :current-user] "")
                                   (swap! input-state assoc-in [:inputs 0 :auth-token] "")
                                   (swap! input-state assoc-in [:inputs 0 :login-time] "")
+                                  (remove-item! :login-time)
+                                  (remove-item! :uid)
+                                  (remove-item! :auth-key)
                                   (->output! (str "Logout Successful"))))} "⇏ logout"]]]]))
 
 (rum/defc side-bar []
@@ -991,6 +1030,10 @@
   ;; (swap! app-state update-in [:__figwheel_counter] inc)
 )
 
+
+
+
+
 ;hax
 (defn hax [] )
 
@@ -1001,6 +1044,38 @@
 
 (.log js/console "sup ninja!!!  " (get (get-url-params) "v"))
 
+
+(defn auto-login []
+  (sente/ajax-lite "/check-login"
+              {:method :post
+               :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
+               :params {:uid           (get-item :uid)
+                        :auth-token    (get-item :auth-key)
+                        :login-time    (get-item :login-time)}
+               :type :text}
+
+              (fn [ajax-resp]
+                (->output! "Auto-login response: " ajax-resp)
+                (let [{:keys [success? ?status ?error ?content ?content-type]} ajax-resp
+                      http-status (:?status ajax-resp)
+                      auto-login-successful? (= 200 http-status)
+                      stuff (cljs.reader/read-string ?content)]
+                  (if-not auto-login-successful?
+                    (->output! "Auto-login failed")
+                    (do
+                       (->output! "Auto-login success!")
+                      ;assoc auth hash
+                      (swap! input-state assoc-in [:inputs 0 :token] (get-item :auth-key))
+                      (swap! input-state assoc-in [:inputs 0 :login-time] (get-item :login-time))
+                      (swap! input-state assoc-in [:inputs 0 :logged-in] true)
+                      (swap! input-state assoc-in [:inputs 0 :current-user] (get-item :uid)) ;'log user in' on client
+                      (sente/chsk-reconnect! chsk)))))))
+
+(set! (.-onload js/window)
+        (if (not (empty? (get-item :auth-key)))
+          auto-login))
+
+(.log js/console "auto login?" (get-item :login-time))
 ;;get params works! woo!
 
 (.log js/console (get-url-params))
