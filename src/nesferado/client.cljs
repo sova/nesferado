@@ -678,9 +678,9 @@
                            (.stopPropagation e)
                            (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} " ∴ preferences"]]
 
-      [:li "ψ " [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "top"   ))} "top"   ]]
-      [:li "Δ " [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "submit"))} "submit"]]
-      [:li [:a {:href "/my/profile"} (str " ϟ " current-user)]]
+      [:li "⏦ " [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "top"   ))} "top"   ]]
+      [:li "⌔ " [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "submit"))} "submit"]]
+      [:li [:a {:href "/my/profile"} (str " ⌬ " current-user)]]
       [:li [:span {
               :on-click (fn [e] (do
                                   (.stopPropagation e)
@@ -1078,6 +1078,9 @@
                       (swap! input-state assoc-in [:inputs 0 :logged-in] true)
                       (swap! input-state assoc-in [:inputs 0 :current-user] (get-item :uid)) ;'log user in' on client
                       (sente/chsk-reconnect! chsk)))))))
+
+(if (not (empty? (get-item :auth-key)))
+    (swap! input-state assoc-in [:inputs 0 :logged-in] true))
 
 (set! (.-onload js/window)
         (if (not (empty? (get-item :auth-key)))

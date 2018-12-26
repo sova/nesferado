@@ -41,6 +41,7 @@ a { transition: color 0.35s ease;}
   height: 4em;
   font-size: 24px;
   border: 1px solid #ccc;
+  border: none;
   resize: none;
   z-index: -1000;
 /*  opacity: 1;*/
@@ -472,3 +473,13 @@ float: left;
   color: #888;
   margin-bottom: 0.25em;
 }
+
+.nonbuzz {
+
+  width: 10em;
+  height: 2em;
+  border-radius: 1.5em;
+  background-color: hsla(100, 10%, 10%, 0.5);
+  z-index: 900;
+  margin-top: 4em;
+  color: #fff; padding-left: 5em;}
