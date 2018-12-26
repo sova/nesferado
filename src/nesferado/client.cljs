@@ -443,6 +443,45 @@
 
 
 
+(defn create-user [user-id pw pw2]
+  (->output! "Creating account" user-id)
+
+  ;;; Use any login procedure you'd like. Here we'll trigger an Ajax
+  ;;; POST request that resets our server-side session. Then we ask
+  ;;; our channel socket to reconnect, thereby picking up the new
+  ;;; session.
+
+  (sente/ajax-lite "/create-account"
+                   {:method :post
+                    :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
+                    :params  {:user-id (str user-id)
+                              :password (str pw)
+                              :password2 (str pw2)}
+                    :type :text}
+
+                   (fn [ajax-resp]
+                     (->output! "Account creation response: " ajax-resp)
+                     (let [{:keys [success? ?status ?error ?content ?content-type]} ajax-resp
+                           http-status (:?status ajax-resp)
+                           account-create-successful? (= 200 http-status)
+                           stuff (cljs.reader/read-string ?content)]
+                       (if-not account-create-successful?
+                         (->output! "Account Creation Failed.")
+                         (do
+                           (->output! "Account Creation Success!")
+                           (->output! (str "Now logged in as " user-id))
+                           (set-item! :auth-key (:auth-token stuff))
+                           (set-item! :login-time (:login-time stuff))
+                           (set-item! :uid (:uid stuff))
+
+                           (swap! input-state assoc-in [:inputs 0 :token] (:auth-token stuff))
+                           (swap! input-state assoc-in [:inputs 0 :login-time] (:login-time stuff))
+                           (swap! input-state assoc-in [:inputs 0 :logged-in] true)
+                           (swap! input-state assoc-in [:inputs 0 :current-user] (:uid stuff))
+
+                           ;'log user in' on client
+                           (sente/chsk-reconnect! chsk)
+                           ))))))
 
 
 
@@ -654,7 +693,7 @@
                                            (do
                                          ;    (.log js/console "create account button pressed")
 
-                                             ;(create-user username password password2)
+                                             (create-user username password password2)
                                              )))} "create account"]])
 
 
@@ -975,59 +1014,6 @@
 (rum/mount (footer)
            (. js/document (getElementById "footing")))
 
-
-
-
-
-
-
-(when-let [target-el (.getElementById js/document "crsubmit")]
-  (.addEventListener target-el "click"
-    (fn [ev]
-      (let [user-id (.-value (.getElementById js/document "cruser"))
-            pw      (.-value (.getElementById js/document "crpass"))
-            pw2     (.-value (.getElementById js/document "crpass2"))]
-        (if (str/blank? user-id)
-          (js/alert "Please enter a user-id first")
-          (do
-            (->output! "Creating account" user-id)
-
-            ;;; Use any login procedure you'd like. Here we'll trigger an Ajax
-            ;;; POST request that resets our server-side session. Then we ask
-            ;;; our channel socket to reconnect, thereby picking up the new
-            ;;; session.
-
-            (sente/ajax-lite "/create-account"
-              {:method :post
-               :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
-               :params  {:user-id (str user-id)
-                         :password (str pw)
-                         :password2 (str pw2)}
-               :type :text}
-
-              (fn [ajax-resp]
-                (->output! "Account creation response: " ajax-resp)
-                (let [{:keys [success? ?status ?error ?content ?content-type]} ajax-resp
-                      http-status (:?status ajax-resp)
-                      account-create-successful? (= 200 http-status)
-                      stuff (cljs.reader/read-string ?content)]
-                  (if-not account-create-successful?
-                    (->output! "Account Creation Failed.")
-                    (do
-                      (->output! "Account Creation Success!")
-                      (->output! (str "Now logged in as " user-id))
-                      (set-item! :auth-key (:auth-token stuff))
-                      (set-item! :login-time (:login-time stuff))
-                      (set-item! :uid (:uid stuff))
-
-                      (swap! input-state assoc-in [:inputs 0 :token] (:auth-token stuff))
-                      (swap! input-state assoc-in [:inputs 0 :login-time] (:login-time stuff))
-                      (swap! input-state assoc-in [:inputs 0 :logged-in] true)
-                      (swap! input-state assoc-in [:inputs 0 :current-user] (:uid stuff))
-
-                      ;'log user in' on client
-                      (sente/chsk-reconnect! chsk)
-                      )))))))))))
 
 
 
