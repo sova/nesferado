@@ -737,7 +737,7 @@
 
       [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "default"))} "⌁ top"   ]]
       [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "submit"))} "⌁ submit"]]
-      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile"))} (str " ⌬ " (if (empty? current-user) "....." current-user))]]
+      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile"))} (str " ⌬ " (if (empty? current-user) ". . ." current-user))]]
       [:li [:span.sidebarbutton {
               :on-click (fn [e] (do
                                   (.stopPropagation e)
@@ -748,7 +748,7 @@
                                   (remove-item! :login-time)
                                   (remove-item! :uid)
                                   (remove-item! :auth-key)
-                                  (->output! (str "Logout Successful"))))} " ⇏ logout"]]]]))
+                                  (->output! (str "Logout Successful"))))} " ⇏"]]]]))
 
 (rum/defc side-bar []
   [:div#sidebar
@@ -1083,6 +1083,8 @@
    (if (= "set-password" curr-view) (set-password))
 
    (if (= "invite-friend" curr-view) (invite-fields))
+
+   (if (= "submit" curr-view) (post-input))
 
   ; top is currently pointing to "default"
 
