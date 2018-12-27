@@ -589,9 +589,9 @@
                                             (some #(= % pid) (get-in @input-state [:inputs 0 :selected-child])) "selectedChild")} (:contents noc-post)
             [:div.item-author   (:author noc-post)]
             [:div.rate
-               [:div.item-rate-doubleplus {:on-click (fn [e] (rate :double-plus pid))} "++"]
-               [:div.item-rate-plus  {:on-click (fn [e] (rate :plus pid))} "+"]
-               [:div.item-rate-minus {:on-click (fn [e] (rate :minus pid))} "-"]
+               [:div.item-rate-doubleplus {:on-click (fn [e] (rate :double-plus pid))} ""] ;++
+               [:div.item-rate-plus  {:on-click (fn [e] (rate :plus pid))} ""] ;+
+               [:div.item-rate-minus {:on-click (fn [e] (rate :minus pid))} ""] ;-
               [:div.item-rating   (/ (:ratings-total noc-post) (:number-of-ratings noc-post))]]]]])
        ;lest the post has comments and needs more renders in pocket.
        (let [com-post (first (filter  #(= pid (:id %)) (sort-by #(/ (:ratings-total %) (:number-of-ratings %))  post-coll)))]
@@ -605,9 +605,9 @@
                                               (some #(= % pid) (get-in @input-state [:inputs 0 :selected-child])) "selectedChild")} (:contents com-post)
              [:div.item-author (:author com-post)]
              [:div.rate
-               [:div.item-rate-doubleplus {:on-click (fn [e] (rate :double-plus pid))} "++"]
-               [:div.item-rate-plus  {:on-click (fn [e] (rate :plus pid))} "+"]
-               [:div.item-rate-minus {:on-click (fn [e] (rate :minus pid))} "-"]
+               [:div.item-rate-doubleplus {:on-click (fn [e] (rate :double-plus pid))} ""] ;++
+               [:div.item-rate-plus  {:on-click (fn [e] (rate :plus pid))} ""] ;+
+               [:div.item-rate-minus {:on-click (fn [e] (rate :minus pid))} ""] ;-
                [:div.item-rating   (/ (:ratings-total com-post) (:number-of-ratings com-post))]]]
 
            [:button.commentog {:on-click (fn [_] (swap! local-atom #(* -1 %)))}
@@ -852,6 +852,8 @@
         id (:id td)
         posted-by (:posted-by td)
         timestamp (:timestamp td)
+        n-ratings (:number-of-ratings td)
+        ratings-t (:ratings-total td)
         cids (return-comment-ids-of-tv id) ]
     [:li [:div.tile {:on-click (fn [e] (do
                                          (.log js/console "link to post" id " + comments disp, " td)
@@ -869,6 +871,11 @@
                      :id (str "tile" id)}
         [:div.heading title]
         [:div.contents contents]
+        [:div.tile-rate
+            [:div.tile-rate-doubleplus {:on-click (fn [e] (rate :double-plus id))} ""]
+            [:div.tile-rate-plus  {:on-click (fn [e] (rate :plus id))} ""]
+            [:div.tile-rate-minus {:on-click (fn [e] (rate :minus id))} ""]
+            [:div.tile-rating   (/ ratings-t n-ratings)]]
         [:div.priority id]]])))
 
 

@@ -1,4 +1,4 @@
-(defproject nesferado "0.0.0.0.0.0.0.1.00.0.9"
+(defproject nesferado "0.0.0.0.0.0.0.1.11.0.9"
   :description "Nonforum Nesferado"
   :url "https://github.com/sova/nesferado"
   :license {:description "All rights reserved." }
@@ -11,7 +11,6 @@
    [org.clojure/clojurescript "1.9.229"]
    [org.clojure/core.async    "0.2.395"]
    [org.clojure/tools.nrepl   "0.2.12"] ; Optional, for Cider
-
    [com.taoensso/sente        "1.11.0"] ; <--- Sente
    [com.taoensso/timbre       "4.7.4"]
 
@@ -22,16 +21,10 @@
    [cljs-ajax "0.7.5"]
    [duratom "0.3.3"] ;production server likes this one best
 
-   ;;; TODO Choose (uncomment) a supported web server -----------------------
    [http-kit                             "2.2.0"] ; Default
    [ring                      "1.5.0"]
    [ring/ring-defaults        "0.2.1"] ; Includes `ring-anti-forgery`, etc.
-   ;; [ring-anti-forgery      "1.0.0"]
-
    [compojure                 "1.5.1"]
-
-   ;;; Transit deps optional; may be used to aid perf. of larger data payloads
-   ;;; (see reference example for details):
    [com.cognitect/transit-clj  "0.8.290"]
    [com.cognitect/transit-cljs "0.8.239"]]
 

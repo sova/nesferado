@@ -1,6 +1,10 @@
 /* some style */
 
 @import url('https://fonts.googleapis.com/css?family=Assistant:300');
+@font-face {
+  font-family: drakken-dice;
+  src: url(drakken-dice.ttf);
+}
 
 
 * { font-family: 'Assistant', sans-serif;}
@@ -231,6 +235,7 @@ width: 1200px;}
   right: 0;
   float: left;
   font-size: 32px;
+  font-family: 'drakken-dice';
 }
 
 .item-contents {
@@ -305,6 +310,7 @@ width: 1200px;}
   background-color: pink;
 }
 .tile {
+  position: relative;
   clear: left;
   width: auto;
   height: auto;
@@ -413,7 +419,7 @@ style: none;}
   }
   .topbar {width: 400px;}
   #footer {width: 100%;}
-  #maincontain {width: 102%;}
+  #maincontain {}
 }
 
 @media only screen and (min-width: 600px) {
@@ -515,3 +521,65 @@ float: left;
 .logout {
   margin-left: 4em;
 }
+
+
+.tile-rate {
+  position: absolute;
+  right: 0.05em;
+  top: 0.05em;
+  width: 4em;
+  height: 4em;
+  border: 1px solid teal;
+  overflow: hidden;
+  z-index: 1002;
+}
+
+.tile-rate-doubleplus {
+  position: absolute;
+  top: 0; left; 0;
+  width: 100%;
+  height: 33.34%;
+  z-index: 1003;
+  opacity: 0.3;
+}
+.tile-rate-doubleplus:hover {
+  background-color: green;
+  z-index: 1003;
+}
+.tile-rate-plus {
+  position: absolute;
+  top: 33.33%;
+  left: 0;
+  width: 100%;
+  height: 33.34%;
+  z-index: 1003;
+  opacity: 0.3;
+  }
+.tile-rate-plus:hover {
+  background-color: blue;
+z-index: 1003;}
+
+.tile-rate-minus {
+  position: absolute;
+  top: 66.66%;
+  left: 0;
+  width: 100%;
+  height: 33.34%;
+  z-index: 1003;
+  opacity: 0.3;}
+.tile-rate-minus:hover {
+  z-index: 1003;
+  background-color: pink;
+}
+.tile-rating {
+  position: absolute;
+  font-size: 95px;
+  top: 0;
+  left: 0;
+  z-index: 200;
+
+  font-family: 'drakken-dice';
+
+
+}
+
