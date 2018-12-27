@@ -289,6 +289,7 @@
 (def input-state (atom {:inputs
                        [ {:title ""
                           :contents ""
+                          :link ""
                           :comment ""
                           :selected-parent 0
                           :selected-child []
@@ -717,9 +718,9 @@
                            (.stopPropagation e)
                            (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} " ∴ preferences"]]
 
-      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "⏦ top"   ))} "top"   ]]
-      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "⌔ submit"))} "submit"]]
-      [:li [:a {:href "/my/profile"} (str " ⌬ " current-user)]]
+      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "default"))} "⌁ top"   ]]
+      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "submit"))} "⌁ submit"]]
+      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile"))} (str " ⌬ " (if (empty? current-user) "....." current-user))]]
       [:li [:span.sidebarbutton {
               :on-click (fn [e] (do
                                   (.stopPropagation e)
@@ -735,17 +736,36 @@
 (rum/defc side-bar []
   [:div#sidebar
    [:ol.sidebar
-    [:li (link "edit profile")]
-    [:li (link "view profile")]
-    [:li (link "stats")]
-    [:li (link "set password")]
-    [:li (link "set email")]
-    [:li (link "invite friends")]
     [:li [:div.sidebarbutton {:on-click (fn [_] (do
+                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile")
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "ᐃ edit profile"]]
 
+    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "set-public-email")
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "໑ set public email"]]
+
+    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "set-recovery-email")
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "ༀ set recovery e-mail"]]
+
+    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "set password")
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "༓ set password"]]
+
+    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "invite-friends")
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "၀ invite friends"]]
+
+    [:li [:div.sidebarbutton {:on-click (fn [_] (do
                                                   (swap! input-state assoc-in [:inputs 0 :current-view] "send-feedback")
-                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "give feedback"]]
-    [:li (link "Support nf")]]])
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "૪ give feedback"]]
+
+    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "support-nf")
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "៷៸៸ support nf"]]
+
+    [:li [:div.sidebarbutton {:on-click (fn [_] (swap! input-state update-in [:inputs 0 :show-sidebar] not))} "ᐉ hide preferences"]]
+    ]])
 
 (rum/defc login-bar []
   [:div#loginbar
@@ -805,15 +825,20 @@
 
 (rum/defc post-input []
   [:form#postinput "Create new post"
-   [:input.fullwidth {:placeholder "title"
+   [:input.postinput{:placeholder "title"
                       :on-change (fn [e] (do
                                     (swap! input-state assoc-in [:inputs 0 :title] (.-value (.-target e)))
                                     (.log js/console (get-in @input-state [:inputs 0 :title]))))}]
-   [:input.fullwidth {:placeholder "contents"
+   [:input.postinput {:placeholder "link"
+                      :on-change (fn [e] (do
+                                   (swap! input-state assoc-in [:inputs 0 :link] (.-value (.-target e)))
+                                   (.log js/console (get-in @input-state [:inputs 0 :link]))))}]
+
+   [:input.postinput {:placeholder "contents"
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :contents] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :contents]))))}]
-   [:button.fullwidth {:type "button"
+   [:button.postinput {:type "button"
                        :on-click (fn [e]
                                      ;(.preventDefault e)
                                      ;(.stopPropagation e)
@@ -1055,7 +1080,9 @@
                       auto-login-successful? (= 200 http-status)
                       stuff (cljs.reader/read-string ?content)]
                   (if-not auto-login-successful?
-                    (->output! "Auto-login failed")
+                    (do
+                      (->output! "Auto-login failed")
+                      (swap! input-state assoc-in [:inputs 0 :logged-in] false))
                     (do
                        (->output! "Auto-login success!")
                       ;assoc auth hash
@@ -1066,7 +1093,7 @@
                       (sente/chsk-reconnect! chsk)))))))
 
 (if (not (empty? (get-item :auth-key)))
-    (swap! input-state assoc-in [:inputs 0 :logged-in] true))
+  (swap! input-state assoc-in [:inputs 0 :logged-in] true))
 
 (set! (.-onload js/window)
         (if (not (empty? (get-item :auth-key)))

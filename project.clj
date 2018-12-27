@@ -1,6 +1,6 @@
-(defproject nesferado "0.0.0.0.0.0.0.1.00.0.8"
-  :description "Sente, reference web-app example project"
-  :url "https://github.com/ptaoussanis/sente"
+(defproject nesferado "0.0.0.0.0.0.0.1.00.0.9"
+  :description "Nonforum Nesferado"
+  :url "https://github.com/sova/nesferado"
   :license {:description "All rights reserved." }
   :min-lein-version "2.3.3"
   :global-vars {*warn-on-reflection* false
@@ -20,6 +20,7 @@
    [crypto-password "0.2.0"]
    [com.cemerick/url "0.1.1"]
    [cljs-ajax "0.7.5"]
+   [duratom "0.3.3"] ;production server likes this one best
 
    ;;; TODO Choose (uncomment) a supported web server -----------------------
    [http-kit                             "2.2.0"] ; Default

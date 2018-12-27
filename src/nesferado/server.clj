@@ -17,6 +17,7 @@
    [crypto.password.pbkdf2 :as password]
    [org.httpkit.server :as http-kit]
    [taoensso.sente.server-adapters.http-kit :refer (get-sch-adapter)]
+   [duratom.core :refer :all]
 
 
    ;; Optional, for Transit encoding:
@@ -98,6 +99,19 @@
 ;comments
 ;ratings
 
+
+(def nf-users-db (duratom :local-file
+                           :file-path "pasona.sova"
+                           :init []))
+(def nf-submissions (duratom :local-file
+                      :file-path "submissions.sova"
+                      :init []))
+(def nf-comments (duratom :local-file
+                    :file-path "comments.sova"
+                    :init []))
+(def nf-ratings (duratom :local-file
+                    :file-path "ratings.sova"
+                    :init []))
 
 
 (defn create-auth-token-map [user-email]

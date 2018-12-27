@@ -1,21 +1,54 @@
-DEC 25
+DEC 25, DEC 26
 
 edit profile
-view profile
-stats
+  your stats
+  comments 42 (view)
+  submissions 21 (view)
+  your bio
+  your public-email
+
+  set bio
+  set public e-mail
+
+
+v1.8___________8.1v
+  set user-image
+  view buddy list
+  add to buddy list
+  follow / unfollow
+  remove from buddy list
+  block
+  send message
+
+
 set password
+  you must add a recovery e-mail to change the password.
+  please add a recovery e-mail in the [set email] page.
+
+  enter old password: xxx
+  enter new password: ooo
+  re-enter new pw:    ooo
+
+  what is 1001 + 336? 1337.
+
+  password set!
+  your e-mail has been notified.
+  this action can be rescinded by the rightful account owner.
+
+
 set email
+  set public e-mail
+  set recovery (private) e-mail
+
 invite friends
+
+  invite a friend
+  [enter some emails to invite friends to nonforum]
+
 give feedback
+
+
 support nf
-
-
-New Views
-  change password,
-  email,
-  support page,
-  basically everything in "preferences" needs a view.
-
 
 
 
