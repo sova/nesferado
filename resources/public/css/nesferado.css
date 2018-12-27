@@ -322,6 +322,10 @@ width: 1200px;}
   align: center;
 }
 
+.contents {
+  margin-right: 98px;
+}
+
 .tv > li {
   list-style-type: none;
 }

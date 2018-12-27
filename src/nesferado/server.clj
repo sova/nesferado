@@ -1,5 +1,5 @@
 (ns nesferado.server
-  "nonforum server based on sente"
+  "Nonforum Nesferado Server"
   {:author "@_vaso"}
 
   (:require
@@ -134,6 +134,7 @@
   (let [now (quot (System/currentTimeMillis) 1000)
         phase (- login-time now)
         shift 1300000 ;1.3 mil seconds = 2 weeks
+        ;doesn't actually work because time is not an int? huh?
 
         valid? (< phase shift)]
       (and valid? (password/check (str user-email login-time) auth-key))))
