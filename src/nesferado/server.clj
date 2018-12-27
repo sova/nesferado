@@ -98,19 +98,23 @@
 ;submsiions
 ;comments
 ;ratings
+;participation
 
 
 (def nf-users-db (duratom :local-file
-                           :file-path "pasona.sova"
+                           :file-path "data/pasona.sova"
                            :init []))
 (def nf-submissions (duratom :local-file
-                      :file-path "submissions.sova"
+                      :file-path "data/submissions.sova"
                       :init []))
 (def nf-comments (duratom :local-file
-                    :file-path "comments.sova"
+                    :file-path "data/comments.sova"
                     :init []))
 (def nf-ratings (duratom :local-file
-                    :file-path "ratings.sova"
+                    :file-path "data/ratings.sova"
+                    :init []))
+(def nf-participation (duratom :local-file
+                    :file-path "data/participation.sova"
                     :init []))
 
 

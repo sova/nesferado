@@ -44,6 +44,7 @@ a { transition: color 0.35s ease;}
   border: none;
   resize: none;
   z-index: -1000;
+  overflow: hidden;
 /*  opacity: 1;*/
 }
 .topbar {
@@ -51,12 +52,14 @@ a { transition: color 0.35s ease;}
   min-height: 40px;
   margin-top: 0;
   margin-left: 0;
-  background-color: hsla(240, 50%, 77%, 1.0);
+  /*background-color: hsla(240, 50%, 77%, 1.0); light regal urple*/
+  background-color: hsl(270, 40%, 10%); /*Nonforum Regal Urple*/
   color: #fff;
   display: inline-block;
   width: 1230px;
   border-radius: 3px;
   z-index: +1000;
+  border: 1px solid green;
 }
 
 .topbar>li {  display: inline-block; margin-right: 0.3em; }
@@ -77,6 +80,7 @@ a { transition: color 0.35s ease;}
   top: 1em;
   left: 10em;
   border: 1px solid green;
+  border-radius: 3px;
   display: block;
   height: auto;
   width: auto;
@@ -84,16 +88,18 @@ a { transition: color 0.35s ease;}
   margin-right: 1em;
   margin-bottom: 0.5em;
   background-color: #fff;
-  background-color: #000;
+  background-color: hsl(271, 41%, 11%);
   z-index: 1008;
+  opacity: 0.99;
+  padding-left: 1em;
+  padding-top: 0.5em;
 }
 .sidebar>li {
-  padding-left: 1em;
+  margin-left: 1em;
   height: 45px;
   width: 10em;
-  font-size: 35px;
-  background-color: #ccc;
-  border: 1px solid white;
+  font-size: 20px;
+  border: 1px solid hsl(270, 40%, 10%);
   border-width: 1px 0 1px 1px;
   list-style-type: none;
   margin: 0;
@@ -106,7 +112,7 @@ a { transition: color 0.35s ease;}
 .sidebarbutton {
   color:purple;
   text-decoration: none;
-  transition: color 0.35s ease;
+  transition: color 0.25s ease;
 }
 
 .sidebarbutton:hover {
@@ -488,4 +494,24 @@ float: left;
 .postinput {
   width: 15em;
   height: 2em;
+}
+
+
+.si {
+  float: left;
+  clear: left;
+}
+
+.hideprefs {
+  color: #8a9c9b;
+}
+
+.bb {
+
+  width: 100%;
+  height: 100%
+}
+
+.logout {
+  margin-left: 4em;
 }

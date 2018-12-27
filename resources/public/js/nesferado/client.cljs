@@ -259,7 +259,9 @@
                            :posted-by "v@nonforum.com"
                            :timestamp 808080808
                            :comments [69]
-                           :parent nil}
+                           :parent nil
+                           :number-of-ratings 2
+                           :ratings-total 188}
                           {:title "Let's Put Sun Panels on the Roof"
                            :contents "Put a powerplant on your home and be free of your electric bill"
                            :priority 2
@@ -267,7 +269,9 @@
                            :posted-by "v@nonforum.com"
                            :timestamp 808080808
                            :comments []
-                           :parent nil}
+                           :parent nil
+                           :number-of-ratings 2
+                           :ratings-total 188}
                           {:title "Tonsky/rum is excellent for cljs"
                            :contents "the best way to be the best"
                            :priority 3
@@ -275,7 +279,9 @@
                            :posted-by "v@nonforum.com"
                            :timestamp 808080808
                            :comments []
-                           :parent nil}
+                           :parent nil
+                           :number-of-ratings 2
+                           :ratings-total 188}
                           {:title "Postpostpost"
                            :contents "this is the post!"
                            :link "http://hysterical.com"
@@ -284,7 +290,9 @@
                            :posted-by "v@nonforum.com"
                            :timestamp 808080808
                            :comments []
-                           :parent nil}]))
+                           :parent nil
+                           :number-of-ratings 2
+                           :ratings-total 188}]))
 
 (def input-state (atom {:inputs
                        [ {:title ""
@@ -312,7 +320,7 @@
                           :tv-timestamp 808
                           :tv-comments []
                           :tv-current {}
-                          :tv-curr-id 0
+                          :tv-curr-id ""
                           :logged-in false
 
                           :set-email ""
@@ -729,59 +737,88 @@
   (let [current-user (get-in (rum/react input-state) [:inputs 0 :current-user])]
     [:div#topbar
      [:ol.topbar
-      [:li [:div.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "default"))} "n⊜nforum"]]
+      [:li [:div.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "default"))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "n⊜nforum"]]
       [:li [:span.sidebarbutton {:on-click
                  (fn [e] (do
                            (.stopPropagation e)
-                           (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} " ∴ preferences"]]
+                           (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ∴ preferences"]]
 
-      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "default"))} "⌁ top"   ]]
-      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "submit"))} "⌁ submit"]]
-      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile"))} (str " ⌬ " (if (empty? current-user) ". . ." current-user))]]
-      [:li [:span.sidebarbutton {
+      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "default"))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ top"   ]]
+      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "submit"))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ submit"]]
+      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile"))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "crosshair"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} (str " ⌬ " (if (empty? current-user) ". . ." current-user))]]
+      [:li [:span.sidebarbutton.logout {
               :on-click (fn [e] (do
                                   (.stopPropagation e)
                                   (swap! input-state assoc-in [:inputs 0 :logged-in] false)
                                   (swap! input-state assoc-in [:inputs 0 :current-user] "")
                                   (swap! input-state assoc-in [:inputs 0 :auth-token] "")
                                   (swap! input-state assoc-in [:inputs 0 :login-time] "")
+                                  (swap! input-state assoc-in [:inputs 0 :current-view] "default")
                                   (remove-item! :login-time)
                                   (remove-item! :uid)
                                   (remove-item! :auth-key)
-                                  (->output! (str "Logout Successful"))))} " ⇏"]]]]))
+                                  (->output! (str "Logout Successful"))))
+              :onMouseOver (fn [e] (set! js/document.body.style.cursor "not-allowed"))
+              :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ⇏"]]]]))
 
 (rum/defc side-bar []
   [:div#sidebar
    [:ol.sidebar
-    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+    [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
                                                   (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile")
-                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "ᐃ edit profile"]]
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "ᐃ edit profile"]]
 
-    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+    [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
                                                   (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile")
-                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "໑ set public email"]]
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "໑ set public email"]]
 
-    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+    [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
                                                   (swap! input-state assoc-in [:inputs 0 :current-view] "set-recovery-email")
-                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "ༀ set recovery e-mail"]]
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "ༀ set recovery e-mail"]]
 
-    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+    [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
                                                   (swap! input-state assoc-in [:inputs 0 :current-view] "set-password")
-                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "༓ set password"]]
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "༓ set password"]]
 
-    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+    [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
                                                   (swap! input-state assoc-in [:inputs 0 :current-view] "invite-friend")
-                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "၀ invite friends"]]
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "၀ invite friends"]]
 
-    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+    [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
                                                   (swap! input-state assoc-in [:inputs 0 :current-view] "send-feedback")
-                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "૪ give feedback"]]
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "૪ give feedback"]]
 
-    [:li [:div.sidebarbutton {:on-click (fn [_] (do
+    [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
                                                   (swap! input-state assoc-in [:inputs 0 :current-view] "support-nf")
-                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "៷៸៸ support nf"]]
+                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "៷៸៸ support nf"]]
 
-    [:li [:div.sidebarbutton {:on-click (fn [_] (swap! input-state update-in [:inputs 0 :show-sidebar] not))} "ᐉ hide preferences"]]
+    [:li [:div.sidebarbutton.bb.hideprefs {:on-click (fn [_] (swap! input-state update-in [:inputs 0 :show-sidebar] not))
+                                           :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                           :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "ᐉ hide preferences"]]
     ]])
 
 (rum/defc login-bar []
@@ -898,17 +935,17 @@
 
 (rum/defc set-recovery-email []
   [:form#profileinput "Set Recovery Email"
-   [:input.profileinput{:placeholder "recovery e-mail"
+   [:input.si.profileinput {:placeholder "recovery e-mail"
                       :on-change (fn [e] (do
                                     (swap! input-state assoc-in [:inputs 0 :bio] (.-value (.-target e)))
                                     (.log js/console (get-in @input-state [:inputs 0 :bio]))))}]
-   [:span "password:" [:input.postinput {:placeholder ""
+   [:div.si "password:" [:input.postinput {:placeholder ""
                       :type "password"
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :password] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :link]))))}]]
 
-    [:button.postinput {:type "button"
+    [:button.si.postinput {:type "button"
                        :on-click (fn [e]
                                      (.log js/console "set recovery e-mail")
                                    ;submit to server here!
@@ -917,25 +954,25 @@
                        } "set recovery e-mail"]])
 
 (rum/defc set-password []
-  [:form#profileinput "Update Password"
-   [:span "old password" [:input.profileinput{:placeholder ""
+  [:form#setpasswordinput.si
+   [:div.si "old password" [:input {:placeholder ""
                                               :auto-complete "old-password"
                       :on-change (fn [e] (do
                                     (swap! input-state assoc-in [:inputs 0 :change-pass-old-pw] (.-value (.-target e)))
                                     (.log js/console (get-in @input-state [:inputs 0 :change-pass-old-pw]))))}]
-   [:span "new password:" [:input.postinput {:placeholder ""
+   [:div.si "new password:" [:input {:placeholder ""
                       :type "password"
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :change-pass-new-pw]))))}]]
 
-    [:span "new password confirm:" [:input.postinput {:placeholder ""
+    [:div.si "new password confirm:" [:input {:placeholder ""
                       :type "password"
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw2] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :change-pass-new-pw2]))))}]]
 
-    [:button.postinput {:type "button"
+    [:button.si {:type "button"
                        :on-click (fn [e]
                                      (.log js/console "set recovery e-mail")
                                    ;submit to server here!
@@ -1113,6 +1150,7 @@
    (if (= "default" curr-view)
     (if (= true logged-in)
      (tv-cell tv-current)))
+;       (first (filter  #(= tv-current (:id %)) @tv-state))))) ;now an id, filter atom for td.
 
    (if (= "default" curr-view)
     (if (not (empty? tv-current))
@@ -1200,6 +1238,20 @@
 ;;get params works! woo!
 
 (.log js/console (get-url-params))
+
+
+;;IN PROGRESS
+(.log js/console "snax: " (get (get-url-params) "nfid"))
+(let [url-params (get-url-params)
+      nfid (get url-params "nfid")
+      v (get url-params "v")
+      td (filter  #(= nfid (:id %)) @tv-state)]
+  (.log js/console nfid v " any luck? " td)
+  (.log js/console (:comments td))
+
+  ;don't forget to also figure out and swap in tv-comments.
+
+  (swap! input-state assoc-in [:inputs 0 :tv-current] td))
 
 ;;;; Init stuff
 
