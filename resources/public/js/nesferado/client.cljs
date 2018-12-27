@@ -293,6 +293,7 @@
                           :comment ""
                           :selected-parent 0
                           :selected-child []
+
                           :username "" ;input/mutable
                           :password "" ;input/mutable
 
@@ -320,9 +321,9 @@
                           :change-pass-old-pw ""
                           :change-pass-new-pw ""
                           :change-pass-new-pw2 ""
+                          :invite-friend-input ""
 
                           :edit-display-name ""
-                          :invite-friends-input ""
                           :send-feedback-input ""
                           :send-feedback-extra ""
 
@@ -630,6 +631,22 @@
 
 
 
+(rum/defc invite-fields []
+  [:form#invitefriendsform
+   [:input#invitefriendsinput.fullwidth {:placeholder "Enter a friend's email and invite them to join nonforum." :name "invite"
+                      :on-change (fn [e] (do
+                                              (swap! input-state assoc-in [:inputs 0 :invite-friend-input] (.-value (.-target e)))
+                                           ))}]
+
+   [:button#sfsubmit.fullwidth {:type "button"
+                       :on-click (fn [e] (let [invite-friend  (get-in @input-state [:inputs 0 :invite-friend-input])]
+                                           (do
+                                             (.log js/console "invite friend button pressed")
+
+                                             ;(create-user username password password2)
+                                             )))} "invite friend"]])
+
+
 
 
 
@@ -731,7 +748,7 @@
                                   (remove-item! :login-time)
                                   (remove-item! :uid)
                                   (remove-item! :auth-key)
-                                  (->output! (str "Logout Successful"))))} "⇏ logout"]]]]))
+                                  (->output! (str "Logout Successful"))))} " ⇏ logout"]]]]))
 
 (rum/defc side-bar []
   [:div#sidebar
@@ -741,7 +758,7 @@
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "ᐃ edit profile"]]
 
     [:li [:div.sidebarbutton {:on-click (fn [_] (do
-                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "set-public-email")
+                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile")
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "໑ set public email"]]
 
     [:li [:div.sidebarbutton {:on-click (fn [_] (do
@@ -749,11 +766,11 @@
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "ༀ set recovery e-mail"]]
 
     [:li [:div.sidebarbutton {:on-click (fn [_] (do
-                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "set password")
+                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "set-password")
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "༓ set password"]]
 
     [:li [:div.sidebarbutton {:on-click (fn [_] (do
-                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "invite-friends")
+                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "invite-friend")
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))} "၀ invite friends"]]
 
     [:li [:div.sidebarbutton {:on-click (fn [_] (do
@@ -856,6 +873,76 @@
 
                                        (swap! tv-state update :tiles conj new-post-map))) ;thanks @Marc O'Morain
                        } "post new"]])
+
+(rum/defc edit-profile []
+  [:form#profileinput "Edit Profile"
+   [:textarea.profileinput{:placeholder "bio"
+                      :on-change (fn [e] (do
+                                    (swap! input-state assoc-in [:inputs 0 :bio] (.-value (.-target e)))
+                                    (.log js/console (get-in @input-state [:inputs 0 :bio]))))}]
+   [:input.postinput {:placeholder "public e-mail"
+                      :on-change (fn [e] (do
+                                   (swap! input-state assoc-in [:inputs 0 :link] (.-value (.-target e)))
+                                   (.log js/console (get-in @input-state [:inputs 0 :link]))))}]
+
+    [:button.postinput {:type "button"
+                       :on-click (fn [e]
+                                     (.log js/console "updating bio")
+                                   ;submit to server here!
+
+                                    (let [new-bio-data {:bio (get-in @input-state [:inputs 0 :bio])
+                                                        :public-email (get-in @input-state [:inputs 0 :public-email])}]
+
+                                       )) ;thanks @Marc O'Morain
+                       } "update bio"]])
+
+(rum/defc set-recovery-email []
+  [:form#profileinput "Set Recovery Email"
+   [:input.profileinput{:placeholder "recovery e-mail"
+                      :on-change (fn [e] (do
+                                    (swap! input-state assoc-in [:inputs 0 :bio] (.-value (.-target e)))
+                                    (.log js/console (get-in @input-state [:inputs 0 :bio]))))}]
+   [:span "password:" [:input.postinput {:placeholder ""
+                      :type "password"
+                      :on-change (fn [e] (do
+                                   (swap! input-state assoc-in [:inputs 0 :password] (.-value (.-target e)))
+                                   (.log js/console (get-in @input-state [:inputs 0 :link]))))}]]
+
+    [:button.postinput {:type "button"
+                       :on-click (fn [e]
+                                     (.log js/console "set recovery e-mail")
+                                   ;submit to server here!
+
+                                       ) ;thanks @Marc O'Morain
+                       } "set recovery e-mail"]])
+
+(rum/defc set-password []
+  [:form#profileinput "Update Password"
+   [:span "old password" [:input.profileinput{:placeholder ""
+                                              :auto-complete "old-password"
+                      :on-change (fn [e] (do
+                                    (swap! input-state assoc-in [:inputs 0 :change-pass-old-pw] (.-value (.-target e)))
+                                    (.log js/console (get-in @input-state [:inputs 0 :change-pass-old-pw]))))}]
+   [:span "new password:" [:input.postinput {:placeholder ""
+                      :type "password"
+                      :on-change (fn [e] (do
+                                   (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw] (.-value (.-target e)))
+                                   (.log js/console (get-in @input-state [:inputs 0 :change-pass-new-pw]))))}]]
+
+    [:span "new password confirm:" [:input.postinput {:placeholder ""
+                      :type "password"
+                      :on-change (fn [e] (do
+                                   (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw2] (.-value (.-target e)))
+                                   (.log js/console (get-in @input-state [:inputs 0 :change-pass-new-pw2]))))}]]
+
+    [:button.postinput {:type "button"
+                       :on-click (fn [e]
+                                     (.log js/console "set recovery e-mail")
+                                   ;submit to server here!
+
+                                       ) ;thanks @Marc O'Morain
+                       } "set password"]]])
+
 
 ;; https://github.com/tonsky/grumpy/blob/master/src/grumpy/editor.cljc#L257
 ;; thank you, @tonsky
@@ -989,13 +1076,15 @@
 
    (if (= "send-feedback" curr-view) (send-feedback-fields))
 
-   (if (= "submit" curr-view) (post-input))
+   (if (= "edit-profile" curr-view) (edit-profile))
 
-   (if (= "feed" curr-view) (post-input))
+   (if (= "set-recovery-email" curr-view) (set-recovery-email))
 
-   (if (= "latest" curr-view) (post-input))
+   (if (= "set-password" curr-view) (set-password))
 
-   (if (= "top" curr-view) (post-input))
+   (if (= "invite-friend" curr-view) (invite-fields))
+
+  ; top is currently pointing to "default"
 
    (if (= "default" curr-view)
     (if (= true logged-in)
