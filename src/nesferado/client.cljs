@@ -944,6 +944,10 @@
                        } "set password"]]])
 
 
+(rum/defc support-nf []
+  [:div#supportnf "Thank you for participating in and contributing to Nonforum."]
+  [:div#$$$$$$$$$ "In order to help support creative endeavors such as this, please contribute whatever you can."])
+
 ;; https://github.com/tonsky/grumpy/blob/master/src/grumpy/editor.cljc#L257
 ;; thank you, @tonsky
 ;; rum is awesome. 25 nov 2018
@@ -1085,6 +1089,8 @@
    (if (= "invite-friend" curr-view) (invite-fields))
 
    (if (= "submit" curr-view) (post-input))
+
+      (if (= "support-nf" curr-view) (support-nf))
 
   ; top is currently pointing to "default"
 
