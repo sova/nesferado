@@ -261,6 +261,8 @@
                            :comments [69]
                            :parent nil
                            :number-of-ratings 2
+                           :link "http://hax.com"
+                           :details "Horne Technologies is on the brink of a fusion breakthrough. Their lab successfully contained plasma in 2017 with high-beta confinement and they need funding to continue research.  So far the fusion efficiency record is 67% (as of Dec. 2018), let's see how many teslas of magnetic field we need to reach 108% efficiency / break parity!"
                            :ratings-total 188}
                           {:title "Let's Put Sun Panels on the Roof"
                            :contents "Put a powerplant on your home and be free of your electric bill"
@@ -271,6 +273,8 @@
                            :comments []
                            :parent nil
                            :number-of-ratings 2
+                           :link "www.coloradosolar.energy"
+                           :details "Colorado Solar is a premier solar installer in Colorado specializing in high-end residential and commercial installations."
                            :ratings-total 188}
                           {:title "Tonsky/rum is excellent for cljs"
                            :contents "the best way to be the best"
@@ -281,7 +285,9 @@
                            :comments []
                            :parent nil
                            :number-of-ratings 2
-                           :ratings-total 188}
+                           :ratings-total 188
+                           :link "www.github.com/tonsky/rum"
+                           :details "rum is dope. the components are reusable and the rendering is truly fast.  it's great, and makes me look like a decent coder! hah"}
                           {:title "Postpostpost"
                            :contents "this is the post!"
                            :link "http://hysterical.com"
@@ -292,7 +298,8 @@
                            :comments []
                            :parent nil
                            :number-of-ratings 2
-                           :ratings-total 188}]))
+                           :ratings-total 188
+                           :description "tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter."}]))
 
 (def input-state (atom {:inputs
                        [ {:title ""
@@ -767,7 +774,8 @@
                                   (remove-item! :login-time)
                                   (remove-item! :uid)
                                   (remove-item! :auth-key)
-                                  (->output! (str "Logout Successful"))))
+                                  (->output! (str "Logout Successful"))
+                                  (fn [e] (set! js/document.body.style.cursor "auto"))))
               :onMouseOver (fn [e] (set! js/document.body.style.cursor "not-allowed"))
               :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ⇏"]]]]))
 
@@ -854,7 +862,10 @@
         timestamp (:timestamp td)
         n-ratings (:number-of-ratings td)
         ratings-t (:ratings-total td)
-        cids (return-comment-ids-of-tv id) ]
+        link (:link td)
+        long-description (:details td)
+        cids (return-comment-ids-of-tv id)
+        tv-current (get-in (rum/react input-state) [:inputs 0 :tv-current])]
     [:li [:div.tile {:on-click (fn [e] (do
                                          (.log js/console "link to post" id " + comments disp, " td)
                                          (swap! input-state assoc-in [:inputs 0 :tv-title] title)
@@ -870,13 +881,24 @@
                                          (swap! input-state assoc-in [:inputs 0 :tv-curr-id] id)))
                      :id (str "tile" id)}
         [:div.heading title]
-        [:div.contents contents]
+          (if (not (empty? tv-current))
+              [:div.contents contents])
+          (if (not (empty? tv-current))
+              [:div.tilelink link])
+        [:div.longdescription long-description]
         [:div.tile-rate
-            [:div.tile-rate-doubleplus {:on-click (fn [e] (rate :double-plus id))} ""]
-            [:div.tile-rate-plus  {:on-click (fn [e] (rate :plus id))} ""]
-            [:div.tile-rate-minus {:on-click (fn [e] (rate :minus id))} ""]
+            [:div.tile-rate-doubleplus {:on-click (fn [e] (do
+                                                            (.stopPropagation e)
+                                                            (rate :double-plus id)))} ""]
+            [:div.tile-rate-plus  {:on-click (fn [e] (do
+                                                       (.stopPropagation e)
+                                                       (rate :plus id)))} ""]
+            [:div.tile-rate-minus {:on-click (fn [e] (do
+                                                       (.stopPropagation e)
+                                                       (rate :minus id)))} ""]
             [:div.tile-rating   (/ ratings-t n-ratings)]]
-        [:div.priority id]]])))
+        [:div.tileid id]
+          ]])))
 
 
 (rum/defc television  < rum/reactive []
@@ -1079,7 +1101,7 @@
                                 (.stopPropagation e)
                                 (swap! input-state assoc-in [:inputs 0 :tv-current] "")
                                 (swap! input-state assoc-in [:inputs 0 :tv-curr-id] "")))}
-                                  "< back to " active-state ]))
+                                  "< Back to " active-state ]))
 
 (rum/defc input-fields []
   [:div#inputs-contain
