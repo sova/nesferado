@@ -774,9 +774,8 @@
                                   (remove-item! :login-time)
                                   (remove-item! :uid)
                                   (remove-item! :auth-key)
-                                  (->output! (str "Logout Successful"))
-                                  (fn [e] (set! js/document.body.style.cursor "auto"))))
-              :onMouseOver (fn [e] (set! js/document.body.style.cursor "not-allowed"))
+                                  (->output! (str "Logout Successful"))))
+              :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
               :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ⇏"]]]]))
 
 (rum/defc side-bar []

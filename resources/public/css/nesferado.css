@@ -426,7 +426,7 @@ style: none;}
   .tv>li>.tile {width: 360px;}
   .tile {
     width: 97%;
-    border: 1px solid #555;
+    border: 1px solid hsl(270, 41%, 11%);
   }
   .topbar {width: 400px;}
   #footer {width: 100%;}
@@ -438,7 +438,7 @@ style: none;}
   .tv>li>.tile {width: 560px;}
   .tile {
     width: 93%;
-    border: 1px solid #777;
+    border: 1px solid hsl(270, 41%, 11%);
   }
   .topbar {width: 90%;}
   #footer {width: 100%;}
@@ -594,4 +594,3 @@ z-index: 1003;}
 
 
 }
-
