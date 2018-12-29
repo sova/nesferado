@@ -20,6 +20,7 @@
    [com.cemerick/url "0.1.1"]
    [cljs-ajax "0.7.5"]
    [duratom "0.3.3"] ;production server likes this one best
+   [venantius/accountant "0.2.4"]
 
    [http-kit                             "2.2.0"] ; Default
    [ring                      "1.5.0"]

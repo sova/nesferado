@@ -594,3 +594,14 @@ z-index: 1003;}
 
 
 }
+
+
+.hideme {
+  display: none;
+}
+
+
+.longdescription {
+  font-size: 20px;
+  margin: 1em;
+}

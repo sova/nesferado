@@ -317,6 +317,23 @@
 
 (defroutes ring-routes
   (GET  "/"      ring-req (landing-pg-handler            ring-req))
+
+  ;phantom routes
+  (GET "/top"     ring-req (landing-pg-handler            ring-req))
+  (GET "/submit"  ring-req (landing-pg-handler            ring-req))
+  (GET "/feedback" ring-req (landing-pg-handler            ring-req))
+
+  (GET "/email/recovery" ring-req (landing-pg-handler            ring-req))
+  (GET "/email/public" ring-req (landing-pg-handler            ring-req))
+  (GET "/password/update" ring-req (landing-pg-handler            ring-req))
+
+  (GET "/support" ring-req (landing-pg-handler            ring-req))
+
+  (GET "/invite" ring-req (landing-pg-handler            ring-req))
+
+  (GET "/profile" ring-req (landing-pg-handler            ring-req))
+  ;/phantomses
+
   (GET  "/chsk"  ring-req (ring-ajax-get-or-ws-handshake ring-req))
   (POST "/chsk"  ring-req (ring-ajax-post                ring-req))
   (POST "/login" ring-req (login-handler                 ring-req))

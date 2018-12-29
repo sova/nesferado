@@ -14,6 +14,7 @@
    [cemerick.url :as u]
    [alandipert.storage-atom :refer [local-storage]]
    [ajax.core :refer [POST]]
+   [accountant.core :as accountant]
 
    ;; Optional, for Transit encoding:
    [taoensso.sente.packers.transit :as sente-transit])
@@ -188,6 +189,9 @@
                        (sente/chsk-reconnect! chsk))))
 
 
+
+
+
 (defn err0r []
   (println "err0r"))
 
@@ -344,6 +348,16 @@
 
                           :current-view "default"
                           }]}))
+
+
+
+
+;;Accountant
+(accountant/configure-navigation! {:nav-handler (fn [path] (swap! input-state assoc-in [:inputs 0 :current-view] path))
+                                   :path-exists? (fn [_] true)
+                                   :reload-same-path? true})
+
+
 
 (defn js-reload []
   (.log js/console "javascript reloaded ^_^;"))
@@ -724,6 +738,9 @@
                                                password  (get-in @input-state [:inputs 0 :create-password])
                                                password2 (get-in @input-state [:inputs 0 :create-password2])]
                                            (do
+                                            ; (set! js/window.location.href "?nfid=108")
+                                            ; (accountant/navigate! "/")
+
                                          ;    (.log js/console "create account button pressed")
 
                                              (create-user username password password2)
@@ -744,7 +761,10 @@
   (let [current-user (get-in (rum/react input-state) [:inputs 0 :current-user])]
     [:div#topbar
      [:ol.topbar
-      [:li [:div.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "default"))
+      [:li [:div.sidebarbutton {:on-click (fn [_] (do
+                                                    (accountant/navigate! "/")
+                                                     ;(swap! input-state assoc-in [:inputs 0 :current-view] "/")
+                                                    ))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "n⊜nforum"]]
       [:li [:span.sidebarbutton {:on-click
@@ -754,13 +774,20 @@
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ∴ preferences"]]
 
-      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "default"))
+      [:li [:span.sidebarbutton {:on-click (fn [_] (do
+                                                     (accountant/navigate! "/top")
+                                                     (swap! input-state assoc-in [:inputs 0 :current-view] "/")))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ top"   ]]
-      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "submit"))
+      [:li [:span.sidebarbutton {:on-click (fn [_] (do
+                                                     (accountant/navigate! "/submit")
+                                                     (swap! input-state assoc-in [:inputs 0 :current-view] "/submit")))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ submit"]]
-      [:li [:span.sidebarbutton {:on-click (fn [_] (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile"))
+      [:li [:span.sidebarbutton {:on-click (fn [_] (do
+                                                     (accountant/navigate! "/profile")
+                                                     ;(swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile")
+                                                     ))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "crosshair"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} (str " ⌬ " (if (empty? current-user) ". . ." current-user))]]
       [:li [:span.sidebarbutton.logout {
@@ -770,7 +797,7 @@
                                   (swap! input-state assoc-in [:inputs 0 :current-user] "")
                                   (swap! input-state assoc-in [:inputs 0 :auth-token] "")
                                   (swap! input-state assoc-in [:inputs 0 :login-time] "")
-                                  (swap! input-state assoc-in [:inputs 0 :current-view] "default")
+                                  (swap! input-state assoc-in [:inputs 0 :current-view] "/")
                                   (remove-item! :login-time)
                                   (remove-item! :uid)
                                   (remove-item! :auth-key)
@@ -782,48 +809,57 @@
   [:div#sidebar
    [:ol.sidebar
     [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
-                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile")
+                                                 ; (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile")
+                                                     (accountant/navigate! "/profile")
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "ᐃ edit profile"]]
 
     [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
-                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile")
+                                                  ;(swap! input-state assoc-in [:inputs 0 :current-view] "/email/public")
+                                                     (accountant/navigate! "/email-public")
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "໑ set public email"]]
 
     [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
-                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "set-recovery-email")
+                                                  ;(swap! input-state assoc-in [:inputs 0 :current-view] "/email/recovery")
+                                                     (accountant/navigate! "/email-recovery")
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "ༀ set recovery e-mail"]]
 
     [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
-                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "set-password")
+                                                  ;(swap! input-state assoc-in [:inputs 0 :current-view] "/password/update")
+                                                     (accountant/navigate! "/password-update")
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "༓ set password"]]
 
     [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
-                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "invite-friend")
+                                                  ;(swap! input-state assoc-in [:inputs 0 :current-view] "/invite")
+                                                     (accountant/navigate! "/invite")
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "၀ invite friends"]]
 
     [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
-                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "send-feedback")
+                                                  ;(swap! input-state assoc-in [:inputs 0 :current-view] "/feedback")
+                                                  (accountant/navigate! "/feedback")
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "૪ give feedback"]]
 
     [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
-                                                  (swap! input-state assoc-in [:inputs 0 :current-view] "support-nf")
+                                                  ;(swap! input-state assoc-in [:inputs 0 :current-view] "/support")
+                                                     (accountant/navigate! "/support")
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "៷៸៸ support nf"]]
 
-    [:li [:div.sidebarbutton.bb.hideprefs {:on-click (fn [_] (swap! input-state update-in [:inputs 0 :show-sidebar] not))
+    [:li [:div.sidebarbutton.bb.hideprefs {:on-click (fn [_] (do
+                                                               (swap! input-state update-in [:inputs 0 :show-sidebar] not)
+                                                               (accountant/navigate! "")))
                                            :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                            :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "ᐉ hide preferences"]]
     ]])
@@ -880,11 +916,9 @@
                                          (swap! input-state assoc-in [:inputs 0 :tv-curr-id] id)))
                      :id (str "tile" id)}
         [:div.heading title]
-          (if (not (empty? tv-current))
-              [:div.contents contents])
-          (if (not (empty? tv-current))
-              [:div.tilelink link])
-        [:div.longdescription long-description]
+        [:div.contents contents]
+        [:div.tilelink            {:class (if (empty? tv-current) "hideme")} link]
+        [:div.longdescription {:class (if (empty? tv-current) "hideme")} long-description]
         [:div.tile-rate
             [:div.tile-rate-doubleplus {:on-click (fn [e] (do
                                                             (.stopPropagation e)
@@ -1083,7 +1117,7 @@
     [:div#foot3 "When you are logged in you can vote on entries with votes signifying double-plus (++), plus (+), and minus (-)"]
     [:div#foot4 "The more you participate, the greater your community trust rating."]
     [:div#foot5 "By providing insightful comments and furthering discussions, your community rating will increase."]
-    [:div#foot6 "There are several media-types at nonforum: Articles, Topics, Questions+Discussions, as well as Books and Speeches."]
+   ;[:div#foot6 "There are several media-types at nonforum: Articles, Topics, Questions+Discussions, as well as Books and Speeches."]
     [:div#foot7 "For complete information on how to use nonforum most effectively, please check out the "[:a {:href "/faq"} "F.A.Q"]]])
 
 
@@ -1143,49 +1177,51 @@
      (if (= true logged-in)
        (side-bar)))
 
-   (if (= "send-feedback" curr-view) (send-feedback-fields))
+   (if (= "/feedback" curr-view) (send-feedback-fields))
 
-   (if (= "edit-profile" curr-view) (edit-profile))
+   (if (= "/email-public" curr-view) (edit-profile))
 
-   (if (= "set-recovery-email" curr-view) (set-recovery-email))
+   (if (= "/profile" curr-view) (edit-profile))
 
-   (if (= "set-password" curr-view) (set-password))
+   (if (= "/email-recovery" curr-view) (set-recovery-email))
 
-   (if (= "invite-friend" curr-view) (invite-fields))
+   (if (= "/password-update" curr-view) (set-password))
 
-   (if (= "submit" curr-view) (post-input))
+   (if (= "/invite" curr-view) (invite-fields))
 
-      (if (= "support-nf" curr-view) (support-nf))
+   (if (= "/submit" curr-view) (post-input))
+
+   (if (= "/support" curr-view) (support-nf))
 
   ; top is currently pointing to "default"
 
-   (if (= "default" curr-view)
+   (if (= "/" curr-view)
     (if (= true logged-in)
      (if (not (empty? tv-current))
        (go-back-button))))
 
-  (if (= "default" curr-view)
+  (if (= "/" curr-view)
     (if (= true logged-in)
      (if (not (empty? tv-current))
        (sponsored-message))))
 
-   (if (= "default" curr-view)
+   (if (= "/" curr-view)
     (if  (empty? tv-current)
      (if (= true logged-in)
       (television))))
 
    ;active tv-cell
-   (if (= "default" curr-view)
+   (if (= "/" curr-view)
     (if (= true logged-in)
      (tv-cell tv-current)))
 ;       (first (filter  #(= tv-current (:id %)) @tv-state))))) ;now an id, filter atom for td.
 
-   (if (= "default" curr-view)
+   (if (= "/" curr-view)
     (if (not (empty? tv-current))
      (if (= true logged-in)
        (map render-item curr-comments))))
 
-   (if (= "default" curr-view)
+   (if (= "/" curr-view)
      (if (not (empty? tv-current))
       (if (= true logged-in)
        (input-fields))))
@@ -1248,6 +1284,8 @@
                       (swap! input-state assoc-in [:inputs 0 :logged-in] false))
                     (do
                        (->output! "Auto-login success!")
+
+                      ; (accountant/dispatch-current!)
                       ;assoc auth hash
                       (swap! input-state assoc-in [:inputs 0 :token] (get-item :auth-key))
                       (swap! input-state assoc-in [:inputs 0 :login-time] (get-item :login-time))
@@ -1261,11 +1299,14 @@
 (set! (.-onload js/window)
         (if (not (empty? (get-item :auth-key)))
           auto-login))
+ (accountant/dispatch-current!)
+
 
 ;(.log js/console "auto login?" (get-item :login-time))
 ;;get params works! woo!
 
 (.log js/console (get-url-params))
+
 
 
 ;;IN PROGRESS
