@@ -505,5 +505,22 @@
 (defn -main "For `lein run`, etc." [] (start!))
 
 ;(comment
-  (start!)
-  (test-fast-server>user-pushes);)
+;  (start!)
+;  (test-fast-server>user-pushes);)
+
+
+(def     tv-state (atom [ {:title "Fusion Power Imminent"
+                           :contents "Horne Technologies has developed a working Plasma Containment Prototype for furthering Fusion"
+                           :priority 1
+                           :id 108
+                           :posted-by "v@nonforum.com"
+                           :timestamp 808080808
+                           :comments [69]
+                           :parent nil
+                           :number-of-ratings 2
+                           :link "http://hax.com"
+                           :details "Horne Technologies is on the brink of a fusion breakthrough. Their lab successfully contained plasma in 2017 with high-beta confinement and they need funding to continue research.  So far the fusion efficiency record is 67% (as of Dec. 2018), let's see how many teslas of magnetic field we need to reach 108% efficiency / break parity!"
+                           :ratings-total 188}]))
+
+(filter  #(= 108 (:id %)) @tv-state)
+
