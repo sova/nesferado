@@ -1,3 +1,27 @@
+DEC 29
+
+  Submit things (tie plumbs into
+
+                    create-account
+                    send-blurb
+                    send-rating
+                    )
+
+  show user-specific profile pages [in- app?]
+  i guess in-app?  but how to seversent/author-data.... hrm...
+
+
+
+  broadcast out  & think and ponder subscription scheme,
+  seems like a reverse index and plain index are key.
+
+
+  accountant is dope and routing works.
+
+  but will need some careful tinkering
+  once we do categorical pages such as "new" etc
+  unless we are starting to render from a different atom altogether for that,
+  in which case it may be very easy.
 
 
 
