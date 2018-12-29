@@ -775,7 +775,7 @@
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ∴ preferences"]]
 
       [:li [:span.sidebarbutton {:on-click (fn [_] (do
-                                                     (accountant/navigate! "/top")
+                                                     (accountant/navigate! "/")
                                                      (swap! input-state assoc-in [:inputs 0 :current-view] "/")))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ top"   ]]
@@ -797,7 +797,8 @@
                                   (swap! input-state assoc-in [:inputs 0 :current-user] "")
                                   (swap! input-state assoc-in [:inputs 0 :auth-token] "")
                                   (swap! input-state assoc-in [:inputs 0 :login-time] "")
-                                  (swap! input-state assoc-in [:inputs 0 :current-view] "/")
+                                  ;(swap! input-state assoc-in [:inputs 0 :current-view] "/")
+                                  (accountant/navigate! "/")
                                   (remove-item! :login-time)
                                   (remove-item! :uid)
                                   (remove-item! :auth-key)
@@ -857,9 +858,7 @@
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "៷៸៸ support nf"]]
 
-    [:li [:div.sidebarbutton.bb.hideprefs {:on-click (fn [_] (do
-                                                               (swap! input-state update-in [:inputs 0 :show-sidebar] not)
-                                                               (accountant/navigate! "")))
+    [:li [:div.sidebarbutton.bb.hideprefs {:on-click (fn [_] (swap! input-state update-in [:inputs 0 :show-sidebar] not))
                                            :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                            :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "ᐉ hide preferences"]]
     ]])
@@ -903,6 +902,7 @@
         tv-current (get-in (rum/react input-state) [:inputs 0 :tv-current])]
     [:li [:div.tile {:on-click (fn [e] (do
                                          (.log js/console "link to post" id " + comments disp, " td)
+                                         ;(accountant/navigate! (str "/?nfid=" id))
                                          (swap! input-state assoc-in [:inputs 0 :tv-title] title)
                                          (swap! input-state assoc-in [:inputs 0 :tv-contents] contents)
                                          (swap! input-state assoc-in [:inputs 0 :tv-posted-by] posted-by)
@@ -1177,21 +1177,21 @@
      (if (= true logged-in)
        (side-bar)))
 
-   (if (= "/feedback" curr-view) (send-feedback-fields))
+   (if (and logged-in (= "/feedback" curr-view)) (send-feedback-fields))
 
-   (if (= "/email-public" curr-view) (edit-profile))
+   (if (and logged-in (= "/email-public" curr-view)) (edit-profile))
 
-   (if (= "/profile" curr-view) (edit-profile))
+   (if (and logged-in (= "/profile" curr-view)) (edit-profile))
 
-   (if (= "/email-recovery" curr-view) (set-recovery-email))
+   (if (and logged-in (= "/email-recovery" curr-view)) (set-recovery-email))
 
-   (if (= "/password-update" curr-view) (set-password))
+   (if (and logged-in (= "/password-update" curr-view)) (set-password))
 
-   (if (= "/invite" curr-view) (invite-fields))
+   (if (and logged-in (= "/invite" curr-view)) (invite-fields))
 
-   (if (= "/submit" curr-view) (post-input))
+   (if (and logged-in (= "/submit" curr-view)) (post-input))
 
-   (if (= "/support" curr-view) (support-nf))
+   (if (and logged-in (= "/support" curr-view)) (support-nf))
 
   ; top is currently pointing to "default"
 
@@ -1205,7 +1205,7 @@
      (if (not (empty? tv-current))
        (sponsored-message))))
 
-   (if (= "/" curr-view)
+   (if  (= "/" curr-view)
     (if  (empty? tv-current)
      (if (= true logged-in)
       (television))))

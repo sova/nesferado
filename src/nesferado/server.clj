@@ -323,9 +323,9 @@
   (GET "/submit"  ring-req (landing-pg-handler            ring-req))
   (GET "/feedback" ring-req (landing-pg-handler            ring-req))
 
-  (GET "/email/recovery" ring-req (landing-pg-handler            ring-req))
-  (GET "/email/public" ring-req (landing-pg-handler            ring-req))
-  (GET "/password/update" ring-req (landing-pg-handler            ring-req))
+  (GET "/email-recovery" ring-req (landing-pg-handler            ring-req))
+  (GET "/email-public" ring-req (landing-pg-handler            ring-req))
+  (GET "/password-update" ring-req (landing-pg-handler            ring-req))
 
   (GET "/support" ring-req (landing-pg-handler            ring-req))
 
