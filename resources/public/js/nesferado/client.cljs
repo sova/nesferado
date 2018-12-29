@@ -854,6 +854,9 @@
                                   (swap! input-state assoc-in [:inputs 0 :current-user] "")
                                   (swap! input-state assoc-in [:inputs 0 :auth-token] "")
                                   (swap! input-state assoc-in [:inputs 0 :login-time] "")
+
+                                  (swap! input-state assoc-in [:inputs 0 :tv-current] "")
+                                  (swap! input-state assoc-in [:inputs 0 :tv-curr-id] "")
                                   ;(swap! input-state assoc-in [:inputs 0 :current-view] "/")
                                   (accountant/navigate! "/")
                                   (remove-item! :login-time)
