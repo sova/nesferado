@@ -1,5 +1,5 @@
 (ns nesferado.client
-  "nonforum client based on sente"
+  "Nonforum Client built on Sente example using Rum, Cemerick/URL, and Venantius/Accountant"
   {:author "@_vaso"}
 
   (:require
