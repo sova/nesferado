@@ -235,7 +235,14 @@ width: 1200px;}
   right: 0;
   float: left;
   font-size: 32px;
-  font-family: 'drakken-dice';
+}
+
+.rollthedice {
+    font-family: 'drakken-dice';
+}
+
+.numerals {
+  font-family: 'Assistant';
 }
 
 .item-contents {
@@ -590,7 +597,6 @@ z-index: 1003;}
   left: 0;
   z-index: 200;
 
-  font-family: 'drakken-dice';
 
 
 }

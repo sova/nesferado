@@ -356,6 +356,13 @@
 
 
 
+(defn get-rating [ratings-total number-of-ratings]
+  (if (< number-of-ratings 6)
+    (inc number-of-ratings)
+    (int (/ ratings-total number-of-ratings))))
+
+
+
 
 (defn get-url-params []
   (:query (u/url (-> js/window .-location .-href))))
@@ -383,7 +390,7 @@
 (defn return-comment-ids [post-id]
   (let [cids (:comments (first (filter  #(= post-id (:id %)) @posts)))
         posts (map get-post-by-id cids)
-        post-collection (sort-by #(/ (:ratings-total %) (:number-of-ratings %)) posts)
+        post-collection (sort-by #(get-rating (:ratings-total %) (:number-of-ratings %)) posts)
         spc  (map :id post-collection)]
 
     spc))
@@ -391,7 +398,7 @@
 (defn return-comment-ids-of-tv [tile-id]
   (let [cids (:comments (first (filter  #(= tile-id (:id %)) @tv-state)))
         posts (map get-post-by-id cids)
-        post-collection (sort-by #(/ (:ratings-total %) (:number-of-ratings %)) posts)
+        post-collection (sort-by #(get-rating (:ratings-total %) (:number-of-ratings %)) posts)
         spc  (map :id post-collection)]
 
     spc))
@@ -608,7 +615,9 @@
         local-atom (::hidecomments state)]
     ;(prn cids)
     (if (empty? (return-comment-ids pid))
-      (let [noc-post  (first (filter  #(= pid (:id %)) post-coll))]
+      (let [noc-post  (first (filter  #(= pid (:id %)) post-coll))
+            nor-nospost (:number-of-ratings noc-post)
+            rating (get-rating (:ratings-total noc-post) nor-nospost)]
         [:div.nocomments {:id pid :class "genpost"}
          [:div.padleft {:on-click (fn [e] (do
                                          (.log js/console "Freshly selected: " pid)
@@ -622,9 +631,14 @@
                [:div.item-rate-doubleplus {:on-click (fn [e] (rate :double-plus pid))} ""] ;++
                [:div.item-rate-plus  {:on-click (fn [e] (rate :plus pid))} ""] ;+
                [:div.item-rate-minus {:on-click (fn [e] (rate :minus pid))} ""] ;-
-              [:div.item-rating   (/ (:ratings-total noc-post) (:number-of-ratings noc-post))]]]]])
+              [:div.item-rating {:class (if (< nor-nospost 6)
+                                          "rollthedice"
+                                          "numerals") } rating ]]]]])
        ;lest the post has comments and needs more renders in pocket.
-       (let [com-post (first (filter  #(= pid (:id %)) (sort-by #(/ (:ratings-total %) (:number-of-ratings %))  post-coll)))]
+       (let [com-post (first (filter  #(= pid (:id %)) (sort-by #(get-rating (:ratings-total %) (:number-of-ratings %))  post-coll)))
+
+            nor-compost (:number-of-ratings com-post)
+             com-rating (get-rating (:ratings-total com-post) nor-compost)]
          [:div.hascomments {:id pid }
           [:div.padleft {:on-click (fn [e] (do
                                          (.log js/console "Freshly selected: " pid)
@@ -638,7 +652,9 @@
                [:div.item-rate-doubleplus {:on-click (fn [e] (rate :double-plus pid))} ""] ;++
                [:div.item-rate-plus  {:on-click (fn [e] (rate :plus pid))} ""] ;+
                [:div.item-rate-minus {:on-click (fn [e] (rate :minus pid))} ""] ;-
-               [:div.item-rating   (/ (:ratings-total com-post) (:number-of-ratings com-post))]]]
+               [:div.item-rating  {:class (if (< nor-compost 6)
+                                          "rollthedice"
+                                          "numerals") } com-rating]]]
 
            [:button.commentog {:on-click (fn [_] (swap! local-atom #(* -1 %)))}
               (if (= @local-atom -1)
@@ -953,7 +969,9 @@
             [:div.tile-rate-minus {:on-click (fn [e] (do
                                                        (.stopPropagation e)
                                                        (rate :minus id)))} ""]
-            [:div.tile-rating   (/ ratings-t n-ratings)]]
+            [:div.tile-rating  {:class (if (< n-ratings 6)
+                                          "rollthedice"
+                                          "numerals") } (get-rating ratings-t n-ratings)]]
         [:div.tileid id]
           ]])))
 
@@ -1004,6 +1022,8 @@
                                                         :subtitle          (get-in @input-state [:inputs 0 :title])
                                                         :contents       (get-in @input-state [:inputs 0 :contents])
                                                         :link           (get-in @input-state [:inputs 0 :link])
+                                                       ; :number-of-ratings 0
+                                                       ; :ratings-total 0
 
                                                         ;:posted-by      (get-in @input-state [:inputs 0 :current-user])
 
@@ -1133,7 +1153,9 @@
                                           new-comment-map {:id (swap! y inc)
                                                           :contents (get-in @input-state [:inputs 0 :comment])
                                                           :author username
-                                                          :comments []}]
+                                                          :comments []
+                                                          :ratings-total 0
+                                                          :number-of-ratings 0}]
 
                                       (let [first-hit (->> @posts
                                                           (keep-indexed #(when (= (:id %2) parent-id) %1))
