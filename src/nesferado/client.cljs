@@ -320,7 +320,7 @@
                     :contents "fusion is coming soon to a powergrid near you."
                     :author "non@nonforum.com"
                     :number-of-ratings 3
-                    :ratings-total 300
+                    :ratings-total 297
                     :comments [37]}
                    {:id 37
                     :contents "hello there to the galaxy"
