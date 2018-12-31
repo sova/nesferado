@@ -305,14 +305,14 @@
 (def posts (atom [ {:id 77
                     :contents "Seventy seven is the nicest number below one hundred"
                     :author "nonforum@nonforum.com"
-                    :number-of-ratings 2
-                    :ratings-total 98
+                    :number-of-ratings 7
+                    :ratings-total 699
                     :comments [33 53]}
                    {:id 33
                     :contents "Thirty three is awesome."
                     :author "monforum@nonforum.com"
-                    :number-of-ratings 1
-                    :ratings-total 99
+                    :number-of-ratings 5
+                    :ratings-total 540
                     :comments [34]}
                    {:id 34
                     :contents "fusion is coming soon to a powergrid near you."
@@ -357,7 +357,7 @@
 
 
 (defn get-rating [ratings-total number-of-ratings]
-  (if (< number-of-ratings 6)
+  (if (< number-of-ratings 3)
     (inc number-of-ratings)
     (int (/ ratings-total number-of-ratings))))
 
@@ -902,10 +902,10 @@
     [:li.nfnf "Nonforum Login:" (nf-login-input)]
     [:li.nfca "Create a Nonforum account:" (create-account-input)]
     [:li.terms "terms: "]
-    [:li.terms ""]
-    [:li.terms ""]
-    [:li.terms ""]
-    [:li.terms ""]
+    [:li.terms "   "]
+    [:li.terms "   "]
+    [:li.terms "   "]
+    [:li.terms "   "]
     [:li.terms "by participating here at nonforum you agree to: "]
     [:li.terms "abide kindly and virtuously,"]
     [:li.terms "express yourself in ways that further the discussion and enhance morale,"]
