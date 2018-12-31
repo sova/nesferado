@@ -900,7 +900,17 @@
     ;[:li.gogo [:a {:href "/gogole"} "Google Login"]]
     ;[:li.twtw [:a {:href "/twitter"} "Twitter Login"]]
     [:li.nfnf "Nonforum Login:" (nf-login-input)]
-    [:li.nfca "Create a Nonforum account:" (create-account-input)]]])
+    [:li.nfca "Create a Nonforum account:" (create-account-input)]
+    [:li.terms "terms: "]
+    [:li.terms ""]
+    [:li.terms ""]
+    [:li.terms ""]
+    [:li.terms ""]
+    [:li.terms "by participating here at nonforum you agree to: "]
+    [:li.terms "abide kindly and virtuously,"]
+    [:li.terms "express yourself in ways that further the discussion and enhance morale,"]
+    [:li.terms "and, in short, participate in ways to help elevate humanity."]
+    [:li.terms "There is currently no surcharge to create an account, you may have one."]]])
 
 (defn check-if-showing [id]
   (let [showsters (get-in @input-state [:inputs 0 :showing])]
