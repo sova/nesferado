@@ -255,9 +255,8 @@
 ;in articles, each subtopic is an NF thread.
 
 
-(defonce app-state (atom {:text "Hello world!"}))
 (def     tv-state (atom [ {:title "Fusion Power Imminent"
-                           :contents "Horne Technologies has developed a working Plasma Containment Prototype for furthering Fusion"
+                           :subtitle "Horne Technologies has developed a working Plasma Containment Prototype for furthering Fusion"
                            :priority 1
                            :id 108
                            :posted-by "v@nonforum.com"
@@ -266,10 +265,10 @@
                            :parent nil
                            :number-of-ratings 2
                            :link "http://hax.com"
-                           :details "Horne Technologies is on the brink of a fusion breakthrough. Their lab successfully contained plasma in 2017 with high-beta confinement and they need funding to continue research.  So far the fusion efficiency record is 67% (as of Dec. 2018), let's see how many teslas of magnetic field we need to reach 108% efficiency / break parity!"
+                           :contents "Horne Technologies is on the brink of a fusion breakthrough. Their lab successfully contained plasma in 2017 with high-beta confinement and they need funding to continue research.  So far the fusion efficiency record is 67% (as of Dec. 2018), let's see how many teslas of magnetic field we need to reach 108% efficiency / break parity!"
                            :ratings-total 188}
                           {:title "Let's Put Sun Panels on the Roof"
-                           :contents "Put a powerplant on your home and be free of your electric bill"
+                           :subtitle "Put a powerplant on your home and be free of your electric bill"
                            :priority 2
                            :id 109
                            :posted-by "v@nonforum.com"
@@ -278,10 +277,10 @@
                            :parent nil
                            :number-of-ratings 2
                            :link "www.coloradosolar.energy"
-                           :details "Colorado Solar is a premier solar installer in Colorado specializing in high-end residential and commercial installations."
+                           :contents "Colorado Solar is a premier solar installer in Colorado specializing in high-end residential and commercial installations."
                            :ratings-total 188}
                           {:title "Tonsky/rum is excellent for cljs"
-                           :contents "the best way to be the best"
+                           :subtitle "the best way to be the best"
                            :priority 3
                            :id 110
                            :posted-by "v@nonforum.com"
@@ -291,9 +290,9 @@
                            :number-of-ratings 2
                            :ratings-total 188
                            :link "www.github.com/tonsky/rum"
-                           :details "rum is dope. the components are reusable and the rendering is truly fast.  it's great, and makes me look like a decent coder! hah"}
+                           :contents "rum is dope. the components are reusable and the rendering is truly fast.  it's great, and makes me look like a decent coder! hah"}
                           {:title "Postpostpost"
-                           :contents "this is the post!"
+                           :subtitle "this is the post!"
                            :link "http://hysterical.com"
                            :priority 4
                            :id 111
@@ -303,10 +302,11 @@
                            :parent nil
                            :number-of-ratings 2
                            :ratings-total 188
-                           :description "tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter."}]))
+                           :contents "tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter."}]))
 
 (def input-state (atom {:inputs
                        [ {:title ""
+                          :subtitle ""
                           :contents ""
                           :link ""
                           :comment ""
@@ -820,7 +820,8 @@
      [:ol.topbar
       [:li [:div.sidebarbutton {:on-click (fn [_] (do
                                                     (accountant/navigate! "/")
-                                                     ;(swap! input-state assoc-in [:inputs 0 :current-view] "/")
+                                                    (swap! input-state assoc-in [:inputs 0 :tv-current] "")
+                                                    (swap! input-state assoc-in [:inputs 0 :tv-curr-id] "")
                                                     ))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "n⊜nforum"]]
@@ -833,7 +834,8 @@
 
       [:li [:span.sidebarbutton {:on-click (fn [_] (do
                                                      (accountant/navigate! "/")
-                                                     (swap! input-state assoc-in [:inputs 0 :current-view] "/")))
+                                                     (swap! input-state assoc-in [:inputs 0 :tv-current] "")
+                                                     (swap! input-state assoc-in [:inputs 0 :tv-curr-id] "")))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ top"   ]]
       [:li [:span.sidebarbutton {:on-click (fn [_] (do
@@ -938,13 +940,16 @@
       "showing"
       "notshowing")))
 
-(defn uuid [s]
-  (assert (string? s))
-  (UUID. (.toLowerCase s) nil))
+;(defn uuid [s]
+;  (assert (string? s))
+;  (UUID. (.toLowerCase s) nil))
 
 
 
 
+
+  ;contents is subtitle
+  ; title, subtitle, contents, link [atom of posts]
 
 
 (rum/defc tv-cell  < rum/reactive
@@ -953,7 +958,7 @@
   (if (not (empty? td))
 
   (let [title (:title td)
-        contents (:contents td)
+        contents (:subtitle td)
         comments (:comments td)
         priority (:priority td)
         id (:id td)
@@ -962,7 +967,7 @@
         n-ratings (:number-of-ratings td)
         ratings-t (:ratings-total td)
         link (:link td)
-        long-description (:details td)
+        long-description (:contents td)
         cids (return-comment-ids-of-tv id)
         tv-current (get-in (rum/react input-state) [:inputs 0 :tv-current])]
     [:li [:div.tile {:on-click (fn [e] (do
@@ -1000,10 +1005,20 @@
           ]])))
 
 
+
+
+
 (rum/defc television  < rum/reactive []
   [:div#tv
    [:ol.tv
     (map tv-cell  (rum/react tv-state))]])
+
+
+
+
+
+
+
 
 (rum/defc post-input []
   [:form#postinput "Create new post"
@@ -1028,29 +1043,44 @@
                                      (.log js/console (.getElementById js/document "aft"))
                                    ;submit to server here!
 
-                                    (let [new-post-map {:title (get-in @input-state [:inputs 0 :title])
-                                                        :contents (get-in @input-state [:inputs 0 :contents])
-                                                        :priority 10
-                                                        :posted-by (get-in @input-state [:inputs 0 :current-user])
+                                    (let [new-post-map {:title          (get-in @input-state [:inputs 0 :title])
+                                                        :subtitle          (get-in @input-state [:inputs 0 :title])
+                                                        :contents       (get-in @input-state [:inputs 0 :contents])
+                                                        :link           (get-in @input-state [:inputs 0 :link])
 
-                                                        :timestamp 80008
-                                                        :parent nil}]
+                                                        ;:posted-by      (get-in @input-state [:inputs 0 :current-user])
 
-                                       (swap! tv-state update :tiles conj new-post-map))) ;thanks @Marc O'Morain
+                                                        :timestamp 80008}]
+
+                                                 ;(swap! tv-state conj new-post-map)
+                                                 ; update-in :tiles ;thanks @Marc O'Morain
+                                                 ;wait on server to give us a reply to conj
+                                                 ; no optimistic client-side conj.
+                                       (chsk-send! [:clientsent/new-post new-post-map])
+                                       ;clear input fields
+                                       (swap! input-state assoc-in [:inputs 0 :title] "")
+                                       (swap! input-state assoc-in [:inputs 0 :subtitle] "")
+                                       (swap! input-state assoc-in [:inputs 0 :contents] "")
+                                       (swap! input-state assoc-in [:inputs 0 :link] "")
+
+                                      ))
+
+
+
                        } "post new"]])
 
 (rum/defc edit-profile []
-  [:form#profileinput "Edit Profile"
+  [:form#profileinput.profileinput "Edit Profile"
    [:textarea.profileinput{:placeholder "bio"
                       :on-change (fn [e] (do
                                     (swap! input-state assoc-in [:inputs 0 :bio] (.-value (.-target e)))
                                     (.log js/console (get-in @input-state [:inputs 0 :bio]))))}]
-   [:input.postinput {:placeholder "public e-mail"
+   [:input.profileinput {:placeholder "public e-mail"
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :link] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :link]))))}]
 
-    [:button.postinput {:type "button"
+    [:button.profileinput {:type "button"
                        :on-click (fn [e]
                                      (.log js/console "updating bio")
                                    ;submit to server here!

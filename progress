@@ -1,3 +1,31 @@
+DEC 31 12:11 pm
+
+  https://github.com/clojure/data.int-map
+   for fast int mapses
+
+   by the way, logins never expire
+   provided the user has the login key,
+   so...
+   mabe change that in the future
+   for securita
+
+
+DEC 31 2:12 am
+
+ dozing off attempting to implement :clientsent/new-post-map
+
+ needs:
+
+ :serversent/new-post-map
+ :serversent/new-comment-map
+ :serversent/all-the-posts (current posts and comments)
+ :serversent/rating-update
+
+ :clientsent/new-post-map
+ :clientsent/new-rating-map
+ :clientsent/new-comment-map
+ :clientsent/req-all-posts
+
 DEC 29
 
   Submit things (tie plumbs into
@@ -5,9 +33,20 @@ DEC 29
                     create-account
                     send-blurb
                     send-rating
+
+                    these also need to Clear Out their respective input boxen
+
+
                     )
 
   show user-specific profile pages [in- app?]
+
+
+           this is problematic? because it requires conjing
+           onto the clientside atom data that it doesn't have...
+
+           but user data is very minimal
+           probably best to only serve when actually requested
   i guess in-app?  but how to seversent/author-data.... hrm...
 
 

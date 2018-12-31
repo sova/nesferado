@@ -117,6 +117,125 @@
                     :file-path "data/participation.sova"
                     :init []))
 
+(def nf-counter (duratom :local-file
+                         :file-path "data/unique-id-current.sova"
+                         :init 888888))
+
+
+(def     tv-state (atom [ {:title "Fusion Power Imminent"
+                           :subtitle "Horne Technologies has developed a working Plasma Containment Prototype for furthering Fusion"
+                           :priority 1
+                           :id 108
+                           :posted-by "v@nonforum.com"
+                           :timestamp 808080808
+                           :comments [69]
+                           :parent nil
+                           :number-of-ratings 2
+                           :link "http://hax.com"
+                           :contents "Horne Technologies is on the brink of a fusion breakthrough. Their lab successfully contained plasma in 2017 with high-beta confinement and they need funding to continue research.  So far the fusion efficiency record is 67% (as of Dec. 2018), let's see how many teslas of magnetic field we need to reach 108% efficiency / break parity!"
+                           :ratings-total 188}
+                          {:title "Let's Put Sun Panels on the Roof"
+                           :subtitle "Put a powerplant on your home and be free of your electric bill"
+                           :priority 2
+                           :id 109
+                           :posted-by "v@nonforum.com"
+                           :timestamp 808080808
+                           :comments []
+                           :parent nil
+                           :number-of-ratings 2
+                           :link "www.coloradosolar.energy"
+                           :contents "Colorado Solar is a premier solar installer in Colorado specializing in high-end residential and commercial installations."
+                           :ratings-total 188}
+                          {:title "Tonsky/rum is excellent for cljs"
+                           :subtitle "the best way to be the best"
+                           :priority 3
+                           :id 110
+                           :posted-by "v@nonforum.com"
+                           :timestamp 808080808
+                           :comments []
+                           :parent nil
+                           :number-of-ratings 2
+                           :ratings-total 188
+                           :link "www.github.com/tonsky/rum"
+                           :contents "rum is dope. the components are reusable and the rendering is truly fast.  it's great, and makes me look like a decent coder! hah"}
+                          {:title "Postpostpost"
+                           :subtitle "this is the post!"
+                           :link "http://hysterical.com"
+                           :priority 4
+                           :id 111
+                           :posted-by "v@nonforum.com"
+                           :timestamp 808080808
+                           :comments []
+                           :parent nil
+                           :number-of-ratings 2
+                           :ratings-total 188
+                           :contents "tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter."}]))
+
+
+
+(def posts (atom [ {:id 77
+                    :contents "Seventy seven is the nicest number below one hundred"
+                    :author "nonforum@nonforum.com"
+                    :number-of-ratings 2
+                    :ratings-total 98
+                    :comments [33 53]}
+                   {:id 33
+                    :contents "Thirty three is awesome."
+                    :author "monforum@nonforum.com"
+                    :number-of-ratings 1
+                    :ratings-total 99
+                    :comments [34]}
+                   {:id 34
+                    :contents "fusion is coming soon to a powergrid near you."
+                    :author "non@nonforum.com"
+                    :number-of-ratings 3
+                    :ratings-total 300
+                    :comments [37]}
+                   {:id 37
+                    :contents "hello there to the galaxy"
+                    :author "x@nonforum.com"
+                    :number-of-ratings 5
+                    :ratings-total 470
+                    :comments []}
+                   {:id 53
+                    :contents "relax , don't do it."
+                    :author "fool@nonforum.com"
+                    :number-of-ratings 70
+                    :ratings-total 6900
+                    :comments [88 7777]}
+                   {:id 69
+                    :contents "the extraordinary world of bugs is glorious."
+                    :author "fx@nonforum.com"
+                    :number-of-ratings 4
+                    :ratings-total 380
+                    :comments [77]}
+                   {:id 7777
+                    :contents "Oh how I love the rain"
+                    :author "rains@nonforum.com"
+                    :number-of-ratings 2
+                    :ratings-total 190
+                    :comments []}]))
+
+(def ratings (atom [{}]))
+
+
+
+
+
+
+
+(gensym "nf_")
+
+
+(gensym "nf_")
+
+(gensym "nf_")
+
+
+
+
+
+
 
 (defn create-auth-token-map [user-email]
   (let [login-time  (quot (System/currentTimeMillis) 1000)
@@ -256,8 +375,8 @@
     (println uid)
     (println auth-token)
     (println login-time)
-    ;(println (is-good-auth-key auth-token uid login-time))
-    (println (check-creds uid auth-token login-time))
+    ;(println (is-good-auth-key auth-token uid (int login-time)))
+    (println (check-creds     uid auth-token login-time))
 
     (if (check-creds uid auth-token login-time)
       {:status 200
@@ -271,7 +390,7 @@
                                    :auth-token auth-token})
          }
       ;else
-      {:status 302 :session session})))
+      {:status 302 :session {}})))
 
 
 (defn create-account-handler
@@ -340,27 +459,7 @@
   (POST "/check-login" ring-req (check-login-handler      ring-req))
   (POST "/create-account" ring-req (create-account-handler ring-req))
   (route/resources "/") ; Static files, notably public/main.js (our cljs target)
-  (route/not-found "<h1>Page not found</h1>"))
-
-;; User defined unauthorized handler
-;;
-;; This function is responsible for handling
-;; unauthorized requests (when unauthorized exception
-;; is raised by some handler)
-;;buudy auth provided unauth handler
-;(defn unauthorized-handler
-;  [request metadata]
-;  (cond
-;    ;; If request is authenticated, raise 403 instead
-;    ;; of 401 (because user is authenticated but permission
-;    ;; denied is raised).
-;    (authenticated? request)
-;    (-> (render (slurp (io/resource "error.html")) request)
-;        (assoc :status 403))
-;    ;; In other cases, redirect the user to login page.
-;    :else
-;    (let [current-url (:uri request)]
-;      (redirect (format "/login?next=%s" current-url)))))
+  (route/not-found "<h2>Nonforum Four-oh-four, resource not found.</h2>"))
 
 
 (def main-ring-handler
@@ -437,30 +536,31 @@
   (let [loop-enabled? (swap! broadcast-enabled?_ not)]
     (?reply-fn loop-enabled?)))
 
-(defmethod -event-msg-handler
-  :clientsent/ping ; Default/fallback case (no other matching handler)
-  [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
-  (let [session (:session ring-req)
-        uid     (:uid     session)
-        auth-token (:auth-token session)
-        login-time (:login-time session)]
-    ;(println  session)
-    (println uid)
-    (println auth-token)
-    (println login-time)
-    (println (is-good-auth-key auth-token uid login-time))))
 
-(defmethod -event-msg-handler
-  :clientsent/newpost ; Default/fallback case (no other matching handler)
+(defmethod -event-msg-handler :clientsent/new-post
   [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
   (let [session (:session ring-req)
         uid     (:uid     session)
         auth-token (:auth-token session)
-        login-time (:login-time session)]
-    ;(println  session)
-    (println uid)
-    (println auth-token)
-    (println (is-good-auth-key auth-token uid login-time))))
+        login-time (:login-time session)
+        auth-ok? (check-creds uid auth-token login-time) ;(is-good-auth-key auth-token uid (int login-time))
+        datum (second event)
+        now (quot (System/currentTimeMillis) 1000)
+        ]
+    (println datum)
+    (println "by " uid)
+    (if auth-ok?
+      (swap! tv-state conj
+             (merge datum {:uid uid
+                           :timestamp now
+                           :number-of-ratings 0
+                           :ratings-total 0})))))
+
+
+
+
+
+
 
    ; (when ?reply-fn
     ;  (?reply-fn {:umatched-event-as-echoed-from-from-server event}))))
@@ -505,22 +605,6 @@
 (defn -main "For `lein run`, etc." [] (start!))
 
 ;(comment
-;  (start!)
-;  (test-fast-server>user-pushes);)
-
-
-(def     tv-state (atom [ {:title "Fusion Power Imminent"
-                           :contents "Horne Technologies has developed a working Plasma Containment Prototype for furthering Fusion"
-                           :priority 1
-                           :id 108
-                           :posted-by "v@nonforum.com"
-                           :timestamp 808080808
-                           :comments [69]
-                           :parent nil
-                           :number-of-ratings 2
-                           :link "http://hax.com"
-                           :details "Horne Technologies is on the brink of a fusion breakthrough. Their lab successfully contained plasma in 2017 with high-beta confinement and they need funding to continue research.  So far the fusion efficiency record is 67% (as of Dec. 2018), let's see how many teslas of magnetic field we need to reach 108% efficiency / break parity!"
-                           :ratings-total 188}]))
-
-(filter  #(= 108 (:id %)) @tv-state)
+  (start!)
+  (test-fast-server>user-pushes);)
 
