@@ -936,6 +936,7 @@
 
                                          (swap! input-state assoc-in [:inputs 0 :tv-current] td)
                                          (swap! input-state assoc-in [:inputs 0 :tv-curr-id] id)
+                                         (.scrollTo js/window 0 0)
                                          (accountant/navigate! (str "?nfid=" id))))
                      :id (str "tile" id)}
         [:div.heading title]
