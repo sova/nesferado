@@ -243,6 +243,7 @@ width: 1200px;}
   right: 0;
   float: left;
   font-size: 32px;
+  margin-top: -0.23em;
 }
 
 .rollthedice {
@@ -607,7 +608,8 @@ z-index: 1003;}
   left: 0;
   z-index: 200;
 
-
+  margin-top: -0.17em;
+  margin-left: 0.03em;
 
 }
 

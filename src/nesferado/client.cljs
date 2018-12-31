@@ -30,8 +30,10 @@
 (defn ->output! [fmt & args]
   (let [msg (apply encore/format fmt args)]
     ;(timbre/debug msg)
-    (aset output-el "value" (str "— " (.-value output-el) "\n" msg))
-    (aset output-el "scrollTop" (.-scrollHeight output-el))))
+    (aset output-el "value" ;(str "— " (.-value output-el) "\n" msg)
+          msg)
+    ;(aset output-el "scrollTop" (.-scrollHeight output-el))
+    ))
 
 (->output! " • Welcome to Nonforum •")
 
