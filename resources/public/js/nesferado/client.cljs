@@ -89,59 +89,11 @@
   (.log js/console (str "something bad happened: " status " " status-text)))
 
 
-;;;; Sente event handlers
 
-(defmulti -event-msg-handler
-  "Multimethod to handle Sente `event-msg`s"
-  :id ; Dispatch on event-id
-  )
 
-(defn event-msg-handler
-  "Wraps `-event-msg-handler` with logging, error catching, etc."
-  [{:as ev-msg :keys [id ?data event]}]
-  (-event-msg-handler ev-msg))
 
-(defmethod -event-msg-handler
-  :default ; Default/fallback case (no other matching handler)
-  [{:as ev-msg :keys [event]}]
-  (.log js/console ".NF. unhandled:" event)
-  ;(->output! "Unhandled event: %s" event)
-  )
 
-(defmethod -event-msg-handler :chsk/state
-  [{:as ev-msg :keys [?data]}]
-  (let [[old-state-map new-state-map] (have vector? ?data)]
-    (if (:first-open? new-state-map)
-      (.log js/console ".NF. " new-state-map)
-      ;(->output! "Channel socket successfully established!: %s" new-state-map)
-      ;(->output! "Channel socket state change: %s"              new-state-map)
-      )
-    ))
 
-(defmethod -event-msg-handler :chsk/recv
-  [{:as ev-msg :keys [?data]}]
-    (.log js/console ".NF. push from serv: " ?data)
-    ;(->output! "Push event from server: %s" ?data)
-  )
-
-(defmethod -event-msg-handler :chsk/handshake
-  [{:as ev-msg :keys [?data]}]
-  (let [[?uid ?csrf-token ?handshake-data] ?data]
-    (.log js/console "Handshake: %s" ?data)
-    ;(->output! "Handshake: %s" ?data)
-    ))
-
-;; TODO Add your (defmethod -event-msg-handler <event-id> [ev-msg] <body>)s here...
-
-;;;; Sente event router (our `event-msg-handler` loop)
-
-(defonce router_ (atom nil))
-(defn  stop-router! [] (when-let [stop-f @router_] (stop-f)))
-(defn start-router! []
-  (stop-router!)
-  (reset! router_
-    (sente/start-client-chsk-router!
-      ch-chsk event-msg-handler)))
 
 ;;;; UI events
 
@@ -1020,18 +972,22 @@
 
 
 
-(rum/defc post-input []
+(rum/defc post-input < rum/reactive []
+  ;(let [ls (get-in @input-state [:inputs 0 :title])]
   [:form#postinput "Create new post"
    [:input.postinput{:placeholder "title"
+                     :value (get-in @input-state [:inputs 0 :title])
                       :on-change (fn [e] (do
                                     (swap! input-state assoc-in [:inputs 0 :title] (.-value (.-target e)))
                                     (.log js/console (get-in @input-state [:inputs 0 :title]))))}]
    [:input.postinput {:placeholder "link"
+                      :value (get-in @input-state [:inputs 0 :link])
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :link] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :link]))))}]
 
    [:input.postinput {:placeholder "contents"
+                      :value (get-in @input-state [:inputs 0 :contents])
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :contents] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :contents]))))}]
@@ -1333,6 +1289,198 @@
 
 (rum/mount (footer)
            (. js/document (getElementById "footing")))
+
+
+
+
+
+
+
+
+
+
+
+
+
+;rating update fxn
+;written by @joshjones in Clojurians slack
+;thanks again ! (=
+
+
+(defn swap-rating-fn
+  [{v :blurbs :as nf} d]
+  (assoc nf :blurbs
+            (vec (for [entry v]
+                   (if (= (:bid entry) (:bid d))
+                     (merge entry d)
+                     entry)))))
+
+(defn swap-rating-active-blurb
+  [{v :nf :as nf} d]
+  (assoc nf :nf
+            (vec (for [entry v]
+                   (if (= (:active-blurb entry) (:bid d))
+                     (merge entry d)
+                     entry)))))
+
+
+
+;;;; Sente event handlers
+
+(defmulti -event-msg-handler
+  "Multimethod to handle Sente `event-msg`s"
+  :id ; Dispatch on event-id
+  )
+
+
+
+   ;;;    ;;;    ;;;        knowledge
+  ;   ;  ;   ;  ;   ;     info
+  ;   ;  ;   ;  ;   ; experience
+  ;   ;   ;;;   ;   ;   forum
+(defn event-msg-handler
+  [{:keys [_ _ ?data]}]
+  (.log js/console (str "&&" ?data ))
+  (.log js/console (str "&! " (first ?data)))
+  (let [event-title (first ?data)
+        new-data (second ?data)]
+    (cond
+      (= false (:ever-opened? event-title))
+        ;(do
+          (.log js/console "Hey I'm trying to get new data yo, since :ever-opened? is false")
+          ;(ask-server-for-blurbs))
+      (= event-title :hello/client)
+        (.log js/console (str "&# " new-data))
+      (= event-title :serversent/blurb)
+        (do
+          (.log js/console (str "&# " new-data))
+          (.log js/console "adding new blurb to atom...")
+          (swap! tv-state conj new-data)
+          ;;Sort blurbs added to blurbset
+         ; (swap! nf-app-state-atom update :blurbs #(reverse (sort-by :number-of-ratings %))) ;descending
+          (.log js/console "added new blurb to atom"))
+         ;(if (= (:author new-data) currently-logged-in-user)
+         ;  (do
+         ;
+         ;    (clear all the blurb input fields)
+         ;    (redirect to single-blurb-page-with-bid <recv'd-bid>))
+
+      (= event-title :serversent/comment)
+        (do
+          (.log js/console (str "&# " new-data))
+          (.log js/console "adding new comment to atom...")
+          (swap! posts conj new-data)
+          (.log js/console "added new comment to atom"))
+
+
+      (= event-title :serversent/page-load-req)
+        (do
+          (.log js/console (str "### " new-data))
+          (let [blurb-core (vec new-data)]
+            (swap! tv-state assoc blurb-core)))
+            ;sort
+           ; (swap! nf-app-state-atom update :blurbs #(reverse (sort-by av-score %)))))
+
+
+      (= event-title :servermod/unused-invites)
+        (.log js/console "love for the unused invites")
+
+      (= event-title :serversent/rating-update)
+        (do
+        ;  (.log js/console (str "rating update.. " new-data))
+          (let [ru-bid (:bid new-data)
+                ru-ts (:total-score new-data)
+                ru-nor (:number-of-ratings new-data)
+                ru-map {:bid ru-bid
+                        :total-score ru-ts
+                        :number-of-ratings ru-nor}]
+        ;    (.log js/console (str ru-bid  " " ru-ts " " ru-nor))
+
+
+            ;; update the local blurb atom information...
+          ;; to have the update total-score & number-of-ratings for given bid
+
+          ;(swap! ratings swap-rating-fn ru-map)
+            (fn [] )
+
+          ;(swap! nf-app-state-atom swap-rating-active-blurb ru-map)
+
+            )))))
+
+
+
+
+;(defn event-msg-handler
+;  "Wraps `-event-msg-handler` with logging, error catching, etc."
+;  [{:as ev-msg :keys [id ?data event]}]
+;  (-event-msg-handler ev-msg))
+;
+;(defmethod -event-msg-handler
+;  :default ; Default/fallback case (no other matching handler)
+;  [{:as ev-msg :keys [event]}]
+;  (.log js/console ".NF. unhandled:" event)
+;  ;(->output! "Unhandled event: %s" event)
+;  )
+
+(defmethod -event-msg-handler :chsk/state
+  [{:as ev-msg :keys [?data]}]
+  (let [[old-state-map new-state-map] (have vector? ?data)]
+    (if (:first-open? new-state-map)
+      (.log js/console ".NF. " new-state-map)
+      ;(->output! "Channel socket successfully established!: %s" new-state-map)
+      ;(->output! "Channel socket state change: %s"              new-state-map)
+      )
+    ))
+
+(defmethod -event-msg-handler :chsk/recv
+  [{:as ev-msg :keys [?data]}]
+    (.log js/console ".NF. push from serv: " ?data)
+    ;(->output! "Push event from server: %s" ?data)
+  )
+
+(defmethod -event-msg-handler :chsk/handshake
+  [{:as ev-msg :keys [?data]}]
+  (let [[?uid ?csrf-token ?handshake-data] ?data]
+    (.log js/console "Handshake: %s" ?data)
+    ;(->output! "Handshake: %s" ?data)
+    ))
+
+(defmethod -event-msg-handler :serversent/blurb
+  [{:as ev-msg :keys [?data]}]
+  (let [[?uid ?csrf-token ?handshake-data] ?data]
+    (.log js/console "Handshake: %s" ?data)
+    ;(->output! "Handshake: %s" ?data)
+    ))
+
+;; TODO Add your (defmethod -event-msg-handler <event-id> [ev-msg] <body>)s here...
+
+;;;; Sente event router (our `event-msg-handler` loop)
+
+(defonce router_ (atom nil))
+(defn  stop-router! [] (when-let [stop-f @router_] (stop-f)))
+(defn start-router! []
+  (stop-router!)
+  (reset! router_
+    (sente/start-client-chsk-router!
+      ch-chsk event-msg-handler)))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

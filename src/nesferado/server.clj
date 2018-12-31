@@ -536,6 +536,24 @@
   (let [loop-enabled? (swap! broadcast-enabled?_ not)]
     (?reply-fn loop-enabled?)))
 
+(defn broadcast-blurb!
+  "Broadcasts a given blurb-map (typically a fresh dbsave!) to all connected browsings"
+  [ blurb-map  ]
+  (doseq [uid (:any @connected-uids)]
+    (chsk-send! uid [:serversent/blurb {  :posted-by (:posted-by blurb-map)
+                                          :link (:link blurb-map)
+                                          :title (:title blurb-map)
+                                          :subtitle (:subtitle blurb-map)
+                                          :content (:content blurb-map)
+                                          :ratngs-total (:ratings-total blurb-map)
+                                          :number-of-ratings (:number-of-ratings blurb-map)
+                                          :timestamp (:timestamp blurb-map)
+                                          }])))
+
+
+(defn add-to-tv-and-send-to-peers [datum]
+  (swap! tv-state conj datum)
+  (broadcast-blurb! datum))
 
 (defmethod -event-msg-handler :clientsent/new-post
   [{:as ev-msg :keys [event id ?data ring-req ?reply-fn send-fn]}]
@@ -546,15 +564,17 @@
         auth-ok? (check-creds uid auth-token login-time) ;(is-good-auth-key auth-token uid (int login-time))
         datum (second event)
         now (quot (System/currentTimeMillis) 1000)
+        counter (swap! nf-counter inc)
         ]
     (println datum)
     (println "by " uid)
     (if auth-ok?
-      (swap! tv-state conj
-             (merge datum {:uid uid
+      (add-to-tv-and-send-to-peers
+             (merge datum {:posted-by uid
                            :timestamp now
                            :number-of-ratings 0
-                           :ratings-total 0})))))
+                           :ratings-total 0
+                           :nfid counter})))))
 
 
 
