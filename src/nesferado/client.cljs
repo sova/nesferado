@@ -220,43 +220,7 @@
                            :number-of-ratings 2
                            :link "http://hax.com"
                            :contents "Horne Technologies is on the brink of a fusion breakthrough. Their lab successfully contained plasma in 2017 with high-beta confinement and they need funding to continue research.  So far the fusion efficiency record is 67% (as of Dec. 2018), let's see how many teslas of magnetic field we need to reach 108% efficiency / break parity!"
-                           :ratings-total 188}
-                          {:title "Let's Put Sun Panels on the Roof"
-                           :subtitle "Put a powerplant on your home and be free of your electric bill"
-                           :priority 2
-                           :id 109
-                           :posted-by "v@nonforum.com"
-                           :timestamp 808080808
-                           :comments []
-                           :parent nil
-                           :number-of-ratings 2
-                           :link "www.coloradosolar.energy"
-                           :contents "Colorado Solar is a premier solar installer in Colorado specializing in high-end residential and commercial installations."
-                           :ratings-total 188}
-                          {:title "Tonsky/rum is excellent for cljs"
-                           :subtitle "the best way to be the best"
-                           :priority 3
-                           :id 110
-                           :posted-by "v@nonforum.com"
-                           :timestamp 808080808
-                           :comments []
-                           :parent nil
-                           :number-of-ratings 2
-                           :ratings-total 188
-                           :link "www.github.com/tonsky/rum"
-                           :contents "rum is dope. the components are reusable and the rendering is truly fast.  it's great, and makes me look like a decent coder! hah"}
-                          {:title "Postpostpost"
-                           :subtitle "this is the post!"
-                           :link "http://hysterical.com"
-                           :priority 4
-                           :id 111
-                           :posted-by "v@nonforum.com"
-                           :timestamp 808080808
-                           :comments []
-                           :parent nil
-                           :number-of-ratings 2
-                           :ratings-total 188
-                           :contents "tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter."}]))
+                           :ratings-total 188}]))
 
 (def input-state (atom {:inputs
                        [ {:title ""
@@ -689,12 +653,13 @@
 
 (rum/defc invite-fields []
   [:form#invitefriendsform
-   [:input#invitefriendsinput.fullwidth {:placeholder "Enter a friend's email and invite them to join nonforum." :name "invite"
-                      :on-change (fn [e] (do
-                                              (swap! input-state assoc-in [:inputs 0 :invite-friend-input] (.-value (.-target e)))
-                                           ))}]
+   [:input#invitefriendsinput.reim
+    {:placeholder "Enter a friend's email and invite them to join nonforum." :name "invite"
+     :value (get-in @input-state [:inputs 0 :invite-friend-input])
+     :on-change (fn [e] (do
+                   (swap! input-state assoc-in [:inputs 0 :invite-friend-input] (.-value (.-target e)))))}]
 
-   [:button#sfsubmit.fullwidth {:type "button"
+   [:button#sfsubmit.reim {:type "button"
                        :on-click (fn [e] (let [invite-friend  (get-in @input-state [:inputs 0 :invite-friend-input])]
                                            (do
                                              (.log js/console "invite friend button pressed")
@@ -888,12 +853,12 @@
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "૪ give feedback"]]
 
-    [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
-                                                  ;(swap! input-state assoc-in [:inputs 0 :current-view] "/support")
-                                                     (accountant/navigate! "/support")
+    [:li [:div.sidebarbutton.bb.bd {:on-click (fn [_] (do
+                                                  ;(swap! input-state assoc-in [:inputs 0 :current-view] "/donate")
+                                                     (accountant/navigate! "/donate")
                                                   (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
-                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "៷៸៸ support nf"]]
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "៷៸៸ support fusion research"]]
 
     [:li [:div.sidebarbutton.bb.hideprefs {:on-click (fn [_] (swap! input-state update-in [:inputs 0 :show-sidebar] not))
                                            :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
@@ -1011,23 +976,23 @@
 (rum/defc post-input < rum/reactive []
   ;(let [ls (get-in @input-state [:inputs 0 :title])]
   [:form#postinput "Create new post"
-   [:input.postinput{:placeholder "title"
+   [:input.reim{:placeholder "title"
                      :value (get-in @input-state [:inputs 0 :title])
                       :on-change (fn [e] (do
                                     (swap! input-state assoc-in [:inputs 0 :title] (.-value (.-target e)))
                                     (.log js/console (get-in @input-state [:inputs 0 :title]))))}]
-   [:input.postinput {:placeholder "link"
+   [:input.reim {:placeholder "link"
                       :value (get-in @input-state [:inputs 0 :link])
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :link] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :link]))))}]
 
-   [:input.postinput {:placeholder "contents"
+   [:input.reim {:placeholder "contents"
                       :value (get-in @input-state [:inputs 0 :contents])
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :contents] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :contents]))))}]
-   [:button.postinput {:type "button"
+   [:button.reim {:type "button"
                        :on-click (fn [e]
                                      ;(.preventDefault e)
                                      ;(.stopPropagation e)
@@ -1138,7 +1103,14 @@
 
 (rum/defc support-nf []
   [:div#supportnf "Thank you for participating in and contributing to Nonforum."]
-  [:div#$$$$$$$$$ "In order to help support creative endeavors such as this, please contribute whatever you can."])
+  [:div#mission0 "Part of our mission at Nonforum is to further Humanity in significant ways."]
+  [:div#mission1 "We are partnered with Horne Technologies to help them achieve parity-efficiency (100:100) with their new 5 Tesla reactor"]
+  [:div#mission2 "In order to continue fusion research in 2019 we need to raise approximately $150,000."]
+  [:div#mission3 "In order to create a power-generating reactor once we know how many Teslas of magnetic field we need and how to orient the field-generation devices, will require approximately $15 Million"]
+  [:div#mission4 "Fusion will enable Humanity to harness the power of the stars."]
+  [:div#mission5 "A fusion future would leave cities free of smog and free of adverse pollution in the air, water and earth."]
+  [:div#mission6 "Our priority is funding fusion so that Humanity will become 100% green and sustainable as soon as possible."]
+  [:div#mission7 "Please contribute whatever you can.  The suggested donation is $15.00"])
 
 ;; https://github.com/tonsky/grumpy/blob/master/src/grumpy/editor.cljc#L257
 ;; thank you, @tonsky
@@ -1213,7 +1185,7 @@
     [:div#foot4 "The more you participate, the greater your community trust rating."]
     [:div#foot5 "By providing insightful comments and furthering discussions, your community rating will increase."]
    ;[:div#foot6 "There are several media-types at nonforum: Articles, Topics, Questions+Discussions, as well as Books and Speeches."]
-    [:div#foot7 "For complete information on how to use nonforum most effectively, please check out the "[:a {:href "/faq"} "F.A.Q"]]])
+    [:div#foot7 "For complete information on how to use nonforum most effectively, please check out the "[:a {:href "/about"} "About Page"]]])
 
 
 (rum/defc about-fields []
@@ -1223,8 +1195,8 @@
     [:div#about3.about "To comment on the parent simply click on the original news piece and then submit your comment."]
     [:div#about4.about "If you wish to reply directly to other comments, click on the comment you want to reply to.  It will be fig colored when selected."]
     [:div#about5.about "Voting is a natural right and you can vote on any submission or comment. There are three levels to the tri-vote, double-plus, plus, and minus.  These correlate roughly to the spectrum of 0-99 and eventually, after a threshold number of votes has been met, the dice will transform to a number likely landing between 30 and 99."]
-    [:div#about6.about "Nonforum is built using ClojureScript (Rum, Sente, Accountant)"]
-    [:div#about7.about "We are helping to raise money for Fusion Research.  Fusion will bring us the pollution-free future today.  Help humanity harness the power of the stars!  Donate today."]]
+    [:div#about6.about "Nonforum is built using ClojureScript (Rum for UI, Sente for Client/Server Sockets, and Accountant for page \"routing\")"]
+    [:div#about7.about "We are helping to raise money for Fusion Research.  Fusion will bring us the pollution-free future today.  Help humanity harness the power of the stars!  Donate today at "[:a {:href "/donate"} "nonforum.com/donate"]]]
   )
 
 (rum/defc non-buzz-placeholder []
@@ -1300,7 +1272,9 @@
 
    (if (and logged-in (= "/submit" curr-view)) (post-input))
 
-   (if (and logged-in (= "/support" curr-view)) (support-nf))
+   (if (and logged-in (= "/donate" curr-view)) (support-nf))
+
+   (if (and logged-in (= "/fusion" curr-view)) (support-nf))
 
   ; top is currently pointing to "default"
 
@@ -1380,6 +1354,20 @@
                      entry)))))
 
 
+(defn ask-server-for-blurbs
+  []
+  (chsk-send! [:clientsent/req-all-blurbs  {:can-i-please-has-the "blurbs"}]
+               3000 ;timeout
+                (fn [blurb-core]
+                  (if (sente/cb-success? blurb-core)
+                    (do
+                      (.log js/console "callback with blurbs rcevd")
+                      (.log js/console ":cs/rab " blurb-core)
+                      (reset! tv-state blurb-core)
+                      (swap! tv-state #(sort-by :number-of-ratings %))))))) ;descending
+
+
+
 
 ;;;; Sente event handlers
 
@@ -1402,24 +1390,21 @@
         new-data (second ?data)]
     (cond
       (= false (:ever-opened? event-title))
-        ;(do
+        (do
           (.log js/console "Hey I'm trying to get new data yo, since :ever-opened? is false")
-          ;(ask-server-for-blurbs))
+          (ask-server-for-blurbs)
+          )
       (= event-title :hello/client)
         (.log js/console (str "&# " new-data))
+
       (= event-title :serversent/blurb)
         (do
           (.log js/console (str "&# " new-data))
           (.log js/console "adding new blurb to atom...")
           (swap! tv-state conj new-data)
           ;;Sort blurbs added to blurbset
-         ; (swap! nf-app-state-atom update :blurbs #(reverse (sort-by :number-of-ratings %))) ;descending
+         ; (swap! tv-state #(reverse (sort-by :number-of-ratings %))) ;descending
           (.log js/console "added new blurb to atom"))
-         ;(if (= (:author new-data) currently-logged-in-user)
-         ;  (do
-         ;
-         ;    (clear all the blurb input fields)
-         ;    (redirect to single-blurb-page-with-bid <recv'd-bid>))
 
       (= event-title :serversent/comment)
         (do
@@ -1427,19 +1412,6 @@
           (.log js/console "adding new comment to atom...")
           (swap! posts conj new-data)
           (.log js/console "added new comment to atom"))
-
-
-      (= event-title :serversent/page-load-req)
-        (do
-          (.log js/console (str "### " new-data))
-          (let [blurb-core (vec new-data)]
-            (swap! tv-state assoc blurb-core)))
-            ;sort
-           ; (swap! nf-app-state-atom update :blurbs #(reverse (sort-by av-score %)))))
-
-
-      (= event-title :servermod/unused-invites)
-        (.log js/console "love for the unused invites")
 
       (= event-title :serversent/rating-update)
         (do
@@ -1464,53 +1436,7 @@
             )))))
 
 
-
-
-;(defn event-msg-handler
-;  "Wraps `-event-msg-handler` with logging, error catching, etc."
-;  [{:as ev-msg :keys [id ?data event]}]
-;  (-event-msg-handler ev-msg))
-;
-;(defmethod -event-msg-handler
-;  :default ; Default/fallback case (no other matching handler)
-;  [{:as ev-msg :keys [event]}]
-;  (.log js/console ".NF. unhandled:" event)
-;  ;(->output! "Unhandled event: %s" event)
-;  )
-
-(defmethod -event-msg-handler :chsk/state
-  [{:as ev-msg :keys [?data]}]
-  (let [[old-state-map new-state-map] (have vector? ?data)]
-    (if (:first-open? new-state-map)
-      (.log js/console ".NF. " new-state-map)
-      ;(->output! "Channel socket successfully established!: %s" new-state-map)
-      ;(->output! "Channel socket state change: %s"              new-state-map)
-      )
-    ))
-
-(defmethod -event-msg-handler :chsk/recv
-  [{:as ev-msg :keys [?data]}]
-    (.log js/console ".NF. push from serv: " ?data)
-    ;(->output! "Push event from server: %s" ?data)
-  )
-
-(defmethod -event-msg-handler :chsk/handshake
-  [{:as ev-msg :keys [?data]}]
-  (let [[?uid ?csrf-token ?handshake-data] ?data]
-    (.log js/console "Handshake: %s" ?data)
-    ;(->output! "Handshake: %s" ?data)
-    ))
-
-(defmethod -event-msg-handler :serversent/blurb
-  [{:as ev-msg :keys [?data]}]
-  (let [[?uid ?csrf-token ?handshake-data] ?data]
-    (.log js/console "Handshake: %s" ?data)
-    ;(->output! "Handshake: %s" ?data)
-    ))
-
-;; TODO Add your (defmethod -event-msg-handler <event-id> [ev-msg] <body>)s here...
-
-;;;; Sente event router (our `event-msg-handler` loop)
+;;;; Sente event loope
 
 (defonce router_ (atom nil))
 (defn  stop-router! [] (when-let [stop-f @router_] (stop-f)))
@@ -1522,6 +1448,12 @@
 
 
 
+
+
+(defn validate-email
+  [email]
+  (let [pattern #"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"]
+    (and (string? email) (re-matches pattern email))))
 
 
 
@@ -1587,8 +1519,10 @@
   (swap! input-state assoc-in [:inputs 0 :logged-in] true))
 
 (set! (.-onload js/window)
-        (if (not (empty? (get-item :auth-key)))
-          auto-login))
+    (if (not (empty? (get-item :auth-key)))
+      auto-login))
+
+
 
 
 (accountant/dispatch-current!)

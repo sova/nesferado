@@ -113,16 +113,21 @@
 (def nf-ratings (duratom :local-file
                     :file-path "data/ratings.sova"
                     :init []))
-(def nf-participation (duratom :local-file
-                    :file-path "data/participation.sova"
-                    :init []))
+
+(def nf-participation (duratom
+                        :local-file
+                        :file-path "data/participation.sova"
+                        :init []))
 
 (def nf-counter (duratom :local-file
                          :file-path "data/unique-id-current.sova"
                          :init 888888))
 
 
-(def     tv-state (atom [ {:title "Fusion Power Imminent"
+(def     tv-state (duratom :local-file
+                           :file-path "data/tv-state.sova"
+                           :init [
+                          {:title "Fusion Power Imminent"
                            :subtitle "Horne Technologies has developed a working Plasma Containment Prototype for furthering Fusion"
                            :priority 1
                            :id 108
@@ -158,9 +163,9 @@
                            :ratings-total 188
                            :link "www.github.com/tonsky/rum"
                            :contents "rum is dope. the components are reusable and the rendering is truly fast.  it's great, and makes me look like a decent coder! hah"}
-                          {:title "Postpostpost"
+                          {:title "Server-only blurb.  If you are reading this then the server is succesfully sending blurbs to connected clients."
                            :subtitle "this is the post!"
-                           :link "http://hysterical.com"
+                           :link "http://nonforum.com"
                            :priority 4
                            :id 111
                            :posted-by "v@nonforum.com"
@@ -217,24 +222,6 @@
                     :comments []}]))
 
 (def ratings (atom [{}]))
-
-
-
-
-
-
-
-(gensym "nf_")
-
-
-(gensym "nf_")
-
-(gensym "nf_")
-
-
-
-
-
 
 
 (defn create-auth-token-map [user-email]
@@ -442,6 +429,9 @@
   (GET "/submit"  ring-req (landing-pg-handler            ring-req))
   (GET "/feedback" ring-req (landing-pg-handler            ring-req))
   (GET "/about" ring-req (landing-pg-handler            ring-req))
+  (GET "/donate" ring-req (landing-pg-handler            ring-req))
+
+  (GET "/fusion" ring-req (landing-pg-handler            ring-req))
 
   (GET "/email-recovery" ring-req (landing-pg-handler            ring-req))
   (GET "/email-public" ring-req (landing-pg-handler            ring-req))
@@ -452,7 +442,7 @@
   (GET "/invite" ring-req (landing-pg-handler            ring-req))
 
   (GET "/profile" ring-req (landing-pg-handler            ring-req))
-  ;/phantomses
+  ;/phantomses (simply serve the javascript object and let the cljs client do the "routing")
 
   (GET  "/chsk"  ring-req (ring-ajax-get-or-ws-handshake ring-req))
   (POST "/chsk"  ring-req (ring-ajax-post                ring-req))
@@ -536,6 +526,19 @@
   [{:as ev-msg :keys [?reply-fn]}]
   (let [loop-enabled? (swap! broadcast-enabled?_ not)]
     (?reply-fn loop-enabled?)))
+
+(defn get-all-blurbs []
+  @tv-state)
+
+
+(defmethod -event-msg-handler :clientsent/req-all-blurbs
+  [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
+  ;  (println (str (:params ring-req)))
+   ; (println (str (:uid (:params ring-req))))
+   ; (println "sending blurbs to " ?user-id)
+    (when ?reply-fn
+      (?reply-fn (get-all-blurbs))))
+
 
 (defn broadcast-blurb!
   "Broadcasts a given blurb-map (typically a fresh dbsave!) to all connected browsings"
