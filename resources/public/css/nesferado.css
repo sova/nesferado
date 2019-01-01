@@ -243,7 +243,7 @@ width: 1200px;}
   right: 0;
   float: left;
   font-size: 32px;
-  margin-top: -0.23em;
+  /*margin-top: -0.23em;*/
 }
 
 .rollthedice {
@@ -252,7 +252,8 @@ width: 1200px;}
 
 .numerals {
   font-family: 'Assistant';
-  margin-top: -0.3em;
+      margin-top: -0.24em;
+    margin-right: -0.01em;
 
 }
 
@@ -608,7 +609,7 @@ z-index: 1003;}
   left: 0;
   z-index: 200;
 
-  margin-top: -0.17em;
+  margin-top: 0.05em;
   margin-left: 0.03em;
 
 }

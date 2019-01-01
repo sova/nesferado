@@ -633,7 +633,7 @@
                [:div.item-rate-doubleplus {:on-click (fn [e] (rate :double-plus pid))} ""] ;++
                [:div.item-rate-plus  {:on-click (fn [e] (rate :plus pid))} ""] ;+
                [:div.item-rate-minus {:on-click (fn [e] (rate :minus pid))} ""] ;-
-              [:div.item-rating {:class (if (< nor-nospost 6)
+              [:div.item-rating {:class (if (< nor-nospost 3)
                                           "rollthedice"
                                           "numerals") } rating ]]]]])
        ;lest the post has comments and needs more renders in pocket.
@@ -654,7 +654,7 @@
                [:div.item-rate-doubleplus {:on-click (fn [e] (rate :double-plus pid))} ""] ;++
                [:div.item-rate-plus  {:on-click (fn [e] (rate :plus pid))} ""] ;+
                [:div.item-rate-minus {:on-click (fn [e] (rate :minus pid))} ""] ;-
-               [:div.item-rating  {:class (if (< nor-compost 6)
+               [:div.item-rating  {:class (if (< nor-compost 3)
                                           "rollthedice"
                                           "numerals") } com-rating]]]
 
@@ -813,6 +813,11 @@
                                                      (swap! input-state assoc-in [:inputs 0 :current-view] "/submit")))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ submit"]]
+      [:li [:span.sidebarbutton {:on-click (fn [_] (do
+                                                     (accountant/navigate! "/about")
+                                                     (swap! input-state assoc-in [:inputs 0 :current-view] "/about")))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ about"]]
       [:li [:span.sidebarbutton {:on-click (fn [_] (do
                                                      (accountant/navigate! "/profile")
                                                      ;(swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile")
@@ -1208,6 +1213,17 @@
     [:div#foot7 "For complete information on how to use nonforum most effectively, please check out the "[:a {:href "/faq"} "F.A.Q"]]])
 
 
+(rum/defc about-fields []
+  [:div#aboutnf
+    [:div#about1.about "Nonforum is a realtime forum for discussing links, questions, and other user submissions."]
+    [:div#about2.about "When you click on a story on the main page you'll be taken to a detailed view for that submission."]
+    [:div#about3.about "To comment on the parent simply click on the original news piece and then submit your comment."]
+    [:div#about4.about "If you wish to reply directly to other comments, click on the comment you want to reply to.  It will be fig colored when selected."]
+    [:div#about5.about "Voting is a natural right and you can vote on any submission or comment. There are three levels to the tri-vote, double-plus, plus, and minus.  These correlate roughly to the spectrum of 0-99 and eventually, after a threshold number of votes has been met, the dice will transform to a number likely landing between 30 and 99."]
+    [:div#about6.about "Nonforum is built using ClojureScript (Rum, Sente, Accountant)"]
+    [:div#about7.about "We are helping to raise money for Fusion Research.  Fusion will bring us the pollution-free future today.  Help humanity harness the power of the stars!  Donate today."]]
+  )
+
 (rum/defc non-buzz-placeholder []
   [:div.nonbuzz "nonforum"])
 
@@ -1266,6 +1282,8 @@
        (side-bar)))
 
    (if (and logged-in (= "/feedback" curr-view)) (send-feedback-fields))
+
+   (if (and logged-in (= "/about" curr-view)) (about-fields))
 
    (if (and logged-in (= "/email-public" curr-view)) (edit-profile))
 

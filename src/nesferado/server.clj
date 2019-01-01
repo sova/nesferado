@@ -441,6 +441,7 @@
   (GET "/top"     ring-req (landing-pg-handler            ring-req))
   (GET "/submit"  ring-req (landing-pg-handler            ring-req))
   (GET "/feedback" ring-req (landing-pg-handler            ring-req))
+  (GET "/about" ring-req (landing-pg-handler            ring-req))
 
   (GET "/email-recovery" ring-req (landing-pg-handler            ring-req))
   (GET "/email-public" ring-req (landing-pg-handler            ring-req))
