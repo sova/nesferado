@@ -1,3 +1,12 @@
+JAN 01 0:01:39
+
+make sure input fields get cleared on (chsk-send! ...)
+so far so groovy.
+i think user pages will actually be different than the app.
+they will be static pages, which is easy, I can just do (GET "/user/:name") and have it rock my socks.
+Compojure destructuring is a beautiful thing.  And the static pages can still be generated from the atom.
+So that's a plus.
+
 DEC 31 13:49:17 p
 
 Not clearing input fields for some reason,

@@ -625,15 +625,23 @@ z-index: 1003;}
   margin: 1em;
 }
 
-.profileinput {
-  float: left;
-  clear: left;
-  min-width: 250px;
-  min-height: 100px;
-  padding: 0.25em;
-  border: 1px solid purple;
+textarea.profileinput {
+  height: 200px;
 }
 
-#textarea.profileinput {
+
+.profileinput {
+  width: 200px;
   display: block;
+  padding: 0.25em;
+}
+
+
+.reim {
+   width: 400px;
+  margin-left: 0.5em;
+}
+
+.about {
+  font-size: 24px;
 }

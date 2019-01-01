@@ -1087,17 +1087,18 @@
 
 (rum/defc set-recovery-email []
   [:form#profileinput "Set Recovery Email"
-   [:input.si.profileinput {:placeholder "recovery e-mail"
+   [:input.reim {:placeholder "recovery e-mail"
                       :on-change (fn [e] (do
                                     (swap! input-state assoc-in [:inputs 0 :bio] (.-value (.-target e)))
                                     (.log js/console (get-in @input-state [:inputs 0 :bio]))))}]
-   [:div.si "password:" [:input.postinput {:placeholder ""
+   [:div.labez "current nonforum password:" [:input.reim{:placeholder ""
                       :type "password"
+                      :auto-complete "Current Nonforum password"
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :password] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :link]))))}]]
 
-    [:button.si.postinput {:type "button"
+    [:button.reim {:type "button"
                        :on-click (fn [e]
                                      (.log js/console "set recovery e-mail")
                                    ;submit to server here!
@@ -1107,24 +1108,26 @@
 
 (rum/defc set-password []
   [:form#setpasswordinput.si
-   [:div.si "old password" [:input {:placeholder ""
+   [:div.rezz "old password" [:input.reim {:placeholder ""
                                               :auto-complete "old-password"
                       :on-change (fn [e] (do
                                     (swap! input-state assoc-in [:inputs 0 :change-pass-old-pw] (.-value (.-target e)))
                                     (.log js/console (get-in @input-state [:inputs 0 :change-pass-old-pw]))))}]
-   [:div.si "new password:" [:input {:placeholder ""
+   [:div.rezz "new password:" [:input.reim {:placeholder ""
                       :type "password"
+                      :auto-complete "new password"
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :change-pass-new-pw]))))}]]
 
-    [:div.si "new password confirm:" [:input {:placeholder ""
+    [:div.rezz "new password confirm:" [:input.reim {:placeholder ""
                       :type "password"
+                      :auto-complete "new password confirm"
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw2] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :change-pass-new-pw2]))))}]]
 
-    [:button.si {:type "button"
+    [:button.reim {:type "button"
                        :on-click (fn [e]
                                      (.log js/console "set recovery e-mail")
                                    ;submit to server here!
