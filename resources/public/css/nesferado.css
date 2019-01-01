@@ -40,6 +40,7 @@ a { transition: color 0.35s ease;}
 .heading {
   font-size: 26px;
   color: hsl(180, 90%, 20%);
+  margin-right: 96px;
 }
 
 #output {
