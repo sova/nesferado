@@ -552,9 +552,9 @@
 
 (defn rate [rating pid]
   (cond
-    (= rating :double-plus) (.log js/console "user rated " pid " ++")
-    (= rating :plus) (.log js/console (str "user rated " pid " +"))
-    (= rating :minus) (.log js/console "user rated " pid " -")))
+    (= rating :double-plus) (do (.log js/console "user rated " pid " ++"))
+    (= rating :plus) (do (.log js/console (str "user rated " pid " +")))
+    (= rating :minus) (do (.log js/console "user rated " pid " -"))))
 
 (rate :plus 533)
 
@@ -631,7 +631,8 @@
 
 ;;; send-feedback inputs
 
-(rum/defc send-feedback-fields []
+(rum/defc send-feedback-fields < rum/reactive
+                                 show-fresh [state ]
   [:form#sendfeedbackform
    [:textarea#sendfeedbackinput.fullwidth {:placeholder "Send us some feedback, suggestions, comments, concerns." :name "feedback"
                       :on-change (fn [e] (do
@@ -651,7 +652,8 @@
 
 
 
-(rum/defc invite-fields []
+(rum/defc invite-fields < rum/reactive
+                          show-fresh [state ]
   [:form#invitefriendsform
    [:input#invitefriendsinput.reim
     {:placeholder "Enter a friend's email and invite them to join nonforum." :name "invite"
@@ -903,8 +905,9 @@
 
 
 (rum/defc tv-cell  < rum/reactive
-                    { :key-fn (fn [td]
-                                    (str (uuid (str (:title td))))) } [td]
+                     { :key-fn (fn [td]
+                        (str (uuid (str (:title td))))) }
+                      [td]
   (if (not (empty? td))
 
   (let [title (:title td)
@@ -961,7 +964,8 @@
 
 
 
-(rum/defc television  < rum/reactive []
+(rum/defc television  < rum/reactive
+                        show-fresh [state ]
   [:div#tv
    [:ol.tv
     (map tv-cell  (rum/react tv-state))]])
@@ -973,7 +977,8 @@
 
 
 
-(rum/defc post-input < rum/reactive []
+(rum/defc post-input < rum/reactive
+                       show-fresh [state ]
   ;(let [ls (get-in @input-state [:inputs 0 :title])]
   [:form#postinput "Create new post"
    [:input.reim{:placeholder "title"
@@ -1028,7 +1033,8 @@
 
                        } "post new"]])
 
-(rum/defc edit-profile []
+(rum/defc edit-profile < rum/reactive
+                         show-fresh [state ]
   [:form#profileinput.profileinput "Edit Profile"
    [:textarea.profileinput{:placeholder "bio"
                       :on-change (fn [e] (do
@@ -1050,7 +1056,8 @@
                                        )) ;thanks @Marc O'Morain
                        } "update bio"]])
 
-(rum/defc set-recovery-email []
+(rum/defc set-recovery-email < rum/reactive
+                               show-fresh [state ]
   [:form#profileinput "Set Recovery Email"
    [:input.reim {:placeholder "recovery e-mail"
                       :on-change (fn [e] (do
@@ -1071,7 +1078,8 @@
                                        ) ;thanks @Marc O'Morain
                        } "set recovery e-mail"]])
 
-(rum/defc set-password []
+(rum/defc set-password < rum/reactive
+                       show-fresh [state ]
   [:form#setpasswordinput.si
    [:div.rezz "old password" [:input.reim {:placeholder ""
                                               :auto-complete "old-password"
@@ -1101,16 +1109,18 @@
                        } "set password"]]])
 
 
-(rum/defc support-nf []
-  [:div#supportnf "Thank you for participating in and contributing to Nonforum."]
-  [:div#mission0 "Part of our mission at Nonforum is to further Humanity in significant ways."]
-  [:div#mission1 "We are partnered with Horne Technologies to help them achieve parity-efficiency (100:100) with their new 5 Tesla reactor"]
-  [:div#mission2 "In order to continue fusion research in 2019 we need to raise approximately $150,000."]
-  [:div#mission3 "In order to create a power-generating reactor once we know how many Teslas of magnetic field we need and how to orient the field-generation devices, will require approximately $15 Million"]
-  [:div#mission4 "Fusion will enable Humanity to harness the power of the stars."]
-  [:div#mission5 "A fusion future would leave cities free of smog and free of adverse pollution in the air, water and earth."]
-  [:div#mission6 "Our priority is funding fusion so that Humanity will become 100% green and sustainable as soon as possible."]
-  [:div#mission7 "Please contribute whatever you can.  The suggested donation is $15.00"])
+(rum/defc support-nf < rum/reactive
+                       show-fresh [state ]
+  [:div
+    [:div#supportnf "Thank you for participating in and contributing to Nonforum."]
+    [:div#mission0 "Part of our mission at Nonforum is to further Humanity in significant ways."]
+    [:div#mission1 "We are partnered with Horne Technologies to help them achieve parity-efficiency (100:100) with their new 5 Tesla reactor"]
+    [:div#mission2 "In order to continue fusion research in 2019 we need to raise approximately $150,000."]
+    [:div#mission3 "In order to create a power-generating reactor once we know how many Teslas of magnetic field we need and how to orient the field-generation devices, will require approximately $15 Million"]
+    [:div#mission4 "Fusion will enable Humanity to harness the power of the stars."]
+    [:div#mission5 "A fusion future would leave cities free of smog and free of adverse pollution in the air, water and earth."]
+    [:div#mission6 "Our priority is funding fusion so that Humanity will become 100% green and sustainable as soon as possible."]
+    [:div#mission7 "Please contribute whatever you can.  The suggested donation is $15.00"]])
 
 ;; https://github.com/tonsky/grumpy/blob/master/src/grumpy/editor.cljc#L257
 ;; thank you, @tonsky
@@ -1188,7 +1198,8 @@
     [:div#foot7 "For complete information on how to use nonforum most effectively, please check out the "[:a {:href "/about"} "About Page"]]])
 
 
-(rum/defc about-fields []
+(rum/defc about-fields < rum/reactive
+                         show-fresh [state ]
   [:div#aboutnf
     [:div#about1.about "Nonforum is a realtime forum for discussing links, questions, and other user submissions."]
     [:div#about2.about "When you click on a story on the main page you'll be taken to a detailed view for that submission."]
@@ -1202,8 +1213,9 @@
 (rum/defc non-buzz-placeholder []
   [:div.nonbuzz "nonforum"])
 
-(rum/defc sponsored-message []
-  [:div#spmsg "Help fund Horne Technologies in their next round of Fusion Research, a 5Tesla reactor [details]"])
+(rum/defc sponsored-message < rum/reactive
+                              show-fresh [state ]
+  [:div#spmsg "Help fund Horne Technologies in their next round of Fusion Research, a 5Tesla reactor " [:a {:href "donate"} "donate"]])
 
 (rum/defc go-back-button []
   (let [active-state "all"]
@@ -1364,7 +1376,7 @@
                       (.log js/console "callback with blurbs rcevd")
                       (.log js/console ":cs/rab " blurb-core)
                       (reset! tv-state blurb-core)
-                      (swap! tv-state #(sort-by :number-of-ratings %))))))) ;descending
+                      (swap! tv-state #(sort-by :ratings-total %))))))) ;descending
 
 
 

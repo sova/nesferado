@@ -578,7 +578,7 @@
                            :timestamp now
                            :number-of-ratings 0
                            :ratings-total 0
-                           :nfid counter})))))
+                           :id counter})))))
 
 
 
