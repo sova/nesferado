@@ -1185,7 +1185,7 @@
                                             (.log js/console "parent id == current tv")
                                             (.log js/console new-comment-map)
                                             (swap! posts conj new-comment-map) ;add new comment
-                                            ;;(swap! tv-state update-in [second-hit :comments] conj (:id new-comment-map))
+                                            (swap! tv-state update-in [second-hit :comments] conj (:id new-comment-map))
 
                                             ;alse need to update the [td] object in the atom
                                            ; (swap! input-state update-in [:inputs 0 :tv-current :comments] conj (:id new-comment-map))
@@ -1391,7 +1391,7 @@
                     (do
                       (.log js/console "callback with blurbs rcevd")
                       (.log js/console ":cs/rab " blurb-core)
-                      (reset! tv-state blurb-core)
+                      (swap! tv-state concat blurb-core)
                       (swap! tv-state #(sort-by :ratings-total %))))))) ;descending
 
 
