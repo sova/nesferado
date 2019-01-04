@@ -549,10 +549,18 @@
 
 ;(sort-by :number-of-ratings > @posts)
 
+(defn write-rating! [rating pid uid]
+  ;filter the atom on the bid and uid
+  ; if they match, overwrite (merge?)
+  ; otherwise just conj
+  )
+
 
 (defn rate [rating pid]
   (cond
-    (= rating :double-plus) (do (.log js/console "user rated " pid " ++"))
+    (= rating :double-plus) (do
+                              (write-rating! rating pid uid)
+                              (.log js/console "user rated " pid " ++"))
     (= rating :plus) (do (.log js/console (str "user rated " pid " +")))
     (= rating :minus) (do (.log js/console "user rated " pid " -"))))
 
@@ -1152,7 +1160,8 @@
                                    (let [ parent-id (get-in @input-state [:inputs 0 :selected-parent])
                                           username (get-in @input-state [:inputs 0 :current-user])
                                           curr-tv (get-in @input-state [:inputs 0 :tv-curr-id])
-                                          new-comment-map {:id (swap! y inc)
+                                          new-comment-map {
+                                                          :id (swap! y inc)
                                                           :contents (get-in @input-state [:inputs 0 :comment])
                                                           :author username
                                                           :comments []
@@ -1164,7 +1173,7 @@
                                                            first)
                                             second-hit (->> @tv-state
                                                             (keep-indexed #(when (= (:id %2) curr-tv) %1))
-                                                           first)
+                                                           )
                                             ]
                                         (.log js/console ">< " (get-in @posts [first-hit :comments]) (:id new-comment-map))
 
@@ -1173,17 +1182,24 @@
 
                                         (if (= parent-id curr-tv)
                                           (do
+                                            (.log js/console "parent id == current tv")
+                                            (.log js/console new-comment-map)
                                             (swap! posts conj new-comment-map) ;add new comment
-                                            (swap! tv-state update-in [second-hit :comments] conj (:id new-comment-map))
+                                            ;;(swap! tv-state update-in [second-hit :comments] conj (:id new-comment-map))
+
                                             ;alse need to update the [td] object in the atom
-                                            (swap! input-state update-in [:inputs 0 :tv-current :comments] conj (:id new-comment-map))
-                                            (.log js/console (get-in @input-state [:inputs 0 :tv-current :comments]))
-                                            (swap! input-state update-in [:inputs 0 :tv-comments] conj (:id new-comment-map)))
+                                           ; (swap! input-state update-in [:inputs 0 :tv-current :comments] conj (:id new-comment-map))
+                                           ; (.log js/console (get-in @input-state [:inputs 0 :tv-current :comments]))
+                                            (swap! input-state update-in [:inputs 0 :tv-comments] conj (:id new-comment-map))
+                                            (.log js/console "~ " (get-in @input-state [:inputs 0 :tv-comments]))
+                                            )
                                           ;else
                                           (do
+                                            (.log js/console "elsemmm")
                                             (swap! posts conj new-comment-map) ;add new comment
                                             (swap! posts update-in [first-hit :comments] conj (:id new-comment-map)))) ;add comment id to parent
-                                     (.log js/console @posts))
+                                    ; (.log js/console @posts)
+                                        )
                                      ))} "Post a comment."]])
 
 
@@ -1539,7 +1555,8 @@
 
 (accountant/dispatch-current!)
 
-
+(set! (.-ready js/document)
+      (accountant/dispatch-current!))
 
 ;;;; Init stuff
 
