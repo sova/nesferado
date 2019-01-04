@@ -311,7 +311,7 @@
                     :ratings-total 190
                     :comments []}]))
 
-(swap! posts conj {:id 88
+(swap! posts concat {:id 88
                    :contents "fortunate are the African penguins"
                    :author "vv@nonforum.com"
                    :number-of-ratings 2
@@ -1135,6 +1135,18 @@
 ;; rum is awesome. 25 nov 2018
 
 
+
+
+
+
+
+(defn scan-idx [k v coll]
+  (reduce-kv (fn [_ idx m] (when (= v (k m)) (reduced idx)))
+   nil
+   coll))
+
+; (update-in data [(scan-idx :id 8 data) :comments] conj 99))
+
 (def y (atom 999))
 
 (rum/defc post-comment-input < rum/reactive []
@@ -1167,15 +1179,19 @@
                                                           :comments []
                                                           :ratings-total 0
                                                           :number-of-ratings 0}]
+                                     (swap! tv-state vec)
+                                     (swap! posts vec)
 
                                       (let [first-hit (->> @posts
                                                           (keep-indexed #(when (= (:id %2) parent-id) %1))
                                                            first)
                                             second-hit (->> @tv-state
                                                             (keep-indexed #(when (= (:id %2) curr-tv) %1))
-                                                           )
+                                                           first)
                                             ]
-                                        (.log js/console ">< " (get-in @posts [first-hit :comments]) (:id new-comment-map))
+                                        (.log js/console ">><< " (get-in @posts [first-hit :comments]) (:id new-comment-map))
+
+                                        (.log js/console "<<>> " (get-in @tv-state [second-hit :comments]) (:id new-comment-map))
 
                                          (.log js/console ">< "  first-hit " | " second-hit)
                                         (.log js/console ">< "  parent-id " || " curr-tv)
@@ -1185,11 +1201,18 @@
                                             (.log js/console "parent id == current tv")
                                             (.log js/console new-comment-map)
                                             (swap! posts conj new-comment-map) ;add new comment
-                                            ;;(swap! tv-state update-in [second-hit :comments] conj (:id new-comment-map))
+                                            (.log js/console @tv-state)
+                                            ;how to conj to TV state?
+
+
+
+                                            ;(scan-idx :id parent-id @tv-state)
+                                            ;(.log js/console second-hit " <>P><> " @tv-state)
+                                            ;(swap! tv-state update-in [second-hit :comments] conj (:id new-comment-map))
+                                             (swap! tv-state update-in [ second-hit   :comments] conj (:id new-comment-map))
+                                            ;atte conj to tv-state comments of active tvcell
 
                                             ;alse need to update the [td] object in the atom
-                                           ; (swap! input-state update-in [:inputs 0 :tv-current :comments] conj (:id new-comment-map))
-                                           ; (.log js/console (get-in @input-state [:inputs 0 :tv-current :comments]))
                                             (swap! input-state update-in [:inputs 0 :tv-comments] conj (:id new-comment-map))
                                             (.log js/console "~ " (get-in @input-state [:inputs 0 :tv-comments]))
                                             )
@@ -1384,6 +1407,8 @@
 
 (defn ask-server-for-blurbs
   []
+
+  ;;also ask for the specific current NFID
   (chsk-send! [:clientsent/req-all-blurbs  {:can-i-please-has-the "blurbs"}]
                3000 ;timeout
                 (fn [blurb-core]
@@ -1391,7 +1416,9 @@
                     (do
                       (.log js/console "callback with blurbs rcevd")
                       (.log js/console ":cs/rab " blurb-core)
-                      (reset! tv-state blurb-core)
+                      (swap! tv-state concat blurb-core)
+
+                      (accountant/dispatch-current!)
                       (swap! tv-state #(sort-by :ratings-total %))))))) ;descending
 
 
@@ -1553,10 +1580,10 @@
 
 
 
-(accountant/dispatch-current!)
 
-(set! (.-ready js/document)
-      (accountant/dispatch-current!))
+
+;(set! (.-ready js/document)
+;      (accountant/dispatch-current!))
 
 ;;;; Init stuff
 
