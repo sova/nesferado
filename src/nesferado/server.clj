@@ -592,7 +592,21 @@
     (println (str "params rr " (:params ring-req)))
     (println (str "session rr " (:session ring-req)))
     (println (str "uid " uid))
-    (println (str comment-map))))
+    (println (str comment-map))
+    ;add comment to posts atom
+      (swap! nf-comments conj (assoc comment-map :ratings-total 0 :number-of-ratings 0 :comments []))
+
+    ;check if the parent id is in tv-state or in comments atom
+    ; and update the :comments [] vec accordingly
+
+       ;(let [seek-tv-state (find-tv-item parent-id)
+       ;      seek-cm-state (find-cm-item parent-id)] ....
+
+    ; broadcast comment to all peers and
+    ; broadcast alongside the comment it's updated parent id
+    ; server can hold onto up-to-date parent ids while clients update their own
+
+    ))
 
 (defn broadcast-blurb!
   "Broadcasts a given blurb-map (typically a fresh dbsave!) to all connected browsings"
