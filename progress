@@ -1,3 +1,23 @@
+JAN 05 11:16:44
+
+Rating submissions work
+and update in the ratings file
+but do not check the author of comments or posts for equality / eponymity
+
+submissions work and simple problems were fixed by (swap! atom vec) on the cljs side.
+
+wanna get ratings working for all pieces
+
+auto sorting
+
+auto trashing of unusefuls
+
+auto archiving of usefuls after timespan
+
+and figure out routing after incoporating serversent/blurbs and callbacks.
+
+
+
 JAN 01 0:01:39
 
 make sure input fields get cleared on (chsk-send! ...)

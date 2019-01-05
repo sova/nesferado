@@ -1181,7 +1181,12 @@
                                                           :author username
                                                           :comments []
                                                           :ratings-total 0
-                                                          :number-of-ratings 0}]
+                                                          :number-of-ratings 0}
+                                          submit-comment-map {
+                                                          :contents (get-in @input-state [:inputs 0 :comment])
+                                                          :parent parent-id
+                                                          :curr-tv curr-tv}]
+                                     (chsk-send! [:clientsent/new-comment submit-comment-map])
                                      (swap! tv-state vec)
                                      (swap! posts vec)
 

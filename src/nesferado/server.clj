@@ -221,7 +221,9 @@
                     :ratings-total 190
                     :comments []}]))
 
-(def ratings (atom [{}]))
+(def ratings (duratom :local-file
+                      :file-path "data/ratings.sova"
+                      :init []))
 
 
 (defn create-auth-token-map [user-email]
@@ -558,8 +560,7 @@
   ;;[over]write the rating in the ratings db
   ;; and invoke a recalculate on ratings-total and number-of-ratings
 
-  (let [uid ?user-id
-        rating-map (second (:event ev-msg))
+  (let [rating-map (second (:event ev-msg))
         rating (:rating rating-map)
         pid (:pid rating-map)
         uid (:uid (:session ring-req))
@@ -581,6 +582,17 @@
         (swap! ratings update-in [cheqq] assoc :rating rating)
         (prn "rating updated")))))
 
+
+(defmethod -event-msg-handler :clientsent/new-comment
+  [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
+  (let [comment-map (second (:event ev-msg))
+        contents (:contents comment-map)
+        pid (swap! nf-counter inc)
+        uid (:uid (:session ring-req))]
+    (println (str "params rr " (:params ring-req)))
+    (println (str "session rr " (:session ring-req)))
+    (println (str "uid " uid))
+    (println (str comment-map))))
 
 (defn broadcast-blurb!
   "Broadcasts a given blurb-map (typically a fresh dbsave!) to all connected browsings"
