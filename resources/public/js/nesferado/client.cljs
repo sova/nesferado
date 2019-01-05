@@ -1184,7 +1184,7 @@
                                                           :number-of-ratings 0}
                                           submit-comment-map {
                                                           :contents (get-in @input-state [:inputs 0 :comment])
-                                                          :parent parent-id
+                                                          :parent-id parent-id
                                                           :curr-tv curr-tv}]
                                      (chsk-send! [:clientsent/new-comment submit-comment-map])
                                      (swap! tv-state vec)

@@ -583,24 +583,47 @@
         (prn "rating updated")))))
 
 
+(defn find-tv-item [pid]
+  (let [first-hit (->> @tv-state
+                    (keep-indexed #(when (= pid (:id %2)) %1))
+                     first)]
+    (prn first-hit)
+         first-hit))
+
+(defn find-cm-item [pid]
+  (let [first-hit (->> @nf-comments
+                    (keep-indexed #(when (= pid (:id %2)) %1))
+                     first)]
+    (prn first-hit)
+         first-hit))
+
+
 (defmethod -event-msg-handler :clientsent/new-comment
   [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
   (let [comment-map (second (:event ev-msg))
         contents (:contents comment-map)
+        parent-id (:parent-id comment-map)
         pid (swap! nf-counter inc)
         uid (:uid (:session ring-req))]
     (println (str "params rr " (:params ring-req)))
     (println (str "session rr " (:session ring-req)))
-    (println (str "uid " uid))
+    (println (str "pp z " parent-id))
     (println (str comment-map))
     ;add comment to posts atom
-      (swap! nf-comments conj (assoc comment-map :ratings-total 0 :number-of-ratings 0 :comments []))
+      (swap! nf-comments conj (assoc comment-map :ratings-total 0 :number-of-ratings 0 :comments [] :id pid))
 
     ;check if the parent id is in tv-state or in comments atom
     ; and update the :comments [] vec accordingly
 
-       ;(let [seek-tv-state (find-tv-item parent-id)
-       ;      seek-cm-state (find-cm-item parent-id)] ....
+       (let [seek-tv-state (find-tv-item parent-id)
+             seek-cm-state (find-cm-item parent-id)]
+         (println "seek-tv " seek-tv-state)
+         (println "seek-cm " seek-cm-state)
+         (if (= nil seek-tv-state)
+           (swap! nf-comments update-in [seek-cm-state :comments] conj pid)
+          ;else
+           (swap! tv-state update-in [seek-tv-state :comments] conj pid)))
+
 
     ; broadcast comment to all peers and
     ; broadcast alongside the comment it's updated parent id
