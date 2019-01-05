@@ -540,6 +540,48 @@
       (?reply-fn (get-all-blurbs))))
 
 
+(defn check-if-rating-exists [rm]
+  (let [uid (:uid rm)
+        pid (:pid rm)
+        rating (:rating rm)
+        elements-pid (filter #(and (= pid (:pid %1)) (= uid (:uid %1))) @ratings)
+        first-hit (->> @ratings
+                    (keep-indexed #(when (and (= pid (:pid %2)) (= uid (:uid %2))) %1))
+                     first)]
+    (prn first-hit)
+         first-hit))
+
+(defmethod -event-msg-handler :clientsent/rating
+  [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
+
+  ;;see if there is a rating in the rating db already
+  ;;[over]write the rating in the ratings db
+  ;; and invoke a recalculate on ratings-total and number-of-ratings
+
+  (let [uid ?user-id
+        rating-map (second (:event ev-msg))
+        rating (:rating rating-map)
+        pid (:pid rating-map)
+        uid (:uid (:session ring-req))
+        pid-filt (filter #(= (:pid %1) pid) @ratings)
+        uid-filt (filter #(= (:uid %1) uid) @ratings)
+        cheqq (check-if-rating-exists rating-map)
+        ]
+    (println (str "params rr " (:params ring-req)))
+    (println (str "session rr " (:session ring-req)))
+    (println (str "uid " uid))
+    (println (str rating-map))
+
+    (if (= nil cheqq)
+      (do
+        (swap! ratings conj rating-map)
+        (prn "rating added"))
+      ;else
+      (do
+        (swap! ratings update-in [cheqq] assoc :rating rating)
+        (prn "rating updated")))))
+
+
 (defn broadcast-blurb!
   "Broadcasts a given blurb-map (typically a fresh dbsave!) to all connected browsings"
   [ blurb-map  ]

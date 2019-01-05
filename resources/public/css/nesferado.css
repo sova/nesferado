@@ -83,7 +83,7 @@ a { transition: color 0.35s ease;}
 .topbar>li>a:hover { color: #fff; }
 
 
-#nflogin {
+#nfutlogin {
   min-width: 400px;
   border: 1px solid gray;
 }
@@ -554,7 +554,7 @@ float: left;
 }
 
 .logout {
-  margin-left: 1em;
+  margin-left: 0.5em;
 }
 
 

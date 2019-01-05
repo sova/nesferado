@@ -549,20 +549,23 @@
 
 ;(sort-by :number-of-ratings > @posts)
 
-(defn write-rating! [rating pid uid]
-  ;filter the atom on the bid and uid
-  ; if they match, overwrite (merge?)
-  ; otherwise just conj
-  )
+(defn write-rating! [rating pid]
+
+  (chsk-send! [:clientsent/rating
+                 { :pid pid
+                   :uid (get-in @input-state [:inputs 0 :current-user])
+                   :rating rating }]))
 
 
 (defn rate [rating pid]
   (cond
     (= rating :double-plus) (do
-                              (write-rating! rating pid uid)
+                              (write-rating! rating pid)
                               (.log js/console "user rated " pid " ++"))
-    (= rating :plus) (do (.log js/console (str "user rated " pid " +")))
-    (= rating :minus) (do (.log js/console "user rated " pid " -"))))
+    (= rating :plus) (do (write-rating! rating pid)
+                       (.log js/console (str "user rated " pid " +")))
+    (= rating :minus) (do (write-rating! rating pid)
+                        (.log js/console "user rated " pid " -"))))
 
 (rate :plus 533)
 
@@ -1585,6 +1588,8 @@
 ;(set! (.-ready js/document)
 ;      (accountant/dispatch-current!))
 
+
+;(accountant/dispatch-current!)
 ;;;; Init stuff
 
 (defn start! [] (start-router!))
