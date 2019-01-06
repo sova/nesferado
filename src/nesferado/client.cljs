@@ -547,7 +547,7 @@
                          (rum/local -1 ::hidecomments)
                         ; { :key-fn (fn [state pid]
                          ;  (str pid)) }
-                         ;show-fresh
+                        show-fresh
                        [state pid]
 
   (let [post-coll   (rum/react posts) ;atom
