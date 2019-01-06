@@ -1003,6 +1003,7 @@
                                        (swap! input-state assoc-in [:inputs 0 :subtitle] "")
                                        (swap! input-state assoc-in [:inputs 0 :contents] "")
                                        (swap! input-state assoc-in [:inputs 0 :link] "")
+                                      (accountant/navigate! "/")
 
                                       ))
 
