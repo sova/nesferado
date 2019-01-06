@@ -739,12 +739,7 @@
                                                     ))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "n⊜nforum"]]
-      [:li [:span.sidebarbutton {:on-click
-                 (fn [e] (do
-                           (.stopPropagation e)
-                           (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
-                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
-                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ∴ preferences"]]
+
 
       [:li [:span.sidebarbutton {:on-click (fn [_] (do
                                                      (accountant/navigate! "/")
@@ -752,6 +747,12 @@
                                                      (swap! input-state assoc-in [:inputs 0 :tv-curr-id] "")))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ top"   ]]
+      [:li [:span.sidebarbutton {:on-click
+                 (fn [e] (do
+                           (.stopPropagation e)
+                           (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
+                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ∴ preferences"]]
       [:li [:span.sidebarbutton {:on-click (fn [_] (do
                                                      (accountant/navigate! "/submit")
                                                      (swap! input-state assoc-in [:inputs 0 :current-view] "/submit")))
@@ -959,23 +960,23 @@
                        show-fresh [state ]
   ;(let [ls (get-in @input-state [:inputs 0 :title])]
   [:form#postinput "Create new post"
-   [:input.reim{:placeholder "title"
+   [:input.reim.kash {:placeholder "title"
                      :value (get-in @input-state [:inputs 0 :title])
                       :on-change (fn [e] (do
                                     (swap! input-state assoc-in [:inputs 0 :title] (.-value (.-target e)))
                                     (.log js/console (get-in @input-state [:inputs 0 :title]))))}]
-   [:input.reim {:placeholder "link"
+   [:input.reim.kash {:placeholder "link"
                       :value (get-in @input-state [:inputs 0 :link])
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :link] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :link]))))}]
 
-   [:input.reim {:placeholder "contents"
+   [:input.reim.kash {:placeholder "contents"
                       :value (get-in @input-state [:inputs 0 :contents])
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :contents] (.-value (.-target e)))
                                    (.log js/console (get-in @input-state [:inputs 0 :contents]))))}]
-   [:button.reim {:type "button"
+   [:button.reim.kash {:type "button"
                        :on-click (fn [e]
                                      ;(.preventDefault e)
                                      ;(.stopPropagation e)
@@ -1129,7 +1130,7 @@
 
 (rum/defc post-comment-input < rum/reactive []
   [:form#postcommentinput
-   [:textarea.fullwidth {:value @nf-comment
+   [:textarea.fullwidth {:value (rum/react nf-comment)
                          :placeholder "let us be kind"
                          :on-change (fn [e] (do
                                               (reset! nf-comment (.-value (.-target e)))
@@ -1155,7 +1156,8 @@
                                                           :curr-tv curr-tv
                                                           :author username}]
 
-                                     (chsk-send! [:clientsent/new-comment submit-comment-map])
+                                     (if (not (= "" @nf-comment))
+                                       (chsk-send! [:clientsent/new-comment submit-comment-map]))
                                      (reset! nf-comment "")))} "Comment in reply to selected."]])
 
 
