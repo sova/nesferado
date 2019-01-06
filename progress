@@ -1,3 +1,46 @@
+{:id 77
+                    :contents "Seventy seven is the nicest number below one hundred"
+                    :author "nonforum@nonforum.com"
+                    :number-of-ratings 7
+                    :ratings-total 699
+                    :comments [33 53]}
+                   {:id 33
+                    :contents "Thirty three is awesome."
+                    :author "monforum@nonforum.com"
+                    :number-of-ratings 5
+                    :ratings-total 540
+                    :comments [34]}
+                   {:id 34
+                    :contents "fusion is coming soon to a powergrid near you."
+                    :author "non@nonforum.com"
+                    :number-of-ratings 3
+                    :ratings-total 297
+                    :comments [37]}
+                   {:id 37
+                    :contents "hello there to the galaxy"
+                    :author "x@nonforum.com"
+                    :number-of-ratings 5
+                    :ratings-total 470
+                    :comments []}
+                   {:id 53
+                    :contents "relax , don't do it."
+                    :author "fool@nonforum.com"
+                    :number-of-ratings 70
+                    :ratings-total 6900
+                    :comments [88 7777]}
+                   {:id 69
+                    :contents "the extraordinary world of bugs is glorious."
+                    :author "fx@nonforum.com"
+                    :number-of-ratings 4
+                    :ratings-total 380
+                    :comments [77]}
+                   {:id 7777
+                    :contents "Oh how I love the rain"
+                    :author "rains@nonforum.com"
+                    :number-of-ratings 2
+                    :ratings-total 190
+                    :comments []}
+
 JAN 05 11:16:44
 
 Rating submissions work

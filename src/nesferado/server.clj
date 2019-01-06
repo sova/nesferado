@@ -532,6 +532,9 @@
 (defn get-all-blurbs []
   @tv-state)
 
+(defn get-all-comments []
+  @nf-comments)
+
 
 (defmethod -event-msg-handler :clientsent/req-all-blurbs
   [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
@@ -540,6 +543,17 @@
    ; (println "sending blurbs to " ?user-id)
     (when ?reply-fn
       (?reply-fn (get-all-blurbs))))
+
+
+
+(defmethod -event-msg-handler :clientsent/req-all-comments
+  [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
+  ;  (println (str (:params ring-req)))
+   ; (println (str (:uid (:params ring-req))))
+   ; (println "sending comments to " ?user-id)
+    (when ?reply-fn
+      (?reply-fn (get-all-comments))))
+
 
 
 (defn check-if-rating-exists [rm]
@@ -604,6 +618,7 @@
         contents (:contents comment-map)
         parent-id (:parent-id comment-map)
         pid (swap! nf-counter inc)
+        user (:author comment-map)
         uid (:uid (:session ring-req))]
     (println (str "params rr " (:params ring-req)))
     (println (str "session rr " (:session ring-req)))

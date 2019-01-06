@@ -62,6 +62,8 @@
   )
 
 
+(def y (atom 999))
+
 
 ;;js localStorage interaction
 (defn set-item!
@@ -144,7 +146,7 @@
 
 
 
-
+(enable-console-print!)
 
 (defn err0r []
   (println "err0r"))
@@ -209,18 +211,19 @@
 ;in articles, each subtopic is an NF thread.
 
 
-(def     tv-state (atom [ {:title "Fusion Power Imminent"
-                           :subtitle "Horne Technologies has developed a working Plasma Containment Prototype for furthering Fusion"
-                           :priority 1
-                           :id 108
-                           :posted-by "v@nonforum.com"
-                           :timestamp 808080808
-                           :comments [69]
-                           :parent nil
-                           :number-of-ratings 2
-                           :link "http://hax.com"
-                           :contents "Horne Technologies is on the brink of a fusion breakthrough. Their lab successfully contained plasma in 2017 with high-beta confinement and they need funding to continue research.  So far the fusion efficiency record is 67% (as of Dec. 2018), let's see how many teslas of magnetic field we need to reach 108% efficiency / break parity!"
-                           :ratings-total 188}]))
+(def     tv-state (atom [ ;{:title "Fusion Power Imminent"
+                          ; :subtitle "Horne Technologies has developed a working Plasma Containment Prototype for furthering Fusion"
+                          ; :priority 1
+                          ; :id 108
+                          ; :posted-by "v@nonforum.com"
+                          ; :timestamp 808080808
+                          ; :comments [69]
+                          ; :parent nil
+                          ; :number-of-ratings 2
+                          ; :link "http://hax.com"
+                          ; :contents "Horne Technologies is on the brink of a fusion breakthrough. Their lab successfully contained plasma in 2017 with high-beta confinement and they need funding to continue research.  So far the fusion efficiency record is 67% (as of Dec. 2018), let's see how many teslas of magnetic field we need to reach 108% efficiency / break parity!"
+                          ; :ratings-total 188}
+                          ]))
 
 (def input-state (atom {:inputs
                        [ {:title ""
@@ -268,55 +271,13 @@
                           }]}))
 
 
-(def posts (atom [ {:id 77
-                    :contents "Seventy seven is the nicest number below one hundred"
-                    :author "nonforum@nonforum.com"
-                    :number-of-ratings 7
-                    :ratings-total 699
-                    :comments [33 53]}
-                   {:id 33
-                    :contents "Thirty three is awesome."
-                    :author "monforum@nonforum.com"
-                    :number-of-ratings 5
-                    :ratings-total 540
-                    :comments [34]}
-                   {:id 34
-                    :contents "fusion is coming soon to a powergrid near you."
-                    :author "non@nonforum.com"
-                    :number-of-ratings 3
-                    :ratings-total 297
-                    :comments [37]}
-                   {:id 37
-                    :contents "hello there to the galaxy"
-                    :author "x@nonforum.com"
-                    :number-of-ratings 5
-                    :ratings-total 470
-                    :comments []}
-                   {:id 53
-                    :contents "relax , don't do it."
-                    :author "fool@nonforum.com"
-                    :number-of-ratings 70
-                    :ratings-total 6900
-                    :comments [88 7777]}
-                   {:id 69
-                    :contents "the extraordinary world of bugs is glorious."
-                    :author "fx@nonforum.com"
-                    :number-of-ratings 4
-                    :ratings-total 380
-                    :comments [77]}
-                   {:id 7777
-                    :contents "Oh how I love the rain"
-                    :author "rains@nonforum.com"
-                    :number-of-ratings 2
-                    :ratings-total 190
-                    :comments []}]))
-
-(swap! posts concat {:id 88
-                   :contents "fortunate are the African penguins"
-                   :author "vv@nonforum.com"
-                   :number-of-ratings 2
-                   :ratings-total 184
-                   :comments []})
+(def posts (atom [ ]))
+                   ;{:id 33
+                   ; :contents "Thirty three is awesome."
+                   ; :author "monforum@nonforum.com"
+                   ; :number-of-ratings 5
+                   ; :ratings-total 540
+                   ; :comments [34]}
 
 (def ratings (atom [{}]))
 
@@ -583,7 +544,10 @@
 
  (rum/defcs render-item < rum/reactive
                          (rum/local -1 ::hidecomments)
-                         show-fresh [state pid]
+                         { :key-fn (fn []
+                          (str "slam" (swap! y inc))) }
+                         ;show-fresh
+                       [state pid]
 
   (let [post-coll   (rum/react posts) ;atom
         input-coll (rum/react input-state)
@@ -642,7 +606,7 @@
 
 ;;; send-feedback inputs
 
-(rum/defc send-feedback-fields < rum/reactive
+(rum/defcs send-feedback-fields < rum/reactive
                                  show-fresh [state ]
   [:form#sendfeedbackform
    [:textarea#sendfeedbackinput.fullwidth {:placeholder "Send us some feedback, suggestions, comments, concerns." :name "feedback"
@@ -663,7 +627,7 @@
 
 
 
-(rum/defc invite-fields < rum/reactive
+(rum/defcs invite-fields < rum/reactive
                           show-fresh [state ]
   [:form#invitefriendsform
    [:input#invitefriendsinput.reim
@@ -975,7 +939,7 @@
 
 
 
-(rum/defc television  < rum/reactive
+(rum/defcs television  < rum/reactive
                         show-fresh [state ]
   [:div#tv
    [:ol.tv
@@ -988,7 +952,7 @@
 
 
 
-(rum/defc post-input < rum/reactive
+(rum/defcs post-input < rum/reactive
                        show-fresh [state ]
   ;(let [ls (get-in @input-state [:inputs 0 :title])]
   [:form#postinput "Create new post"
@@ -1044,7 +1008,7 @@
 
                        } "post new"]])
 
-(rum/defc edit-profile < rum/reactive
+(rum/defcs edit-profile < rum/reactive
                          show-fresh [state ]
   [:form#profileinput.profileinput "Edit Profile"
    [:textarea.profileinput{:placeholder "bio"
@@ -1067,7 +1031,7 @@
                                        )) ;thanks @Marc O'Morain
                        } "update bio"]])
 
-(rum/defc set-recovery-email < rum/reactive
+(rum/defcs set-recovery-email < rum/reactive
                                show-fresh [state ]
   [:form#profileinput "Set Recovery Email"
    [:input.reim {:placeholder "recovery e-mail"
@@ -1089,7 +1053,7 @@
                                        ) ;thanks @Marc O'Morain
                        } "set recovery e-mail"]])
 
-(rum/defc set-password < rum/reactive
+(rum/defcs set-password < rum/reactive
                        show-fresh [state ]
   [:form#setpasswordinput.si
    [:div.rezz "old password" [:input.reim {:placeholder ""
@@ -1120,7 +1084,7 @@
                        } "set password"]]])
 
 
-(rum/defc support-nf < rum/reactive
+(rum/defcs support-nf < rum/reactive
                        show-fresh [state ]
   [:div
     [:div#supportnf "Thank you for participating in and contributing to Nonforum."]
@@ -1150,7 +1114,6 @@
 
 ; (update-in data [(scan-idx :id 8 data) :comments] conj 99))
 
-(def y (atom 999))
 
 (rum/defc post-comment-input < rum/reactive []
   [:form#postcommentinput
@@ -1161,14 +1124,6 @@
                                               ;(.log js/console (get-in @input-state [:inputs 0 :comment]))
                                               ))
                          }]
-   ;[:input.fullwidth {:value (get-in @input-state [:inputs 0 :current-user])
-    ;                     :placeholder "username"
-    ;                     :readonly "readonly"
-                         ;:on-change (fn [e] (do
-                         ;                     (swap! input-state assoc-in [:inputs 0 :username] (.-value (.-target e)))
-                         ;                     ;(.log js/console (get-in @input-state [:inputs 0 :username]))
-                         ;                     ))
-     ;                    }]
    [:button.fullwidth {:type "button"
                        :class "replySelected"
                        :on-click (fn [e]
@@ -1185,58 +1140,9 @@
                                           submit-comment-map {
                                                           :contents (get-in @input-state [:inputs 0 :comment])
                                                           :parent-id parent-id
-                                                          :curr-tv curr-tv}]
-                                     (chsk-send! [:clientsent/new-comment submit-comment-map])
-
-                                     ;;reply-fn could send.... what should it send
-                                     ;; it can send the comment-id and the parent-id
-                                     ;; once it knows the actual comment-id.
-                                     ;; or, you know, the user will just get it from the broadcast.
-                                     (swap! tv-state vec)
-                                     (swap! posts vec)
-
-                                      (let [first-hit (->> @posts
-                                                          (keep-indexed #(when (= (:id %2) parent-id) %1))
-                                                           first)
-                                            second-hit (->> @tv-state
-                                                            (keep-indexed #(when (= (:id %2) curr-tv) %1))
-                                                           first)
-                                            ]
-                                        (.log js/console ">><< " (get-in @posts [first-hit :comments]) (:id new-comment-map))
-
-                                        (.log js/console "<<>> " (get-in @tv-state [second-hit :comments]) (:id new-comment-map))
-
-                                         (.log js/console ">< "  first-hit " | " second-hit)
-                                        (.log js/console ">< "  parent-id " || " curr-tv)
-
-                                        (if (= parent-id curr-tv)
-                                          (do
-                                            (.log js/console "parent id == current tv")
-                                            (.log js/console new-comment-map)
-                                            (swap! posts conj new-comment-map) ;add new comment
-                                            (.log js/console @tv-state)
-                                            ;how to conj to TV state?
-
-
-
-                                            ;(scan-idx :id parent-id @tv-state)
-                                            ;(.log js/console second-hit " <>P><> " @tv-state)
-                                            ;(swap! tv-state update-in [second-hit :comments] conj (:id new-comment-map))
-                                             (swap! tv-state update-in [ second-hit   :comments] conj (:id new-comment-map))
-                                            ;atte conj to tv-state comments of active tvcell
-
-                                            ;alse need to update the [td] object in the atom
-                                            (swap! input-state update-in [:inputs 0 :tv-comments] conj (:id new-comment-map))
-                                            (.log js/console "~ " (get-in @input-state [:inputs 0 :tv-comments]))
-                                            )
-                                          ;else
-                                          (do
-                                            (.log js/console "elsemmm")
-                                            (swap! posts conj new-comment-map) ;add new comment
-                                            (swap! posts update-in [first-hit :comments] conj (:id new-comment-map)))) ;add comment id to parent
-                                    ; (.log js/console @posts)
-                                        )
-                                     ))} "Post a comment."]])
+                                                          :curr-tv curr-tv
+                                                          :author username}]
+                                     (chsk-send! [:clientsent/new-comment submit-comment-map])))} "Post a comment."]])
 
 
 (rum/defc footer []
@@ -1250,22 +1156,22 @@
     [:div#foot7 "For complete information on how to use nonforum most effectively, please check out the "[:a {:href "/about"} "About Page"]]])
 
 
-(rum/defc about-fields < rum/reactive
+(rum/defcs about-fields < rum/reactive
                          show-fresh [state ]
   [:div#aboutnf
-    [:div#about1.about "Nonforum is a realtime forum for discussing links, questions, and other user submissions."]
-    [:div#about2.about "When you click on a story on the main page you'll be taken to a detailed view for that submission."]
-    [:div#about3.about "To comment on the parent simply click on the original news piece and then submit your comment."]
-    [:div#about4.about "If you wish to reply directly to other comments, click on the comment you want to reply to.  It will be fig colored when selected."]
-    [:div#about5.about "Voting is a natural right and you can vote on any submission or comment. There are three levels to the tri-vote, double-plus, plus, and minus.  These correlate roughly to the spectrum of 0-99 and eventually, after a threshold number of votes has been met, the dice will transform to a number likely landing between 30 and 99."]
-    [:div#about6.about "Nonforum is built using ClojureScript (Rum for UI, Sente for Client/Server Sockets, and Accountant for page \"routing\")"]
-    [:div#about7.about "We are helping to raise money for Fusion Research.  Fusion will bring us the pollution-free future today.  Help humanity harness the power of the stars!  Donate today at "[:a {:href "/donate"} "nonforum.com/donate"]]]
+    [:div#about1.about "Nonforum is a realtime forum."]
+    [:div#about2.about "Click on a news tile to see its details."]
+    [:div#about3.about "To comment, click on the element you wish to comment on.  This can be another comment or the original news piece."]
+    [:div#about4.about "A selected comment will be fig colored when selected."]
+    [:div#about5.about "Voting is a natural right and you can vote on any submission or comment via trivote. There are three levels to the tri-vote, double-plus, plus, and minus.  These correlate roughly to the spectrum of 0-99 and eventually, after a threshold number of votes has been met, the dice will transform to a number likely landing between 30 and 99."]
+    ;[:div#about6.about "Nonforum is built using ClojureScript (Rum for UI, Sente for Client/Server Sockets, and Accountant for page \"routing\")"]
+    [:div#about6.about "We are helping to raise money for Fusion Research with Horne Technologies.  Fusion will bring us the pollution-free future rapidly into our presence.  Help humanity harness the power of the stars!  Donate today at "[:a {:href "/donate"} "nonforum.com/donate"]]]
   )
 
 (rum/defc non-buzz-placeholder []
   [:div.nonbuzz "nonforum"])
 
-(rum/defc sponsored-message < rum/reactive
+(rum/defcs sponsored-message < rum/reactive
                               show-fresh [state ]
   [:div#spmsg "Help fund Horne Technologies in their next round of Fusion Research, a 5Tesla reactor " [:a {:href "donate"} "donate"]])
 
@@ -1429,15 +1335,33 @@
                     (do
                       (.log js/console "callback with blurbs rcevd")
                       (.log js/console ":cs/rab " blurb-core)
-                      (swap! tv-state concat blurb-core)
+                      (reset! tv-state blurb-core)
+                      (swap!  tv-state  vec)
 
                       (accountant/dispatch-current!)
                       (swap! tv-state #(sort-by :ratings-total %))))))) ;descending
 
 
 
+(defn ask-server-for-comments
+  []
+
+  ;;also ask for the specific current NFID
+  (chsk-send! [:clientsent/req-all-comments  {:can-i-please-has-the "comments"}]
+               3000 ;timeout
+                (fn [comments-core]
+                  (if (sente/cb-success? comments-core)
+                    (do
+                      (.log js/console "callback with comments rcevd")
+                      (.log js/console ":cs/rac " comments-core)
+
+                      (reset! posts  comments-core)
+                      (swap!  posts  vec))))))
+
+
 
 (defn find-tv-item [pid]
+  (swap! tv-state vec)
   (let [first-hit (->> @tv-state
                     (keep-indexed #(when (= pid (:id %2)) %1))
                      first)]
@@ -1445,6 +1369,7 @@
          first-hit))
 
 (defn find-cm-item [pid]
+  (swap! posts vec)
   (let [first-hit (->> @posts
                     (keep-indexed #(when (= pid (:id %2)) %1))
                      first)]
@@ -1480,6 +1405,7 @@
         (do
           (.log js/console "Hey I'm trying to get new data yo, since :ever-opened? is false")
           (ask-server-for-blurbs)
+          (ask-server-for-comments)
           )
       (= event-title :hello/client)
         (.log js/console (str "&# " new-data))
@@ -1493,32 +1419,40 @@
          ; (swap! tv-state #(reverse (sort-by :number-of-ratings %))) ;descending
           (.log js/console "added new blurb to atom"))
 
+
+
       (= event-title :serversent/comment)
         (let [new-comment-map  new-data]
           (do
             (.log js/console (str "&# " new-comment-map))
-            (.log js/console "adding new comment to atom...")
-            (swap! posts conj new-comment-map)
+            ;(swap! posts conj new-comment-map)
             (.log js/console (:parent-id new-comment-map) " parent-id is.")
-            (.log js/console "added new comment to atom")
+            (.log js/console (str "pp z " (:parent-id new-comment-map)))
 
 
-      (.log js/console (str "pp z " (:parent-id new-comment-map)))))
+            (let [pid (:id new-comment-map)
+                  parent-id (:parent-id new-comment-map)
+                  seek-tv-state (find-tv-item parent-id)
+                  seek-cm-state (find-cm-item parent-id)]
 
-    ;add comment to posts atom
-        (swap! posts conj (assoc comment-map :ratings-total 0 :number-of-ratings 0 :comments [] :id pid))
+              ;add comment to posts atom
+              (.log js/console "adding new comment to atom...")
 
-    ;check if the parent id is in tv-state or in comments atom
-    ; and update the :comments [] vec accordingly
 
-       (let [seek-tv-state (find-tv-item parent-id)
-             seek-cm-state (find-cm-item parent-id)]
-         (.log js/console "seek-tv " seek-tv-state)
-         (.log js/console "seek-cm " seek-cm-state)
-         (if (= nil seek-tv-state)
-           (swap! posts update-in [seek-cm-state :comments] conj pid)
-  ;        ;else
-           (swap! tv-state update-in [seek-tv-state :comments] conj pid))))
+              (swap! posts conj (assoc new-comment-map :ratings-total 0 :number-of-ratings 0 :comments [] :id pid))
+              (.log js/console "added new comment to atom")
+
+              ;check if the parent id is in tv-state or in comments atom
+              ; and update the :comments [] vec accordingly
+
+              (.log js/console "seek-tv " seek-tv-state)
+              (.log js/console "seek-cm " seek-cm-state)
+              (if (= nil seek-tv-state)
+                (swap! posts update-in [seek-cm-state :comments] conj pid)
+                ;        ;else
+                (do
+                  (swap! tv-state update-in [seek-tv-state :comments] conj pid)
+                  (swap! input-state update-in [:inputs 0 :tv-comments] conj pid))))))
 
 
 
@@ -1544,7 +1478,7 @@
 
           ;(swap! nf-app-state-atom swap-rating-active-blurb ru-map)
 
-            ))))
+            )))))
 
 
 ;;;; Sente event loope
