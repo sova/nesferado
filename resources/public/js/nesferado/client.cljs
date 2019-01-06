@@ -1144,7 +1144,9 @@
                                                           :parent-id parent-id
                                                           :curr-tv curr-tv
                                                           :author username}]
-                                     (chsk-send! [:clientsent/new-comment submit-comment-map])))} "Post a comment."]])
+
+                                     (chsk-send! [:clientsent/new-comment submit-comment-map])
+                                     (reset! nf-comment "")))} "Comment in reply to selected."]])
 
 
 (rum/defc footer []
