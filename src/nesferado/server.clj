@@ -657,11 +657,12 @@
   "Broadcasts a given blurb-map (typically a fresh dbsave!) to all connected browsings"
   [ blurb-map  ]
   (doseq [uid (:any @connected-uids)]
-    (chsk-send! uid [:serversent/blurb {  :posted-by (:posted-by blurb-map)
+    (chsk-send! uid [:serversent/blurb {  :id (:id blurb-map)
+                                          :posted-by (:posted-by blurb-map)
                                           :link (:link blurb-map)
                                           :title (:title blurb-map)
                                           :subtitle (:subtitle blurb-map)
-                                          :content (:content blurb-map)
+                                          :contents (:contents blurb-map)
                                           :ratngs-total (:ratings-total blurb-map)
                                           :number-of-ratings (:number-of-ratings blurb-map)
                                           :timestamp (:timestamp blurb-map)

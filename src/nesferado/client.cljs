@@ -888,11 +888,12 @@
   (if (not (empty? td))
 
   (let [title (:title td)
-        contents (:subtitle td)
+        subtitle (:subtitle td)
         comments (:comments td)
         priority (:priority td)
         id (:id td)
         posted-by (:posted-by td)
+
         timestamp (:timestamp td)
         n-ratings (:number-of-ratings td)
         ratings-t (:ratings-total td)
@@ -918,7 +919,7 @@
                                          (accountant/navigate! (str "?nfid=" id))))
                      :id (str "tile" id)}
         [:div.heading title]
-        [:div.contents contents]
+        [:div.contents subtitle]
         [:div.tilelink            {:class (if (empty? tv-current) "hideme")} [:a {:href link} link]]
         [:div.longdescription {:class (if (empty? tv-current) "hideme")} long-description]
         [:div.tile-rate
