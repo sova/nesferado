@@ -919,7 +919,7 @@
                      :id (str "tile" id)}
         [:div.heading title]
         [:div.contents contents]
-        [:div.tilelink            {:class (if (empty? tv-current) "hideme")} link]
+        [:div.tilelink            {:class (if (empty? tv-current) "hideme")} [:a {:href link} link]]
         [:div.longdescription {:class (if (empty? tv-current) "hideme")} long-description]
         [:div.tile-rate
             [:div.tile-rate-doubleplus {:on-click (fn [e] (do
@@ -982,10 +982,18 @@
                                      (.log js/console (.getElementById js/document "aft"))
                                    ;submit to server here!
 
-                                    (let [new-post-map {:title          (get-in @input-state [:inputs 0 :title])
+                                    (let [ potential-link (get-in @input-state [:inputs 0 :link])
+                                           new-post-map {:title          (get-in @input-state [:inputs 0 :title])
                                                         :subtitle          (get-in @input-state [:inputs 0 :title])
                                                         :contents       (get-in @input-state [:inputs 0 :contents])
-                                                        :link           (get-in @input-state [:inputs 0 :link])
+
+                                                        ;verify that link has http:// in front.
+                                                        :link (if (or (str/starts-with? potential-link "http") (str/starts-with? potential-link "https"))
+                                                              potential-link
+                                                            ;else
+                                                             (str "http://" potential-link))
+
+
                                                        ; :number-of-ratings 0
                                                        ; :ratings-total 0
 
