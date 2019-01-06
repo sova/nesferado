@@ -544,8 +544,8 @@
 
  (rum/defcs render-item < rum/reactive
                          (rum/local -1 ::hidecomments)
-                         { :key-fn (fn []
-                          (str "slam" (swap! y inc))) }
+                        ; { :key-fn (fn [state pid]
+                         ;  (str pid)) }
                          ;show-fresh
                        [state pid]
 
@@ -1197,7 +1197,7 @@
         curr-view (get-in (rum/react input-state) [:inputs 0 :current-view])]
     ;(.log js/console "curr comments " curr-comments)
 
-    (when-let [target-el (.getElementById js/document "output")]
+    (if-let [target-el (.getElementById js/document "output")]
        (if (= true logged-in)
          (set! (.-classList target-el) "hideMe")
          (set! (.-classList target-el) "justMounted")))
