@@ -624,6 +624,13 @@
           ;else
            (swap! tv-state update-in [seek-tv-state :comments] conj pid)))
 
+    (doseq [uid (:any @connected-uids)]
+      (chsk-send! uid [:serversent/comment {:contents contents
+                                            :author uid
+                                            :parent-id parent-id
+                                            :id pid}]))
+
+
 
     ; broadcast comment to all peers and
     ; broadcast alongside the comment it's updated parent id

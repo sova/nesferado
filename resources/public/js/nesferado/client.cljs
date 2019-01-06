@@ -1176,7 +1176,7 @@
                                           username (get-in @input-state [:inputs 0 :current-user])
                                           curr-tv (get-in @input-state [:inputs 0 :tv-curr-id])
                                           new-comment-map {
-                                                          :id (swap! y inc)
+                                                          :id (swap! y inc);;;client does not provide canonical id
                                                           :contents (get-in @input-state [:inputs 0 :comment])
                                                           :author username
                                                           :comments []
@@ -1187,6 +1187,11 @@
                                                           :parent-id parent-id
                                                           :curr-tv curr-tv}]
                                      (chsk-send! [:clientsent/new-comment submit-comment-map])
+
+                                     ;;reply-fn could send.... what should it send
+                                     ;; it can send the comment-id and the parent-id
+                                     ;; once it knows the actual comment-id.
+                                     ;; or, you know, the user will just get it from the broadcast.
                                      (swap! tv-state vec)
                                      (swap! posts vec)
 
@@ -1432,6 +1437,25 @@
 
 
 
+(defn find-tv-item [pid]
+  (let [first-hit (->> @tv-state
+                    (keep-indexed #(when (= pid (:id %2)) %1))
+                     first)]
+    (prn first-hit)
+         first-hit))
+
+(defn find-cm-item [pid]
+  (let [first-hit (->> @posts
+                    (keep-indexed #(when (= pid (:id %2)) %1))
+                     first)]
+    (prn first-hit)
+         first-hit))
+
+
+
+
+
+
 ;;;; Sente event handlers
 
 (defmulti -event-msg-handler
@@ -1470,11 +1494,33 @@
           (.log js/console "added new blurb to atom"))
 
       (= event-title :serversent/comment)
-        (do
-          (.log js/console (str "&# " new-data))
-          (.log js/console "adding new comment to atom...")
-          (swap! posts conj new-data)
-          (.log js/console "added new comment to atom"))
+        (let [new-comment-map  new-data]
+          (do
+            (.log js/console (str "&# " new-comment-map))
+            (.log js/console "adding new comment to atom...")
+            (swap! posts conj new-comment-map)
+            (.log js/console (:parent-id new-comment-map) " parent-id is.")
+            (.log js/console "added new comment to atom")
+
+
+      (.log js/console (str "pp z " (:parent-id new-comment-map)))))
+
+    ;add comment to posts atom
+        (swap! posts conj (assoc comment-map :ratings-total 0 :number-of-ratings 0 :comments [] :id pid))
+
+    ;check if the parent id is in tv-state or in comments atom
+    ; and update the :comments [] vec accordingly
+
+       (let [seek-tv-state (find-tv-item parent-id)
+             seek-cm-state (find-cm-item parent-id)]
+         (.log js/console "seek-tv " seek-tv-state)
+         (.log js/console "seek-cm " seek-cm-state)
+         (if (= nil seek-tv-state)
+           (swap! posts update-in [seek-cm-state :comments] conj pid)
+  ;        ;else
+           (swap! tv-state update-in [seek-tv-state :comments] conj pid))))
+
+
 
       (= event-title :serversent/rating-update)
         (do
@@ -1488,6 +1534,8 @@
         ;    (.log js/console (str ru-bid  " " ru-ts " " ru-nor))
 
 
+
+
             ;; update the local blurb atom information...
           ;; to have the update total-score & number-of-ratings for given bid
 
@@ -1496,7 +1544,7 @@
 
           ;(swap! nf-app-state-atom swap-rating-active-blurb ru-map)
 
-            )))))
+            ))))
 
 
 ;;;; Sente event loope
