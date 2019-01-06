@@ -281,6 +281,7 @@
 
 (def ratings (atom [{}]))
 
+(def nf-comment (atom ""))
 
 
 (defn get-rating [ratings-total number-of-ratings]
@@ -553,7 +554,8 @@
         input-coll (rum/react input-state)
         cids (return-comment-ids pid)
         __ (rum/react tv-state)
-        local-atom (::hidecomments state)]
+        local-atom (::hidecomments state)
+        ]
     ;(prn cids)
     (if (empty? (return-comment-ids pid))
       (let [noc-post  (first (filter  #(= pid (:id %)) post-coll))
@@ -565,8 +567,8 @@
                                          (.stopPropagation e)
                                          (swap! input-state assoc-in [:inputs 0 :selected-parent] pid)
                                          (swap! input-state assoc-in [:inputs 0 :selected-child] (return-comment-ids pid))))}
-          [:div.item-contents.genpost {:class (cond (= pid (get-in @input-state [:inputs 0 :selected-parent])) "selectedParent"
-                                            (some #(= % pid) (get-in @input-state [:inputs 0 :selected-child])) "selectedChild")} (:contents noc-post)
+          [:div.item-contents.genpost {:class (cond (= pid (get-in input-coll [:inputs 0 :selected-parent])) "selectedParent"
+                                            (some #(= % pid) (get-in input-coll [:inputs 0 :selected-child])) "selectedChild")} (:contents noc-post)
             [:div.item-author   (:author noc-post)]
             [:div.rate
                [:div.item-rate-doubleplus {:on-click (fn [e] (rate :double-plus pid))} ""] ;++
@@ -586,8 +588,8 @@
                                          (.stopPropagation e)
                                          (swap! input-state assoc-in [:inputs 0 :selected-parent] pid)
                                          (swap! input-state assoc-in [:inputs 0 :selected-child] (return-comment-ids pid))))}
-           [:div.item-contents.genpost  {:class (cond (= pid (get-in @input-state [:inputs 0 :selected-parent])) "selectedParent"
-                                              (some #(= % pid) (get-in @input-state [:inputs 0 :selected-child])) "selectedChild")} (:contents com-post)
+           [:div.item-contents.genpost  {:class (cond (= pid (get-in input-coll [:inputs 0 :selected-parent])) "selectedParent"
+                                              (some #(= % pid) (get-in input-coll [:inputs 0 :selected-child])) "selectedChild")} (:contents com-post)
              [:div.item-author (:author com-post)]
              [:div.rate
                [:div.item-rate-doubleplus {:on-click (fn [e] (rate :double-plus pid))} ""] ;++
@@ -1117,10 +1119,10 @@
 
 (rum/defc post-comment-input < rum/reactive []
   [:form#postcommentinput
-   [:textarea.fullwidth {:value (get-in @input-state [:inputs 0 :comment])
+   [:textarea.fullwidth {:value @nf-comment
                          :placeholder "let us be kind"
                          :on-change (fn [e] (do
-                                              (swap! input-state assoc-in [:inputs 0 :comment] (.-value (.-target e)))
+                                              (reset! nf-comment (.-value (.-target e)))
                                               ;(.log js/console (get-in @input-state [:inputs 0 :comment]))
                                               ))
                          }]
@@ -1132,13 +1134,13 @@
                                           curr-tv (get-in @input-state [:inputs 0 :tv-curr-id])
                                           new-comment-map {
                                                           :id (swap! y inc);;;client does not provide canonical id
-                                                          :contents (get-in @input-state [:inputs 0 :comment])
+                                                          :contents @nf-comment
                                                           :author username
                                                           :comments []
                                                           :ratings-total 0
                                                           :number-of-ratings 0}
                                           submit-comment-map {
-                                                          :contents (get-in @input-state [:inputs 0 :comment])
+                                                          :contents @nf-comment
                                                           :parent-id parent-id
                                                           :curr-tv curr-tv
                                                           :author username}]
