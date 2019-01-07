@@ -2,6 +2,7 @@
   "Nonforum Nesferado Server"
   {:author "@_vaso"}
 
+
   (:require
    [clojure.string     :as str]
    [ring.middleware.defaults]
@@ -109,9 +110,6 @@
                       :init []))
 (def nf-comments (duratom :local-file
                     :file-path "data/comments.sova"
-                    :init []))
-(def nf-ratings (duratom :local-file
-                    :file-path "data/ratings.sova"
                     :init []))
 
 (def nf-participation (duratom
@@ -226,6 +224,7 @@
                       :init []))
 
 
+
 (defn create-auth-token-map [user-email]
   (let [login-time  (quot (System/currentTimeMillis) 1000)
         encrypted (password/encrypt (str user-email login-time))]
@@ -254,6 +253,7 @@
       login-time (:login-time auth-map)]
      (println login-time)
   (is-good-auth-key token user login-time))
+
 
 
 
@@ -498,6 +498,31 @@
       (when @broadcast-enabled?_ (broadcast! i))
       (recur (inc i)))))
 
+(defn rate-seq [mob]
+  (let [r8 (:rating mob)]
+    (cond
+      (= r8 :double-plus)
+        99
+      (= r8 :plus)
+        77
+      (= r8 :minus)
+        33)))
+
+(defn recalculate-rating-and-broadcast! [pid]
+  (let [xi (filter #(= pid (:pid %1)) @ratings)
+        score-xi (map rate-seq xi)
+        num-ratings (count score-xi)
+        total-score (reduce + score-xi)]
+    (println pid " ::key " xi)
+    ;reduce result set and get rating-total and number of ratings
+    (println "+key " score-xi)
+
+      {:number-of-ratings num-ratings
+       :total-score total-score}))
+
+(recalculate-rating-and-broadcast! 1000)
+
+
 ;;;; Sente event handlers
 
 (defmulti -event-msg-handler
@@ -594,7 +619,8 @@
       ;else
       (do
         (swap! ratings update-in [cheqq] assoc :rating rating)
-        (prn "rating updated")))))
+        (prn "rating updated")))
+    (recalculate-rating-and-broadcast! pid)))
 
 
 (defn find-tv-item [pid]
@@ -721,7 +747,7 @@
 (defn  stop-web-server! [] (when-let [stop-fn @web-server_] (stop-fn)))
 (defn start-web-server! [& [port]]
   (stop-web-server!)
-  (let [port (or port 10288) ; 0 => Choose any available port
+  (let [port (or port 0) ; 0 => Choose any available port
         ring-handler (var main-ring-handler)
 
         [port stop-fn]
@@ -743,6 +769,6 @@
 (defn -main "For `lein run`, etc." [] (start!))
 
 ;(comment
-  (start!)
-  (test-fast-server>user-pushes);)
+;  (start!)
+;  (test-fast-server>user-pushes);)
 
