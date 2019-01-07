@@ -255,8 +255,8 @@ width: 1200px;}
 
 .numerals {
   font-family: 'Assistant';
-      margin-top: -0.24em;
     margin-right: -0.01em;
+    margin-top: -0.17em;
 
 }
 
@@ -618,8 +618,6 @@ z-index: 1003;}
   top: 0;
   left: 0;
   z-index: 200;
-
-  margin-top: 0.05em;
   margin-left: 0.03em;
 
 }

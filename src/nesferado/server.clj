@@ -175,50 +175,6 @@
                            :contents "tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter. tip your postal carrier in the winter."}]))
 
 
-
-(def posts (atom [ {:id 77
-                    :contents "Seventy seven is the nicest number below one hundred"
-                    :author "nonforum@nonforum.com"
-                    :number-of-ratings 2
-                    :ratings-total 98
-                    :comments [33 53]}
-                   {:id 33
-                    :contents "Thirty three is awesome."
-                    :author "monforum@nonforum.com"
-                    :number-of-ratings 1
-                    :ratings-total 99
-                    :comments [34]}
-                   {:id 34
-                    :contents "fusion is coming soon to a powergrid near you."
-                    :author "non@nonforum.com"
-                    :number-of-ratings 3
-                    :ratings-total 300
-                    :comments [37]}
-                   {:id 37
-                    :contents "hello there to the galaxy"
-                    :author "x@nonforum.com"
-                    :number-of-ratings 5
-                    :ratings-total 470
-                    :comments []}
-                   {:id 53
-                    :contents "relax , don't do it."
-                    :author "fool@nonforum.com"
-                    :number-of-ratings 70
-                    :ratings-total 6900
-                    :comments [88 7777]}
-                   {:id 69
-                    :contents "the extraordinary world of bugs is glorious."
-                    :author "fx@nonforum.com"
-                    :number-of-ratings 4
-                    :ratings-total 380
-                    :comments [77]}
-                   {:id 7777
-                    :contents "Oh how I love the rain"
-                    :author "rains@nonforum.com"
-                    :number-of-ratings 2
-                    :ratings-total 190
-                    :comments []}]))
-
 (def ratings (duratom :local-file
                       :file-path "data/ratings.sova"
                       :init []))
@@ -498,6 +454,21 @@
       (when @broadcast-enabled?_ (broadcast! i))
       (recur (inc i)))))
 
+(defn find-tv-item [pid]
+  (let [first-hit (->> @tv-state
+                    (keep-indexed #(when (= pid (:id %2)) %1))
+                     first)]
+    (prn first-hit)
+         first-hit))
+
+(defn find-cm-item [pid]
+  (let [first-hit (->> @nf-comments
+                    (keep-indexed #(when (= pid (:id %2)) %1))
+                     first)]
+    (prn first-hit)
+         first-hit))
+
+
 (defn rate-seq [mob]
   (let [r8 (:rating mob)]
     (cond
@@ -517,10 +488,22 @@
                  :number-of-ratings num-ratings
                  :total-score total-score}]
 
-      (doseq [uid (:any @connected-uids)]
-        (chsk-send! uid [:serversent/rating-update results]))))
+      ;seek map and update rating on serverside
+    (let [seek-tv-state (find-tv-item pid)
+          seek-cm-state (find-cm-item pid)]
+        ; (println "seek-tv " seek-tv-state)
+         ;(println "seek-cm " seek-cm-state)
+         (if (= nil seek-tv-state)
+           (swap! nf-comments update seek-cm-state assoc :number-of-ratings num-ratings :ratings-total total-score)
+          ;else
+           (swap! tv-state    update seek-tv-state assoc :number-of-ratings num-ratings :ratings-total total-score))
 
-(recalculate-rating-and-broadcast! 1000)
+      ;broadcast to all peers
+      (doseq [uid (:any @connected-uids)]
+        (chsk-send! uid [:serversent/rating results])))
+    ))
+
+;(recalculate-rating-and-broadcast! 110)
 
 
 ;;;; Sente event handlers
@@ -623,19 +606,6 @@
     (recalculate-rating-and-broadcast! pid)))
 
 
-(defn find-tv-item [pid]
-  (let [first-hit (->> @tv-state
-                    (keep-indexed #(when (= pid (:id %2)) %1))
-                     first)]
-    (prn first-hit)
-         first-hit))
-
-(defn find-cm-item [pid]
-  (let [first-hit (->> @nf-comments
-                    (keep-indexed #(when (= pid (:id %2)) %1))
-                     first)]
-    (prn first-hit)
-         first-hit))
 
 
 (defmethod -event-msg-handler :clientsent/new-comment
@@ -658,8 +628,8 @@
 
        (let [seek-tv-state (find-tv-item parent-id)
              seek-cm-state (find-cm-item parent-id)]
-         (println "seek-tv " seek-tv-state)
-         (println "seek-cm " seek-cm-state)
+       ;  (println "seek-tv " seek-tv-state)
+       ;  (println "seek-cm " seek-cm-state)
          (if (= nil seek-tv-state)
            (swap! nf-comments update-in [seek-cm-state :comments] conj pid)
           ;else

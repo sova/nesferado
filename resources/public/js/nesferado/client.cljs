@@ -285,10 +285,15 @@
 
 
 (defn get-rating [ratings-total number-of-ratings]
-  (if (< number-of-ratings 3)
+  (if (< number-of-ratings 6)
     (inc number-of-ratings)
     (int (/ ratings-total number-of-ratings))))
 
+
+(defn get-rating-com [ratings-total number-of-ratings]
+  (if (< number-of-ratings 3)
+    (inc number-of-ratings)
+    (int (/ ratings-total number-of-ratings))))
 
 
 
@@ -301,7 +306,7 @@
   (let [post (first (filter #(= post-id (:id %)) @posts))]
     post))
 
-(get-post-by-id 77)
+;(get-post-by-id 77)
 
 
 (first (first (filter #(= (:id (second %)) 88) (map-indexed vector @posts))))
@@ -529,8 +534,8 @@
     (= rating :minus) (do (write-rating! rating pid)
                         (.log js/console "user rated " pid " -"))))
 
-(rate :plus 533)
-
+;(rate :plus 533)
+;
 
 
 (def show-fresh
@@ -560,7 +565,7 @@
     (if (empty? (return-comment-ids pid))
       (let [noc-post  (first (filter  #(= pid (:id %)) post-coll))
             nor-nospost (:number-of-ratings noc-post)
-            rating (get-rating (:ratings-total noc-post) nor-nospost)]
+            rating (get-rating-com (:ratings-total noc-post) nor-nospost)]
         [:div.nocomments {:id pid :class "genpost"}
          [:div.padleft {:on-click (fn [e] (do
                                          (.log js/console "Freshly selected: " pid)
@@ -581,7 +586,7 @@
        (let [com-post (first (filter  #(= pid (:id %)) (sort-by #(get-rating (:ratings-total %) (:number-of-ratings %))  post-coll)))
 
             nor-compost (:number-of-ratings com-post)
-             com-rating (get-rating (:ratings-total com-post) nor-compost)]
+             com-rating (get-rating-com (:ratings-total com-post) nor-compost)]
          [:div.hascomments {:id pid }
           [:div.padleft {:on-click (fn [e] (do
                                          (.log js/console "Freshly selected: " pid)
@@ -1472,17 +1477,29 @@
 
 
 
-      (= event-title :serversent/rating-update)
+      (= event-title :serversent/rating)
         (do
-        ;  (.log js/console (str "rating update.. " new-data))
-          (let [ru-bid (:bid new-data)
-                ru-ts (:total-score new-data)
+          (.log js/console (str "rating update.. " new-data))
+          (let [ru-pid (:pid new-data)
+                ru-ts  (:total-score new-data)
                 ru-nor (:number-of-ratings new-data)
-                ru-map {:bid ru-bid
+                ru-map {:pid ru-pid
                         :total-score ru-ts
                         :number-of-ratings ru-nor}]
-        ;    (.log js/console (str ru-bid  " " ru-ts " " ru-nor))
+            (.log js/console (str ru-pid  " " ru-ts " " ru-nor))
 
+
+            ;seek map and update rating on clientside
+
+            ;seek map and update rating on clientside
+            (let [seek-tv-state (find-tv-item ru-pid)
+                  seek-cm-state (find-cm-item ru-pid)]
+              (println "seek-tv " seek-tv-state)
+              (println "seek-cm " seek-cm-state)
+              (if (= nil seek-tv-state)
+                (swap! posts    update seek-cm-state assoc :number-of-ratings ru-nor :ratings-total ru-ts)
+                ;else
+                (swap! tv-state update seek-tv-state assoc :number-of-ratings ru-nor :ratings-total ru-ts)))
 
 
 
