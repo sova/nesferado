@@ -512,13 +512,13 @@
   (let [xi (filter #(= pid (:pid %1)) @ratings)
         score-xi (map rate-seq xi)
         num-ratings (count score-xi)
-        total-score (reduce + score-xi)]
-    (println pid " ::key " xi)
-    ;reduce result set and get rating-total and number of ratings
-    (println "+key " score-xi)
+        total-score (reduce + score-xi)
+        results {:pid pid
+                 :number-of-ratings num-ratings
+                 :total-score total-score}]
 
-      {:number-of-ratings num-ratings
-       :total-score total-score}))
+      (doseq [uid (:any @connected-uids)]
+        (chsk-send! uid [:serversent/rating-update results]))))
 
 (recalculate-rating-and-broadcast! 1000)
 
@@ -769,6 +769,6 @@
 (defn -main "For `lein run`, etc." [] (start!))
 
 ;(comment
-;  (start!)
-;  (test-fast-server>user-pushes);)
+  (start!)
+  (test-fast-server>user-pushes);)
 
