@@ -273,7 +273,7 @@
     [:div#inputs]
     [:div#footing]
     [:link {:rel "stylesheet" :href "/css/nesferado.css"}]
-    [:script {:src "js/nesferado.js" :type "text/javascript"}]])
+    [:script {:src "js/nesferado.js" :type "text/javascript" :version @nf-counter}]])
 
 
 (rum/render-html (landing-page))
