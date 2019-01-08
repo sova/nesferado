@@ -619,8 +619,10 @@
 (rum/defcs send-feedback-fields < rum/reactive
                                  show-fresh [state ]
   [:form#sendfeedbackform
-   [:textarea#sendfeedbackinput.fullwidth {:placeholder "Send us some feedback, suggestions, comments, concerns." :name "feedback"
-                      :on-change (fn [e] (do
+   [:textarea#sendfeedbackinput.fullwidth {
+                                            :placeholder "Send us some feedback, suggestions, comments, concerns." :name "feedback"
+                                            :value (get-in @input-state [:inputs 0 :send-feedback-input])
+                                            :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :send-feedback-input] (.-value (.-target e)))
                                            ))}]
 
@@ -628,6 +630,8 @@
                        :on-click (fn [e] (let [feedback  (get-in @input-state [:inputs 0 :send-feedback-input])]
                                            (do
                                              (.log js/console "send feedback button pressed")
+                                             (chsk-send! [:clientsent/feedback feedback])
+                                             (swap! input-state assoc-in [:inputs 0 :send-feedback-input] "")
 
                                              ;(create-user username password password2)
                                              )))} "send feedback"]])
@@ -827,12 +831,12 @@
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "༓ set password"]]
 
-    [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
-                                                  ;(swap! input-state assoc-in [:inputs 0 :current-view] "/invite")
-                                                     (accountant/navigate! "/invite")
-                                                  (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
-                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
-                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "၀ invite friends"]]
+   ; [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
+   ;                                               ;(swap! input-state assoc-in [:inputs 0 :current-view] "/invite")
+   ;                                                  (accountant/navigate! "/invite")
+   ;                                               (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
+   ;                              :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
+   ;                              :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "၀ invite friends"]]
 
     [:li [:div.sidebarbutton.bb {:on-click (fn [_] (do
                                                   ;(swap! input-state assoc-in [:inputs 0 :current-view] "/feedback")
@@ -914,7 +918,7 @@
                                          (.log js/console "link to post" id " + comments disp, " td)
 
                                          (swap! input-state assoc-in [:inputs 0 :tv-title] title)
-                                         (swap! input-state assoc-in [:inputs 0 :tv-contents] contents)
+                                         (swap! input-state assoc-in [:inputs 0 :tv-contents] long-description)
                                          (swap! input-state assoc-in [:inputs 0 :tv-posted-by] posted-by)
                                          (swap! input-state assoc-in [:inputs 0 :tv-timestamp] timestamp)
                                          (swap! input-state assoc-in [:inputs 0 :tv-comments] comments)
@@ -1099,32 +1103,49 @@
 (rum/defcs set-password < rum/reactive
                        show-fresh [state ]
   [:form#setpasswordinput.si
-   [:div.rezz "old password" [:input.reim {:placeholder ""
-                                              :auto-complete "old-password"
-                      :on-change (fn [e] (do
-                                    (swap! input-state assoc-in [:inputs 0 :change-pass-old-pw] (.-value (.-target e)))
-                                    (.log js/console (get-in @input-state [:inputs 0 :change-pass-old-pw]))))}]
-   [:div.rezz "new password:" [:input.reim {:placeholder ""
-                      :type "password"
-                      :auto-complete "new password"
-                      :on-change (fn [e] (do
-                                   (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw] (.-value (.-target e)))
-                                   (.log js/console (get-in @input-state [:inputs 0 :change-pass-new-pw]))))}]]
+   [:div.rezz "old password"
+    [:input.reim
+     {:placeholder ""
+      :value (get-in @input-state [:inputs 0 :change-pass-old-pw])
+      :auto-complete "old-password"
+      :on-change (fn [e] (do
+                           (swap! input-state assoc-in [:inputs 0 :change-pass-old-pw] (.-value (.-target e)))
+                           (.log js/console (get-in @input-state [:inputs 0 :change-pass-old-pw]))))}]
+   [:div.rezz "new password:"
+    [:input.reim
+     {:placeholder ""
+      :type "password"
+      :value (get-in @input-state [:inputs 0 :change-pass-new-pw])
+      :auto-complete "new password"
+      :on-change (fn [e] (do
+                           (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw] (.-value (.-target e)))
+                           (.log js/console (get-in @input-state [:inputs 0 :change-pass-new-pw]))))}]]
 
-    [:div.rezz "new password confirm:" [:input.reim {:placeholder ""
-                      :type "password"
-                      :auto-complete "new password confirm"
-                      :on-change (fn [e] (do
-                                   (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw2] (.-value (.-target e)))
-                                   (.log js/console (get-in @input-state [:inputs 0 :change-pass-new-pw2]))))}]]
+    [:div.rezz "new password confirm:"
+     [:input.reim
+      {:placeholder ""
+       :type "password"
+       :value (get-in @input-state [:inputs 0 :change-pass-new-pw2])
+       :auto-complete "new password confirm"
+       :on-change (fn [e] (do
+                            (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw2] (.-value (.-target e)))
+                            (.log js/console (get-in @input-state [:inputs 0 :change-pass-new-pw2]))))}]]
 
-    [:button.reim {:type "button"
-                       :on-click (fn [e]
-                                     (.log js/console "set recovery e-mail")
-                                   ;submit to server here!
-
-                                       ) ;thanks @Marc O'Morain
-                       } "set password"]]])
+    [:button.reim
+      {:type "button"
+       :on-click
+         (fn [e]
+           (.log js/console "update password")
+           (let [old-pw  (get-in @input-state [:inputs 0 :change-pass-old-pw])
+                 new-pw  (get-in @input-state [:inputs 0 :change-pass-new-pw])
+                 new-pw2 (get-in @input-state [:inputs 0 :change-pass-new-pw2])]
+             (chsk-send! [:clientsent/password-change {:old old-pw
+                                                     :new new-pw
+                                                     :new2 new-pw2}])
+             (swap! input-state assoc-in [:inputs 0 :change-pass-old-pw] "")
+             (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw] "")
+             (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw2] "")))} "set password"]
+    [:div#passwordstatus ""]]])
 
 
 (rum/defcs support-nf < rum/reactive
@@ -1426,7 +1447,6 @@
 
 
 
-
 ;;;; Sente event handlers
 
 (defmulti -event-msg-handler
@@ -1464,6 +1484,12 @@
           ;;Sort blurbs added to blurbset
          ; (swap! tv-state #(reverse (sort-by :number-of-ratings %))) ;descending
           (.log js/console "added new blurb to atom"))
+
+      (= event-title :serversent/password-update-yes)
+        (aset (.getElementById js/document "passwordstatus") "value"  "Password update success.")
+
+      (= event-title :serversent/password-update-no)
+        (aset (.getElementById js/document "passwordstatus") "value"  "Password update failed.")
 
 
 

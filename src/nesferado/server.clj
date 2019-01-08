@@ -56,7 +56,9 @@
 
 
 
-(def auth-db (atom []))
+(def auth-db (duratom :local-file
+                       :file-path "data/users.sova"
+                       :init []))
 
 
 (defn add-user [user-email pw]
@@ -575,6 +577,14 @@
          first-hit))
 
 
+(defn check-where-user-exists [username]
+  (let [first-hit (->> @auth-db
+                    (keep-indexed #(when (= username (:username %2)) %1))
+                     first)]
+  ;  (prn first-hit)
+         first-hit))
+
+
 ;;;; Sente event handlers
 
 (defmulti -event-msg-handler
@@ -707,6 +717,25 @@
       (do
         (swap! nf-bios update cheqq assoc :bio bio :public-email email)
         (prn "bio updated")))))
+
+
+(defmethod -event-msg-handler :clientsent/password-change
+  [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
+  (let [pwu-map (second (:event ev-msg))
+        old (:old pwu-map)
+        uid (:uid (:session ring-req))
+        pw-check  (check-login-against-db uid old)
+        new (:new pwu-map)
+        new2 (:new2 pwu-map)
+        cheqq (check-where-user-exists uid)]
+    ;(println uid " + uid +  + + + + ")
+
+      (if (and pw-check (= new new2))
+        (do
+          (swap! auth-db update cheqq assoc :password (password/encrypt new2))
+          (prn "pw updated")
+          (chsk-send! uid [:serversent/password-update-yes]))
+        (chsk-send! uid [:serversent/password-update-no]))))
 
 
 
@@ -843,5 +872,5 @@
 
 ;(comment
   (start!)
-  (test-fast-server>user-pushes);)
+;  (test-fast-server>user-pushes);)
 
