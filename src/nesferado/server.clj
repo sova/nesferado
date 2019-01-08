@@ -105,6 +105,16 @@
 (def nf-users-db (duratom :local-file
                            :file-path "data/pasona.sova"
                            :init []))
+
+(def recovery-emails (duratom :local-file
+                       :file-path "data/recovery.sova"
+                       :init []))
+
+
+(def nf-bios (duratom :local-file
+                       :file-path "data/bios.sova"
+                       :init []))
+
 (def nf-submissions (duratom :local-file
                       :file-path "data/submissions.sova"
                       :init []))
@@ -276,7 +286,16 @@
     [:script {:src "js/nesferado.js" :type "text/javascript" :version @nf-counter}]])
 
 
-(rum/render-html (landing-page))
+;(rum/render-html (landing-page))
+
+(rum/defc user-info-page [username public-email public-bio]
+ [:div
+    [:div {:id "username"} username]
+    [:div {:id "publicbio"} public-bio]
+    [:div {:id "publicemail"} public-email]
+
+    [:link {:rel "stylesheet" :href "/css/nesferado.css"}]])
+
 
 ;;;; Ring handlers
 
@@ -339,9 +358,7 @@
 
 
 (defn create-account-handler
-  "Here's where you'll add your server-side login/auth procedure (Friend, etc.).
-  In our simplified example we'll just always successfully authenticate the user
-  with whatever user-id they provided in the auth request."
+  "Account creation and session authentication in one step."
   [ring-req]
   (let [{:keys [session params]} ring-req
         {:keys [user-id password password2]} params]
@@ -360,6 +377,15 @@
                                        :auth-token (:auth-token auth-map)})}))
         ;else
         {:status 302 :session session}))))
+
+(defn show-user-info
+  [username]
+  (let [seek (first(filter #(= (:uid %1) username) @nf-bios))]
+    (println seek)
+    (if (= nil seek)
+      (rum/render-html (user-info-page username "no public email" "no bio found"))
+        ;else
+        (rum/render-html (user-info-page username (:public-email seek) (:bio seek))))))
 
 
 
@@ -402,11 +428,16 @@
   (GET "/profile" ring-req (landing-pg-handler            ring-req))
   ;/phantomses (simply serve the javascript object and let the cljs client do the "routing")
 
+
+
   (GET  "/chsk"  ring-req (ring-ajax-get-or-ws-handshake ring-req))
   (POST "/chsk"  ring-req (ring-ajax-post                ring-req))
   (POST "/login" ring-req (login-handler                 ring-req))
   (POST "/check-login" ring-req (check-login-handler      ring-req))
   (POST "/create-account" ring-req (create-account-handler ring-req))
+
+  (GET "/bio/:username" [username] (show-user-info username))
+
   (route/resources "/") ; Static files, notably public/main.js (our cljs target)
   (route/not-found "<h2>Nonforum Four-oh-four, resource not found.</h2>"))
 
@@ -506,6 +537,44 @@
 ;(recalculate-rating-and-broadcast! 110)
 
 
+
+(defn get-all-blurbs []
+  @tv-state)
+
+(defn get-all-comments []
+  @nf-comments)
+
+
+
+(defn check-if-recovery-email-exists [uid]
+  (let [first-hit (->> @recovery-emails
+                    (keep-indexed #(when (= uid (:uid %2)) %1))
+                     first)]
+   ; (prn first-hit " " email)
+         first-hit))
+
+
+(defn check-if-rating-exists [rm]
+  (let [uid (:uid rm)
+        pid (:pid rm)
+        rating (:rating rm)
+        elements-pid (filter #(and (= pid (:pid %1)) (= uid (:uid %1))) @ratings)
+        first-hit (->> @ratings
+                    (keep-indexed #(when (and (= pid (:pid %2)) (= uid (:uid %2))) %1))
+                     first)]
+  ;  (prn first-hit)
+         first-hit))
+
+
+
+(defn check-if-bio-exists [uid]
+  (let [first-hit (->> @nf-bios
+                    (keep-indexed #(when (= uid (:uid %2)) %1))
+                     first)]
+  ;  (prn first-hit)
+         first-hit))
+
+
 ;;;; Sente event handlers
 
 (defmulti -event-msg-handler
@@ -537,12 +606,6 @@
   (let [loop-enabled? (swap! broadcast-enabled?_ not)]
     (?reply-fn loop-enabled?)))
 
-(defn get-all-blurbs []
-  @tv-state)
-
-(defn get-all-comments []
-  @nf-comments)
-
 
 (defmethod -event-msg-handler :clientsent/req-all-blurbs
   [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
@@ -563,17 +626,6 @@
       (?reply-fn (get-all-comments))))
 
 
-
-(defn check-if-rating-exists [rm]
-  (let [uid (:uid rm)
-        pid (:pid rm)
-        rating (:rating rm)
-        elements-pid (filter #(and (= pid (:pid %1)) (= uid (:uid %1))) @ratings)
-        first-hit (->> @ratings
-                    (keep-indexed #(when (and (= pid (:pid %2)) (= uid (:uid %2))) %1))
-                     first)]
-    (prn first-hit)
-         first-hit))
 
 (defmethod -event-msg-handler :clientsent/rating
   [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
@@ -601,9 +653,60 @@
         (prn "rating added"))
       ;else
       (do
-        (swap! ratings update-in [cheqq] assoc :rating rating)
+        (swap! ratings update cheqq assoc :rating rating)
         (prn "rating updated")))
     (recalculate-rating-and-broadcast! pid)))
+
+
+
+
+(defmethod -event-msg-handler :clientsent/recovery
+  [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
+  (let [recovery-map (second (:event ev-msg))
+        email (:recovery-email recovery-map)
+        auth-token (:auth-token (:session ring-req))
+        login-time (:login-time (:session ring-req))
+        uid (:uid (:session ring-req))
+        pw (:password recovery-map)
+        pw-check  (check-login-against-db uid pw)
+        user-claim (:user-claim recovery-map)
+        cheqq (check-if-recovery-email-exists uid)
+        ]
+    (println "pw check " pw-check "cheqq " cheqq)
+
+    (if (= nil cheqq)
+      (if pw-check
+        (do
+        (swap! recovery-emails conj {:uid uid :recovery-email email})
+        (prn "recovery added")))
+      ;else
+      (if pw-check
+        (do
+        (swap! recovery-emails update cheqq assoc :recovery-email email)
+        (prn "recovery updated"))))))
+
+
+
+(defmethod -event-msg-handler :clientsent/bio
+  [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
+  (let [bio-map (second (:event ev-msg))
+        email (:public-email bio-map)
+        auth-token (:auth-token (:session ring-req))
+        login-time (:login-time (:session ring-req))
+        uid (:uid (:session ring-req))
+        bio (:bio bio-map)
+        cheqq (check-if-bio-exists uid)
+        ]
+    (println "cheqq " cheqq)
+
+    (if (= nil cheqq)
+      (do
+         (swap! nf-bios conj {:uid uid :public-email email :bio bio})
+         (prn "bio added"))
+      ;else
+      (do
+        (swap! nf-bios update cheqq assoc :bio bio :public-email email)
+        (prn "bio updated")))))
 
 
 

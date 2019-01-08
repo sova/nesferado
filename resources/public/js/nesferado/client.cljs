@@ -263,6 +263,9 @@
                           :change-pass-new-pw2 ""
                           :invite-friend-input ""
 
+                          :bio ""
+                          :recovery-email ""
+
                           :edit-display-name ""
                           :send-feedback-input ""
                           :send-feedback-extra ""
@@ -970,6 +973,12 @@
                       :on-change (fn [e] (do
                                     (swap! input-state assoc-in [:inputs 0 :title] (.-value (.-target e)))
                                     (.log js/console (get-in @input-state [:inputs 0 :title]))))}]
+   [:input.reim.kash {:placeholder "subtitle"
+                     :value (get-in @input-state [:inputs 0 :subtitle])
+                      :on-change (fn [e] (do
+                                    (swap! input-state assoc-in [:inputs 0 :subtitle] (.-value (.-target e)))
+                                    (.log js/console (get-in @input-state [:inputs 0 :subtitle]))))}]
+
    [:input.reim.kash {:placeholder "link"
                       :value (get-in @input-state [:inputs 0 :link])
                       :on-change (fn [e] (do
@@ -1030,13 +1039,15 @@
                          show-fresh [state ]
   [:form#profileinput.profileinput "Edit Profile"
    [:textarea.profileinput{:placeholder "bio"
+                           :value (get-in @input-state [:inputs 0  :bio])
                       :on-change (fn [e] (do
                                     (swap! input-state assoc-in [:inputs 0 :bio] (.-value (.-target e)))
                                     (.log js/console (get-in @input-state [:inputs 0 :bio]))))}]
    [:input.profileinput {:placeholder "public e-mail"
+                         :value (get-in @input-state [:inputs 0  :public-email])
                       :on-change (fn [e] (do
-                                   (swap! input-state assoc-in [:inputs 0 :link] (.-value (.-target e)))
-                                   (.log js/console (get-in @input-state [:inputs 0 :link]))))}]
+                                   (swap! input-state assoc-in [:inputs 0 :public-email] (.-value (.-target e)))
+                                   (.log js/console (get-in @input-state [:inputs 0 :public-email]))))}]
 
     [:button.profileinput {:type "button"
                        :on-click (fn [e]
@@ -1046,30 +1057,44 @@
                                     (let [new-bio-data {:bio (get-in @input-state [:inputs 0 :bio])
                                                         :public-email (get-in @input-state [:inputs 0 :public-email])}]
 
-                                       )) ;thanks @Marc O'Morain
+
+                                      (chsk-send! [:clientsent/bio new-bio-data])
+                                      (swap! input-state assoc-in [:inputs 0 :bio] "")
+                                      (swap! input-state assoc-in [:inputs 0 :public-email] ""))) ;thanks @Marc O'Morain
                        } "update bio"]])
 
 (rum/defcs set-recovery-email < rum/reactive
                                show-fresh [state ]
   [:form#profileinput "Set Recovery Email"
    [:input.reim {:placeholder "recovery e-mail"
-                      :on-change (fn [e] (do
-                                    (swap! input-state assoc-in [:inputs 0 :bio] (.-value (.-target e)))
-                                    (.log js/console (get-in @input-state [:inputs 0 :bio]))))}]
-   [:div.labez "current nonforum password:" [:input.reim{:placeholder ""
+                 :value (get-in @input-state [:inputs 0 :recovery-email])
+                 :on-change (fn [e] (do
+                             (swap! input-state assoc-in [:inputs 0 :recovery-email] (.-value (.-target e)))
+                             (.log js/console (get-in @input-state [:inputs 0 :recovery-email]))))}]
+   [:div.labez "current nonforum password:"
+    [:input.reim{     :placeholder ""
                       :type "password"
+                      :value (get-in @input-state [:inputs 0 :password])
                       :auto-complete "Current Nonforum password"
                       :on-change (fn [e] (do
                                    (swap! input-state assoc-in [:inputs 0 :password] (.-value (.-target e)))
-                                   (.log js/console (get-in @input-state [:inputs 0 :link]))))}]]
+                                   (.log js/console (get-in @input-state [:inputs 0 :password]))))}]]
 
     [:button.reim {:type "button"
-                       :on-click (fn [e]
-                                     (.log js/console "set recovery e-mail")
-                                   ;submit to server here!
+                   :on-click (fn [e]
+                                (.log js/console "set recovery e-mail")
+                                 (let [rec-email (get-in @input-state [:inputs 0 :recovery-email])
+                                       user-as-stashed (get-in @input-state [:inputs 0 :current-user])
+                                       pw (get-in @input-state [:inputs 0 :password])]
 
-                                       ) ;thanks @Marc O'Morain
-                       } "set recovery e-mail"]])
+
+                                       (chsk-send! [:clientsent/recovery {:recovery-email rec-email
+                                                                          :user-claim  user-as-stashed
+                                                                          :password    pw}])
+
+                                       ;clear input fields
+                                       (swap! input-state assoc-in [:inputs 0 :recovery-email] "")
+                                       (swap! input-state assoc-in [:inputs 0 :password] "")))} "set recovery e-mail"]])
 
 (rum/defcs set-password < rum/reactive
                        show-fresh [state ]
