@@ -191,6 +191,10 @@
                       :file-path "data/ratings.sova"
                       :init []))
 
+(def feedbacks (duratom :local-file
+                         :file-path "data/feedbacks.sova"
+                         :init []))
+
 
 
 (defn create-auth-token-map [user-email]
@@ -667,6 +671,14 @@
         (prn "rating updated")))
     (recalculate-rating-and-broadcast! pid)))
 
+(defmethod -event-msg-handler :clientsent/feedback
+  [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
+ (let [feedback-map (second (:event ev-msg))
+        feedback-content (:feedback feedback-map)
+        uid (:uid (:session ring-req))]
+
+   (swap! feedbacks conj {:feedback feedback-content :uid uid})
+   (prn "feedback stored: " feedback-content)))
 
 
 
@@ -684,16 +696,20 @@
         ]
     (println "pw check " pw-check "cheqq " cheqq)
 
-    (if (= nil cheqq)
-      (if pw-check
+
+    (if pw-check
+      (if (= nil cheqq)
         (do
-        (swap! recovery-emails conj {:uid uid :recovery-email email})
-        (prn "recovery added")))
+          (swap! recovery-emails conj {:uid uid :recovery-email email})
+          (prn "recovery added")
+          (chsk-send! uid [:serversent/recovery-email-update-yes]))
       ;else
-      (if pw-check
-        (do
+      (do
         (swap! recovery-emails update cheqq assoc :recovery-email email)
-        (prn "recovery updated"))))))
+        (prn "recovery updated")
+        (chsk-send! uid [:serversent/recovery-email-update-yes])))
+      ;les els
+      (chsk-send! uid [:serversent/recovery-email-update-no]))))
 
 
 

@@ -215,6 +215,7 @@
                           :current-email ""
 
                           :password-status ""
+                          :recovery-email-status ""
                           :change-pass-old-pw ""
                           :change-pass-new-pw ""
                           :change-pass-new-pw2 ""
@@ -587,7 +588,7 @@
                        :on-click (fn [e] (let [feedback  (get-in @input-state [:inputs 0 :send-feedback-input])]
                                            (do
                                              (.log js/console "send feedback button pressed")
-                                             (chsk-send! [:clientsent/feedback feedback])
+                                             (chsk-send! [:clientsent/feedback {:feedback feedback}])
                                              (swap! input-state assoc-in [:inputs 0 :send-feedback-input] "")
 
                                              ;(create-user username password password2)
@@ -1026,7 +1027,10 @@
 
 (rum/defcs set-recovery-email < rum/reactive
                                show-fresh [state ]
-  [:form#profileinput "Set Recovery Email"
+  [:form#recoveryinput "Set Recovery Email"
+   [:textarea#restatus
+     { :readonly true
+       :value (get-in @input-state [:inputs 0 :recovery-email-status])}]
    [:input.reim {:placeholder "recovery e-mail"
                  :value (get-in @input-state [:inputs 0 :recovery-email])
                  :on-change (fn [e] (do
@@ -1055,6 +1059,7 @@
 
                                        ;clear input fields
                                        (swap! input-state assoc-in [:inputs 0 :recovery-email] "")
+                                       (swap! input-state assoc-in [:inputs 0 :recovery-email-status] "")
                                        (swap! input-state assoc-in [:inputs 0 :password] "")))} "set recovery e-mail"]])
 
 (rum/defcs set-password < rum/reactive
@@ -1457,6 +1462,19 @@
         (do
           (swap! input-state assoc-in [:inputs 0 :password-status] "password not changed")
           (.log js/console "password not affected."))
+        ;(set! (.-backgroundColor (.getElementById js/document "pwchang")) "red")
+
+
+      (= event-title :serversent/recovery-email-update-yes)
+      (do
+        (swap! input-state assoc-in [:inputs 0 :recovery-email-status] "recovery email change success")
+        (.log js/console "recovery email updated"))
+        ;(set! (.-backgroundColor (.getElementById js/document "pwchang")) "green")
+
+      (= event-title :serversent/recovery-email-update-no)
+        (do
+          (swap! input-state assoc-in [:inputs 0 :recovery-email-status] "recovery email not changed")
+          (.log js/console "recovery email not affected."))
         ;(set! (.-backgroundColor (.getElementById js/document "pwchang")) "red")
 
 

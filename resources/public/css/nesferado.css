@@ -649,9 +649,11 @@ textarea.profileinput {
   clear: left;
 }
 
-.reim {
+.reim, .labez {
    width: 400px;
   margin-left: 0.5em;
+  float: left;
+  clear: left;
 }
 
 .about {
@@ -678,7 +680,21 @@ textarea.profileinput {
   border-width: 0px;
 }
 
+#restatus {
+  font-size: 32px;
+  border: 1px solid #eee;
+  width: 400px;
+  height: 100px;
+  border-width: 0px;
+}
+
+
 #pwchang {
+  float: left;
+  clear: left;
+}
+
+#recoveryinput {
   float: left;
   clear: left;
 }
