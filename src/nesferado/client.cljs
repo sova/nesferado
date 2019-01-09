@@ -1106,6 +1106,7 @@
    [:div.rezz "old password"
     [:input.reim
      {:placeholder ""
+      :type "password"
       :value (get-in @input-state [:inputs 0 :change-pass-old-pw])
       :auto-complete "old-password"
       :on-change (fn [e] (do
@@ -1132,7 +1133,8 @@
                             (.log js/console (get-in @input-state [:inputs 0 :change-pass-new-pw2]))))}]]
 
     [:button.reim
-      {:type "button"
+      {:id "pwchang"
+       :type "button"
        :on-click
          (fn [e]
            (.log js/console "update password")
@@ -1144,8 +1146,7 @@
                                                      :new2 new-pw2}])
              (swap! input-state assoc-in [:inputs 0 :change-pass-old-pw] "")
              (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw] "")
-             (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw2] "")))} "set password"]
-    [:div#passwordstatus ""]]])
+             (swap! input-state assoc-in [:inputs 0 :change-pass-new-pw2] "")))} "set password"]]])
 
 
 (rum/defcs support-nf < rum/reactive
@@ -1479,17 +1480,23 @@
       (= event-title :serversent/blurb)
         (do
           (.log js/console (str "&# " new-data))
-          (.log js/console "adding new blurb to atom...")
+          (.log js/console "adding new blurb to atom ..")
           (swap! tv-state conj new-data)
           ;;Sort blurbs added to blurbset
          ; (swap! tv-state #(reverse (sort-by :number-of-ratings %))) ;descending
           (.log js/console "added new blurb to atom"))
 
       (= event-title :serversent/password-update-yes)
-        (set! (.-innerHTML (.getElementById js/document "passwordstatus")) "Password update success.")
+        (-> js/document
+           (.getElementById "pwchang")
+           (.-backgroundColor)
+           (set! "green"))
 
       (= event-title :serversent/password-update-no)
-        (set! (.-innerHTML (.getElementById js/document "passwordstatus")) "Password update failed.")
+        (-> js/document
+           (.getElementById "pwchang")
+           (.-backgroundColor)
+           (set! "red"))
 
 
 
