@@ -644,6 +644,10 @@ textarea.profileinput {
   padding: 0.25em;
 }
 
+.rezz {
+  float: left;
+  clear: left;
+}
 
 .reim {
    width: 400px;
@@ -662,4 +666,19 @@ textarea.profileinput {
 #mission1, #mission3, #mission5, #mission7 {
 
   background-color: hsla(270, 50%, 70%, .2);
+}
+
+#pwstatus {
+  font-size: 32px;
+  border: 1px solid #eee;
+  float: left;
+  clear: left;
+  width: 400px;
+  height: 50px;
+  border-width: 0px;
+}
+
+#pwchang {
+  float: left;
+  clear: left;
 }

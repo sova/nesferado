@@ -165,50 +165,6 @@
                                :isbn [10200000000002 210500000000010 200000000000000015]
                                :threads [2 3 4 5 6]
                                }}))
-(def nf-speeches (atom {}))
-(def nf-letters (atom {}))
-(def nf-topics (atom {}))
-
-(def nf-threads (atom { 12121 { :title "cruise on through to the other side"
-                                :author "jimmorrison@nonforum.com"
-                                :comments []
-                                :number-of-ratings 2
-                                :rating-total 98}
-
-                               ; :ratings [{:oid 5175
-                               ;            :rater "z@nf.com"
-                               ;            :rating "+"
-                               ;            :timestamp 564271}]}
-;scrap this ratings idea on the client.. track in on the server.
-                        }))
-
-
-(def nf-ratings (atom { 33373 { :rid 33373
-                                :author "jm@nf.com"
-                                :oid "theThingyRated251215"
-                                :rating "++"
-                                :timestamp 121212121212}}))  ;;massive global rating object.  fill it however you choose from the server.  subscriptions.
-
-(def nf-qd (atom { 12345777 {:contents "Hey this is a question about this site.  How does it all work, and what's it all about?"
-                             :comments []
-                             :author "x@nonforum.com"
-                             :timestamp 80808
-                             :number-of-ratings 32
-                             :rating-total 9700
-
-                             :ratings [{:oid 123456
-                                        :rater "y@nonforum.com"
-                                        :rating "++"
-                                        :timestamp 6756421
-                                        }] }
-
-
-                   })); Questions and Discussions
-
-(def nf-articles (atom {167641 {:subtopics [{:subtopic "deciduous" :ratings [{:rater "bob@nf.com" :rating "++" :timestamp 28282}]}
-                                            {:subtopic "harmony" :ratings [{:rater "oion@nf.com" :rating "++" :timestamp 28282}]}]}}))
-
-;in articles, each subtopic is an NF thread.
 
 
 (def     tv-state (atom [ ;{:title "Fusion Power Imminent"
@@ -258,6 +214,7 @@
                           :set-email ""
                           :current-email ""
 
+                          :password-status ""
                           :change-pass-old-pw ""
                           :change-pass-new-pw ""
                           :change-pass-new-pw2 ""
@@ -318,7 +275,7 @@
   (let [sort-me-id post-id
         spot  (first (first (filter #(= (:id (second %)) sort-me-id) (map-indexed vector @posts))))
         sorted-comments  (map :id
-                         (sort-by :number-of-ratings >
+                         (sort-by #(get-rating (:ratings-total %) (:number-of-ratings %)) <
                            (map get-post-by-id
                              (:comments (get-post-by-id sort-me-id)))))]
       (swap! posts assoc-in [spot :comments] sorted-comments )))
@@ -420,8 +377,8 @@
 
 
 
-(map :id @posts)
-(map sort-the-comments-of! (map :id @posts))
+;(map :id @posts)
+;(map sort-the-comments-of! (map :id @posts))
 
 
 
@@ -1103,6 +1060,9 @@
 (rum/defcs set-password < rum/reactive
                        show-fresh [state ]
   [:form#setpasswordinput.si
+   [:textarea#pwstatus
+     { :readonly true
+       :value (get-in @input-state [:inputs 0 :password-status])}]
    [:div.rezz "old password"
     [:input.reim
      {:placeholder ""
@@ -1138,6 +1098,7 @@
        :on-click
          (fn [e]
            (.log js/console "update password")
+           (swap! input-state assoc-in [:inputs 0 :password-status] "")
            (let [old-pw  (get-in @input-state [:inputs 0 :change-pass-old-pw])
                  new-pw  (get-in @input-state [:inputs 0 :change-pass-new-pw])
                  new-pw2 (get-in @input-state [:inputs 0 :change-pass-new-pw2])]
@@ -1487,17 +1448,16 @@
           (.log js/console "added new blurb to atom"))
 
       (= event-title :serversent/password-update-yes)
-        (-> js/document
-           (.getElementById "pwchang")
-           (.-backgroundColor)
-           (set! "green"))
+      (do
+        (swap! input-state assoc-in [:inputs 0 :password-status] "password change success")
+        (.log js/console "password updated"))
+        ;(set! (.-backgroundColor (.getElementById js/document "pwchang")) "green")
 
       (= event-title :serversent/password-update-no)
-        (-> js/document
-           (.getElementById "pwchang")
-           (.-backgroundColor)
-           (set! "red"))
-
+        (do
+          (swap! input-state assoc-in [:inputs 0 :password-status] "password not changed")
+          (.log js/console "password not affected."))
+        ;(set! (.-backgroundColor (.getElementById js/document "pwchang")) "red")
 
 
       (= event-title :serversent/comment)
