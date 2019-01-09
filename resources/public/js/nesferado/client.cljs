@@ -1454,26 +1454,26 @@
 
       (= event-title :serversent/password-update-yes)
       (do
-        (swap! input-state assoc-in [:inputs 0 :password-status] "password change success")
+        (swap! input-state assoc-in [:inputs 0 :password-status] "Password changed successfully.")
         (.log js/console "password updated"))
         ;(set! (.-backgroundColor (.getElementById js/document "pwchang")) "green")
 
       (= event-title :serversent/password-update-no)
         (do
-          (swap! input-state assoc-in [:inputs 0 :password-status] "password not changed")
+          (swap! input-state assoc-in [:inputs 0 :password-status] "Password not changed.")
           (.log js/console "password not affected."))
         ;(set! (.-backgroundColor (.getElementById js/document "pwchang")) "red")
 
 
       (= event-title :serversent/recovery-email-update-yes)
       (do
-        (swap! input-state assoc-in [:inputs 0 :recovery-email-status] "recovery email change success")
+        (swap! input-state assoc-in [:inputs 0 :recovery-email-status] "Recovery email changed successfully.")
         (.log js/console "recovery email updated"))
         ;(set! (.-backgroundColor (.getElementById js/document "pwchang")) "green")
 
       (= event-title :serversent/recovery-email-update-no)
         (do
-          (swap! input-state assoc-in [:inputs 0 :recovery-email-status] "recovery email not changed")
+          (swap! input-state assoc-in [:inputs 0 :recovery-email-status] "Recovery email not changed.")
           (.log js/console "recovery email not affected."))
         ;(set! (.-backgroundColor (.getElementById js/document "pwchang")) "red")
 
