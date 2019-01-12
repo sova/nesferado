@@ -962,7 +962,7 @@
 
                                     (let [ potential-link (get-in @input-state [:inputs 0 :link])
                                            new-post-map {:title          (get-in @input-state [:inputs 0 :title])
-                                                        :subtitle          (get-in @input-state [:inputs 0 :title])
+                                                        :subtitle          (get-in @input-state [:inputs 0 :subtitle])
                                                         :contents       (get-in @input-state [:inputs 0 :contents])
 
                                                         ;verify that link has http:// in front.

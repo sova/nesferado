@@ -64,8 +64,8 @@
 (defn add-user [user-email pw]
   (swap! auth-db conj {:username user-email :password (password/encrypt pw)}))
 
-(add-user "vas" "l337")
-(add-user "nelly" "18")
+;(add-user "vas" "l337")
+;(add-user "nelly" "18")
 
 
 (defn check-login-against-db [useremail password]

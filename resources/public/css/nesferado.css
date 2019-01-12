@@ -266,7 +266,7 @@ width: 1200px;}
   z-index: 100;
   display: block;
   min-height: 35px;
-  margin-right: 35px; /*accomodate rating*/
+  padding-right: 3em; /*accomodate rating*/
 
 }
 
