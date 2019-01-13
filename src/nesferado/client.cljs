@@ -438,6 +438,7 @@
 
             (sente/ajax-lite "/login"
               {:method :post
+               :timeout-ms 7000
                :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
                :params  {:user-id (str username)
                          :password (str pw)}
