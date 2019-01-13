@@ -360,7 +360,7 @@
                                    :auth-token auth-token})
          }
       ;else
-      {:status 302 :session {}})))
+      {:status 302 :session session})))
 
 
 (defn create-account-handler
