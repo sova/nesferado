@@ -308,56 +308,55 @@
 
 
 ;;Accountant
-(accountant/configure-navigation! {:nav-handler (fn [path]
-                                                  (.log js/console "ac: " path)
-                                                  ;(.log js/console (get-url-params))
-                                                  (if
-                                                    (or
-                                                      (str/starts-with? path "?nfid")
-                                                      (str/starts-with? path "/?nfid"))
-                                                        (do
-                                                          (.log js/console "start swith nfid busted")
-                                                          ;load it up
-                                                            (let [url-params (get-url-params)
-                                                                  nfid (cljs.reader/parse-int (get url-params "nfid"))
-                                                                  td (first (filter  #(= nfid (:id %)) @tv-state))
-                                                                  title (:title td)
-                                                                  contents (:contents td)
-                                                                  comments (:comments td)
+(accountant/configure-navigation!
+  {:nav-handler (fn [path]
+                  (.log js/console "ac: " path)
+                  ;(.log js/console (get-url-params))
+                  (if (or (str/starts-with? path "?nfid") (str/starts-with? path "/?nfid"))
+                    (do
+                      (.log js/console "start swith nfid busted")
+                      ;load it up
+                      (let [url-params (get-url-params)
+                            nfid (cljs.reader/parse-int (get url-params "nfid"))
+                            td (first (filter  #(= nfid (:id %)) @tv-state))
+                            title (:title td)
+                            contents (:contents td)
+                            comments (:comments td)
 
-                                                                  posted-by (:posted-by td)
-                                                                  timestamp (:timestamp td)
-                                                                  n-ratings (:number-of-ratings td)
-                                                                  ratings-t (:ratings-total td)
-                                                                  link (:link td)
-                                                                  long-description (:details td)
-                                                                  cids (return-comment-ids-of-tv nfid)]
-                                                                  (.log js/console nfid title contents posted-by comments)
+                            posted-by (:posted-by td)
+                            timestamp (:timestamp td)
+                            n-ratings (:number-of-ratings td)
+                            ratings-t (:ratings-total td)
+                            link (:link td)
+                            long-description (:details td)
+                            cids (return-comment-ids-of-tv nfid)]
+                        (.log js/console nfid title contents posted-by comments)
 
-                                                                      (swap! input-state assoc-in [:inputs 0 :current-view] "/")
+                        (swap! input-state assoc-in [:inputs 0 :current-view] "/")
 
-                                                                       (swap! input-state assoc-in [:inputs 0 :tv-title] title)
-                                                                       (swap! input-state assoc-in [:inputs 0 :tv-contents] contents)
-                                                                       (swap! input-state assoc-in [:inputs 0 :tv-posted-by] posted-by)
-                                                                       (swap! input-state assoc-in [:inputs 0 :tv-timestamp] timestamp)
-                                                                       (swap! input-state assoc-in [:inputs 0 :tv-comments] comments)
+                        (swap! input-state assoc-in [:inputs 0 :tv-title] title)
+                        (swap! input-state assoc-in [:inputs 0 :tv-contents] contents)
+                        (swap! input-state assoc-in [:inputs 0 :tv-posted-by] posted-by)
+                        (swap! input-state assoc-in [:inputs 0 :tv-timestamp] timestamp)
+                        (swap! input-state assoc-in [:inputs 0 :tv-comments] comments)
 
-                                                                       (swap! input-state assoc-in [:inputs 0 :selected-parent] nfid)
-                                                                       (swap! input-state assoc-in [:inputs 0 :selected-child] cids)
+                        (swap! input-state assoc-in [:inputs 0 :selected-parent] nfid)
+                        (swap! input-state assoc-in [:inputs 0 :selected-child] cids)
 
-                                                                       (swap! input-state assoc-in [:inputs 0 :tv-current] td)
-                                                                       (swap! input-state assoc-in [:inputs 0 :tv-curr-id] nfid))
+                        (swap! input-state assoc-in [:inputs 0 :tv-current] td)
+                        (swap! input-state assoc-in [:inputs 0 :tv-curr-id] nfid))
 
 
-                                                      ; and dance
+                      ; and dance
 
 
-                                                          )
-                                                    ;else
-
-                                                    (swap! input-state assoc-in [:inputs 0 :current-view] path)))
-                                   :path-exists? (fn [_] true)
-                                   :reload-same-path? true})
+                      )
+                    ;else
+                    (do
+                      (swap! input-state assoc-in [:inputs 0 :tv-current] {})
+                      (swap! input-state assoc-in [:inputs 0 :current-view] path))))
+   :path-exists? (fn [_] true)
+   :reload-same-path? true})
 
 
 
