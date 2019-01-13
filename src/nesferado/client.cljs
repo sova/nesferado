@@ -1428,7 +1428,7 @@
   ;   ;  ;   ;  ;   ; experience
   ;   ;   ;;;   ;   ;   forum
 (defn event-msg-handler
-  [{:keys [_ _ ?data]}]
+  [{:keys [_ __ ?data]}]
   (.log js/console (str "&&" ?data ))
   (.log js/console (str "&! " (first ?data)))
   (let [event-title (first ?data)
@@ -1596,12 +1596,14 @@
 
 
 
+(.log js/console "current client-id " (:client-id @chsk-state))
 
 
 (defn auto-login []
   (->output! "Attempting auto-login ...")
   (sente/ajax-lite "/check-login"
               {:method :post
+               :timeout-ms 7000
                :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
                :params {:uid           (get-item :uid)
                         :auth-token    (get-item :auth-key)
@@ -1632,7 +1634,7 @@
 (if (not (empty? (get-item :auth-key)))
   (swap! input-state assoc-in [:inputs 0 :logged-in] true))
 
-(set! (.-onload js/window)
+(set! (.-ready js/document)
     (if (not (empty? (get-item :auth-key)))
       auto-login))
 
