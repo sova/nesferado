@@ -288,8 +288,10 @@
     [:div#thread]
     [:div#inputs]
     [:div#footing]
+    [:script {:src "js/nesferado.js" :type "text/javascript" :version @nf-counter}]
     [:link {:rel "stylesheet" :href "/css/nesferado.css"}]
-    [:script {:src "js/nesferado.js" :type "text/javascript" :version @nf-counter}]])
+
+    [:script {:type "text/javascript"} "//<![CDATA[\n(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)})(window,document,'script','//www.google-analytics.com/analytics.js','ga');ga('create', UA-132533138-1, 'auto');ga('send', 'pageview');\n//]]>"]])
 
 
 ;(rum/render-html (landing-page))
@@ -865,7 +867,7 @@
 (defn  stop-web-server! [] (when-let [stop-fn @web-server_] (stop-fn)))
 (defn start-web-server! [& [port]]
   (stop-web-server!)
-  (let [port (or port 0) ; 0 => Choose any available port
+  (let [port (or port 33733) ; 0 => Choose any available port
         ring-handler (var main-ring-handler)
 
         [port stop-fn]
