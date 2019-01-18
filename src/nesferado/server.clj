@@ -294,13 +294,15 @@
 
 (rum/defc landing-page []
   [:div
+    [:link {:rel "stylesheet" :href "/css/nesferado.css"}]
+    [:title "nonforum | realtime"]
     [:textarea#output]
     [:div#start]
     [:div#thread]
     [:div#inputs]
     [:div#footing]
     [:script {:src "js/nesferado.js" :type "text/javascript" :version @nf-counter}]
-    [:link {:rel "stylesheet" :href "/css/nesferado.css"}]])
+])
 
 
 ;(rum/render-html (landing-page))
@@ -320,7 +322,7 @@
   [ring-req]
   (let [{:keys [session params]} ring-req
         {:keys [user-id password]} params
-        lp (str google-analytics-str (rum/render-html (landing-page)))]
+        lp (str (rum/render-html (landing-page)) google-analytics-str)]
     lp))
 
 
@@ -898,6 +900,6 @@
 (defn -main "For `lein run`, etc." [] (start!))
 
 ;(comment
-  (start!)
+;  (start!)
 ;  (test-fast-server>user-pushes);)
 
