@@ -1315,14 +1315,17 @@
 ;;;;;;;;;;;;;(if (not (empty? (get-item :auth-key)))
 
 
-(set! (.-ready js/document)
+(.addEventListener
+  js/window
+  "DOMContentLoaded"
+  (fn []
     (if (not (empty? (get-item :auth-key)))
       (do
         (swap! input-state assoc-in [:inputs 0 :token] (get-item :auth-key))
         (swap! input-state assoc-in [:inputs 0 :login-time] (get-item :login-time))
         (swap! input-state assoc-in [:inputs 0 :current-user] (get-item :uid))
         (swap! input-state assoc-in [:inputs 0 :logged-in] true)
-        auto-login)))
+        auto-login))))
 
 (defn start! [] (start-router!))
 
