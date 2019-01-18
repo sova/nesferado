@@ -4,10 +4,7 @@
 
   (:require
    [clojure.string  :as str]
-   [cognitect.transit :as t]
    [cljs.core.async :as async  :refer (<! >! put! chan)]
-   [taoensso.encore :as encore :refer-macros (have have?)]
-   [taoensso.timbre :as timbre :refer-macros (tracef debugf infof warnf errorf)]
    [taoensso.sente  :as sente  :refer (cb-success?)]
    [rum.core :as rum]
    [alandipert.storage-atom :refer [local-storage]]
@@ -21,13 +18,8 @@
 (enable-console-print!)
 
 (def output-el (.getElementById js/document "output"))
-(defn ->output! [fmt & args]
-  (let [msg (apply encore/format fmt args)]
-    ;(timbre/debug msg)
-    (aset output-el "value" ;(str "— " (.-value output-el) "\n" msg)
-          msg)
-    ;(aset output-el "scrollTop" (.-scrollHeight output-el))
-    ))
+(defn ->output! [msg]
+  (aset output-el "value" msg))
 
 (->output! " • Welcome to Nonforum •")
 ;;;; Define our Sente channel socket (chsk) client
@@ -76,7 +68,7 @@
     (fn [ev]
       (->output! "Button 2 was clicked (will receive reply from server)")
       (chsk-send! [:example/button2 {:had-a-callback? "indeed"}] 5000
-        (fn [cb-reply] (->output! "Callback reply: %s" cb-reply))))))
+        (fn [cb-reply] (->output! (str "Callback reply: " cb-reply)))))))
 
 (when-let [target-el (.getElementById js/document "btn3")]
   (.addEventListener target-el "click"
@@ -300,7 +292,7 @@
 
 
 (defn create-user [user-id pw pw2]
-  (->output! "Creating account" user-id)
+  (->output! (str "Creating account" user-id))
   (sente/ajax-lite "/create-account"
                    {:method :post
                     :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
@@ -310,7 +302,7 @@
                     :type :text}
 
                    (fn [ajax-resp]
-                     (->output! "Account creation response: " ajax-resp)
+                     (->output! (str "Account creation response: " ajax-resp))
                      (let [{:keys [success? ?status ?error ?content ?content-type]} ajax-resp
                            http-status (:?status ajax-resp)
                            account-create-successful? (= 200 http-status)
@@ -387,7 +379,7 @@
                         (.log js/console "user rated " pid " -"))))
 
 (def show-fresh
-  {:will-mount (fn [state]
+  {:did-mount (fn [state]
                 (let [comp     (:rum/react-component state)
                       dom-node (js/ReactDOM.findDOMNode comp)]
                 ;  (set! (.-backgroundColor (.-style dom-node)) "green")
@@ -1027,8 +1019,6 @@
 
    (if (and logged-in (= "/password-update" curr-view)) (set-password))
 
-   (if (and logged-in (= "/invite" curr-view)) (invite-fields))
-
    (if (and logged-in (= "/submit" curr-view)) (post-input))
 
    (if (and logged-in (= "/donate" curr-view)) (support-nf))
@@ -1302,7 +1292,7 @@
                :type :text}
 
               (fn [ajax-resp]
-                (->output! "Auto-login response: " ajax-resp)
+                (->output! (str "Auto-login response: " ajax-resp))
                 (let [{:keys [success? ?status ?error ?content ?content-type]} ajax-resp
                       http-status (:?status ajax-resp)
                       auto-login-successful? (= 200 http-status)

@@ -10,15 +10,13 @@
   [[org.clojure/clojure       "1.8.0"]
    [org.clojure/clojurescript "1.9.229"]
    [org.clojure/core.async    "0.2.395"]
-   [org.clojure/tools.nrepl   "0.2.12"] ; Optional, for Cider
    [com.taoensso/sente        "1.11.0"] ; <--- Sente
-   [com.taoensso/timbre       "4.7.4"]
 
    [rum "0.11.3"]; :exclusions [cljsjs/react cljsjs/react-dom sablono]]
    [alandipert/storage-atom "1.2.4"]
    [crypto-password "0.2.0"]
-   [com.cemerick/url "0.1.1"]
    [cljs-ajax "0.7.5"]
+   [com.cemerick/url "0.1.1"]
    [duratom "0.3.3"] ;production server likes this one best
    [venantius/accountant "0.2.4"]
 
@@ -30,10 +28,8 @@
    [com.cognitect/transit-cljs "0.8.239"]]
 
   :plugins
-  [[lein-figwheel "0.5.16"]
-   [lein-pprint         "1.1.2"]
-   [lein-cljsbuild      "1.1.4"]
-   [cider/cider-nrepl   "0.18.0"]]
+  [[lein-pprint         "1.1.2"]
+   [lein-cljsbuild      "1.1.4"]]
 
   :cljsbuild
   {:builds
@@ -46,7 +42,7 @@
                 :output-dir "resources/public/js/"
                 :main nesferado.client
                 :asset-path "js/"
-                :optimizations :none
+                :optimizations :advanced
                 :pretty-print true}}]}
 
   :main nesferado.server
@@ -59,6 +55,6 @@
    "nojs"       ["run"]
    "js"         ["do" "cljsbuild" "once," "run"]}
 
-  :profiles {:dev {:dependecies [figwheel-sidecar "0.5.16"]}}
+  :profiles {:dev {:dependecies []}}
   :repositories
   {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"})
