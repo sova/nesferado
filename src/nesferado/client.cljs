@@ -391,7 +391,7 @@
  (rum/defcs render-item < rum/reactive
                          (rum/local -1 ::hidecomments)
                          { :key-fn (fn [state pid]
-                           (str pid (swap! inc y))) }
+                           (str pid (swap! y inc))) }
                         show-fresh
                        [state pid]
 
