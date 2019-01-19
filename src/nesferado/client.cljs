@@ -492,15 +492,19 @@
  (rum/defc create-account-fields []
   [:form#nfcreate
    [:input#cruser.fullwidth {:placeholder "username" :name "username"
-                      :on-change (fn [e] (do
+                             :auto-complete "new-username"
+                             :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :create-username] (.-value (.-target e)))))}]
    [:input#crpass.fullwidth {:placeholder "password" :type "password" :name "password"
+                             :auto-complete "new-password"
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :create-password] (.-value (.-target e)))))}]
    [:input#crpass2.fullwidth {:placeholder "pw confirm" :type "password" :name "password2"
+                              :auto-complete "new-password-confirm"
                       :on-change (fn [e] (do
                                               (swap! input-state assoc-in [:inputs 0 :create-password2] (.-value (.-target e)))))}]
    [:button#crsubmit.fullwidth {:type "button"
+                                :auto-complete "new-user-account-create"
                        :on-click (fn [e] (let [username  (get-in @input-state [:inputs 0 :create-username])
                                                password  (get-in @input-state [:inputs 0 :create-password])
                                                password2 (get-in @input-state [:inputs 0 :create-password2])]
@@ -953,7 +957,9 @@
     [:div#about4.about "A selected comment will be fig colored when selected."]
     [:div#about5.about "Voting is a natural right and you can vote on any submission or comment via trivote. There are three levels to the tri-vote, double-plus, plus, and minus.  These correlate roughly to the spectrum of 0-99 and eventually, after a threshold number of votes has been met, the dice will transform to a number likely landing between 30 and 99."]
     ;[:div#about6.about "Nonforum is built using ClojureScript (Rum for UI, Sente for Client/Server Sockets, and Accountant for page \"routing\")"]
-    [:div#about6.about "We are helping to raise money for Fusion Research with Horne Technologies.  Fusion will bring us the pollution-free future rapidly into our presence.  Help humanity harness the power of the stars!  Donate today at "[:a {:href "/donate"} "nonforum.com/donate"]]]
+    [:div#about6.about "We are helping to raise money for Fusion Research with Horne Technologies.  Fusion will bring us the pollution-free future rapidly into our presence.  Help humanity harness the power of the stars!  Donate today at "[:a {:href "/donate"} "nonforum.com/donate"]]
+    [:img {:class "flyer" :src "nonforum_flyre.png"}]
+]
   )
 
 (rum/defc non-buzz-placeholder []
