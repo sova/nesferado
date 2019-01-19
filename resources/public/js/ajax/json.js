@@ -1,28 +1,28 @@
-// Compiled by ClojureScript 1.9.229 {}
+// Compiled by ClojureScript 1.9.229 {:static-fns true, :optimize-constants true}
 goog.provide('ajax.json');
 goog.require('cljs.core');
 goog.require('ajax.interceptors');
 goog.require('ajax.protocols');
 ajax.json.write_json_native = (function ajax$json$write_json_native(data){
-return JSON.stringify(cljs.core.clj__GT_js.call(null,data));
+return JSON.stringify(cljs.core.clj__GT_js(data));
 });
 ajax.json.read_json_native = (function ajax$json$read_json_native(raw,keywords_QMARK_,text){
 var result_raw = JSON.parse(text);
 if(cljs.core.truth_(raw)){
 return result_raw;
 } else {
-return cljs.core.js__GT_clj.call(null,result_raw,new cljs.core.Keyword(null,"keywordize-keys","keywordize-keys",1310784252),keywords_QMARK_);
+return cljs.core.js__GT_clj.cljs$core$IFn$_invoke$arity$variadic(result_raw,cljs.core.array_seq([cljs.core.cst$kw$keywordize_DASH_keys,keywords_QMARK_], 0));
 }
 });
 ajax.json.make_json_request_format = (function ajax$json$make_json_request_format(write_json){
 return (function ajax$json$make_json_request_format_$_json_request_format(){
-return new cljs.core.PersistentArrayMap(null, 2, [new cljs.core.Keyword(null,"write","write",-1857649168),write_json,new cljs.core.Keyword(null,"content-type","content-type",-508222634),"application/json"], null);
+return new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$write,write_json,cljs.core.cst$kw$content_DASH_type,"application/json"], null);
 });
 });
 ajax.json.strip_prefix = (function ajax$json$strip_prefix(prefix,text){
 if(cljs.core.truth_((function (){var and__6371__auto__ = prefix;
 if(cljs.core.truth_(and__6371__auto__)){
-return cljs.core._EQ_.call(null,(0),text.indexOf(prefix));
+return cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2((0),text.indexOf(prefix));
 } else {
 return and__6371__auto__;
 }
@@ -37,26 +37,29 @@ ajax.json.make_json_response_format = (function ajax$json$make_json_response_for
 return (function() {
 var ajax$json$make_json_response_format_$_json_response_format = null;
 var ajax$json$make_json_response_format_$_json_response_format__0 = (function (){
-return ajax$json$make_json_response_format_$_json_response_format.call(null,cljs.core.PersistentArrayMap.EMPTY);
+return ajax$json$make_json_response_format_$_json_response_format.cljs$core$IFn$_invoke$arity$1(cljs.core.PersistentArrayMap.EMPTY);
 });
-var ajax$json$make_json_response_format_$_json_response_format__1 = (function (p__22486){
-var map__22489 = p__22486;
-var map__22489__$1 = ((((!((map__22489 == null)))?((((map__22489.cljs$lang$protocol_mask$partition0$ & (64))) || (map__22489.cljs$core$ISeq$))?true:false):false))?cljs.core.apply.call(null,cljs.core.hash_map,map__22489):map__22489);
-var prefix = cljs.core.get.call(null,map__22489__$1,new cljs.core.Keyword(null,"prefix","prefix",-265908465));
-var keywords_QMARK_ = cljs.core.get.call(null,map__22489__$1,new cljs.core.Keyword(null,"keywords?","keywords?",764949733));
-var raw = cljs.core.get.call(null,map__22489__$1,new cljs.core.Keyword(null,"raw","raw",1604651272));
-return ajax.interceptors.map__GT_ResponseFormat.call(null,new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"read","read",1140058661),((function (map__22489,map__22489__$1,prefix,keywords_QMARK_,raw){
+var ajax$json$make_json_response_format_$_json_response_format__1 = (function (p__24864){
+var map__24874 = p__24864;
+var map__24874__$1 = ((((!((map__24874 == null)))?((((map__24874.cljs$lang$protocol_mask$partition0$ & (64))) || (map__24874.cljs$core$ISeq$))?true:false):false))?cljs.core.apply.cljs$core$IFn$_invoke$arity$2(cljs.core.hash_map,map__24874):map__24874);
+var prefix = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__24874__$1,cljs.core.cst$kw$prefix);
+var keywords_QMARK_ = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__24874__$1,cljs.core.cst$kw$keywords_QMARK_);
+var raw = cljs.core.get.cljs$core$IFn$_invoke$arity$2(map__24874__$1,cljs.core.cst$kw$raw);
+return ajax.interceptors.map__GT_ResponseFormat(new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$read,((function (map__24874,map__24874__$1,prefix,keywords_QMARK_,raw){
 return (function ajax$json$make_json_response_format_$_json_response_format_$_json_read_response_format(xhrio){
-return read_json.call(null,raw,keywords_QMARK_,ajax.json.strip_prefix.call(null,prefix,ajax.protocols._body.call(null,xhrio)));
-});})(map__22489,map__22489__$1,prefix,keywords_QMARK_,raw))
-,new cljs.core.Keyword(null,"description","description",-1428560544),[cljs.core.str("JSON"),cljs.core.str((cljs.core.truth_(prefix)?[cljs.core.str(" prefix '"),cljs.core.str(prefix),cljs.core.str("'")].join(''):null)),cljs.core.str((cljs.core.truth_(keywords_QMARK_)?" keywordize":null))].join(''),new cljs.core.Keyword(null,"content-type","content-type",-508222634),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, ["application/json"], null)], null));
+var G__24879 = raw;
+var G__24880 = keywords_QMARK_;
+var G__24881 = ajax.json.strip_prefix(prefix,ajax.protocols._body(xhrio));
+return (read_json.cljs$core$IFn$_invoke$arity$3 ? read_json.cljs$core$IFn$_invoke$arity$3(G__24879,G__24880,G__24881) : read_json.call(null,G__24879,G__24880,G__24881));
+});})(map__24874,map__24874__$1,prefix,keywords_QMARK_,raw))
+,cljs.core.cst$kw$description,[cljs.core.str("JSON"),cljs.core.str((cljs.core.truth_(prefix)?[cljs.core.str(" prefix '"),cljs.core.str(prefix),cljs.core.str("'")].join(''):null)),cljs.core.str((cljs.core.truth_(keywords_QMARK_)?" keywordize":null))].join(''),cljs.core.cst$kw$content_DASH_type,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, ["application/json"], null)], null));
 });
-ajax$json$make_json_response_format_$_json_response_format = function(p__22486){
+ajax$json$make_json_response_format_$_json_response_format = function(p__24864){
 switch(arguments.length){
 case 0:
 return ajax$json$make_json_response_format_$_json_response_format__0.call(this);
 case 1:
-return ajax$json$make_json_response_format_$_json_response_format__1.call(this,p__22486);
+return ajax$json$make_json_response_format_$_json_response_format__1.call(this,p__24864);
 }
 throw(new Error('Invalid arity: ' + arguments.length));
 };
@@ -75,7 +78,5 @@ return ajax$json$make_json_response_format_$_json_response_format;
  * http://stackoverflow.com/questions/2669690/why-does-google-prepend-while1-to-their-json-responses
  * http://haacked.com/archive/2009/06/24/json-hijacking.aspx
  */
-ajax.json.json_response_format = ajax.json.make_json_response_format.call(null,ajax.json.read_json_native);
-ajax.json.json_request_format = ajax.json.make_json_request_format.call(null,ajax.json.write_json_native);
-
-//# sourceMappingURL=json.js.map
+ajax.json.json_response_format = ajax.json.make_json_response_format(ajax.json.read_json_native);
+ajax.json.json_request_format = ajax.json.make_json_request_format(ajax.json.write_json_native);

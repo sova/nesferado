@@ -320,6 +320,7 @@
                            (swap! input-state assoc-in [:inputs 0 :login-time] (:login-time stuff))
                            (swap! input-state assoc-in [:inputs 0 :logged-in] true)
                            (swap! input-state assoc-in [:inputs 0 :current-user] (:uid stuff))
+                           (accountant/navigate! "/")
 
                            ;'log user in' on client
                            (sente/chsk-reconnect! chsk)
@@ -358,7 +359,8 @@
                       (swap! input-state assoc-in [:inputs 0 :token] (:auth-token stuff))
                       (swap! input-state assoc-in [:inputs 0 :login-time] (:login-time stuff))
                       (swap! input-state assoc-in [:inputs 0 :logged-in] true)
-                      (swap! input-state assoc-in [:inputs 0 :current-user] (:uid stuff)) ;'log user in' on client
+                      (swap! input-state assoc-in [:inputs 0 :current-user] (:uid stuff))
+                      (accountant/navigate! "/");'log user in' on client
                       (sente/chsk-reconnect! chsk)))))))))
 
 (defn write-rating! [rating pid]
@@ -547,22 +549,28 @@
                            (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ∴ preferences"]]
-      [:li [:span.sidebarbutton {:on-click (fn [_] (do
+      (if (not (empty? current-user)) [:li [:span.sidebarbutton {:on-click (fn [_] (do
                                                      (accountant/navigate! "/submit")
                                                      (swap! input-state assoc-in [:inputs 0 :current-view] "/submit")))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
-                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ submit"]]
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ submit"]])
       [:li [:span.sidebarbutton {:on-click (fn [_] (do
                                                      (accountant/navigate! "/about")
                                                      (swap! input-state assoc-in [:inputs 0 :current-view] "/about")))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ about"]]
-      [:li [:span.sidebarbutton {:on-click (fn [_] (do
-                                                     (accountant/navigate! "/profile")
-                                                     ;(swap! input-state assoc-in [:inputs 0 :current-view] "edit-profile")
-                                                     ))
-                                 :onMouseOver (fn [e] (set! js/document.body.style.cursor "crosshair"))
-                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} (str " ⌬ " (if (empty? current-user) ". . ." current-user))]]
+      [:li (if (empty? current-user)
+             [:span.sidebarbutton
+              {:on-click (fn [_] (do
+                                   (accountant/navigate! "/login")
+                                   (swap! input-state assoc-in [:inputs 0 :current-view] "/login")))} "login"]
+             ;else
+             [:span.sidebarbutton
+              {:on-click (fn [_] (do
+                                  (accountant/navigate! "/profile")))
+               :onMouseOver  (fn [e] (set! js/document.body.style.cursor "auto"))}(str " ⌬ " current-user) ])]
+
+
       [:li [:span.sidebarbutton.logout {
               :on-click (fn [e] (do
                                   (.stopPropagation e)
@@ -999,69 +1007,57 @@
 
 
 
-   (if (= false logged-in)
-     (non-buzz-placeholder))
-   (if (= false logged-in)
-     (login-bar))
+   (top-bar)
 
-
-
-
-   (if (= true logged-in)
-     (top-bar))
    (if (= true show-sidebar)
-     (if (= true logged-in)
-       (side-bar)))
+       (side-bar))
 
-   (if (and logged-in (= "/feedback" curr-view)) (send-feedback-fields))
+   (if  (= "/feedback" curr-view) (send-feedback-fields))
 
-   (if (and logged-in (= "/about" curr-view)) (about-fields))
+   (if  (= "/about" curr-view) (about-fields))
 
-   (if (and logged-in (= "/email-public" curr-view)) (edit-profile))
+   (if  (= "/email-public" curr-view) (edit-profile))
 
-   (if (and logged-in (= "/profile" curr-view)) (edit-profile))
+   (if  (= "/profile" curr-view) (edit-profile))
 
-   (if (and logged-in (= "/email-recovery" curr-view)) (set-recovery-email))
+   (if  (= "/email-recovery" curr-view) (set-recovery-email))
 
-   (if (and logged-in (= "/password-update" curr-view)) (set-password))
+   (if  (= "/password-update" curr-view) (set-password))
 
-   (if (and logged-in (= "/submit" curr-view)) (post-input))
+   (if  (= "/submit" curr-view) (post-input))
 
-   (if (and logged-in (= "/donate" curr-view)) (support-nf))
+   (if  (= "/donate" curr-view) (support-nf))
 
-   (if (and logged-in (= "/fusion" curr-view)) (support-nf))
+   (if  (= "/fusion" curr-view) (support-nf))
+
+   (if  (= "/login" curr-view)  (login-bar))
 
   ; top is currently pointing to "default"
 
    (if (= "/" curr-view)
-    (if (= true logged-in)
      (if (not (empty? tv-current))
-       (go-back-button))))
+       (go-back-button)))
 
   (if (= "/" curr-view)
-    (if (= true logged-in)
      (if (not (empty? tv-current))
-       (sponsored-message))))
+       (sponsored-message)))
 
-   (if  (= "/" curr-view)
-    (if  (empty? tv-current)
-     (if (= true logged-in)
-      (television))))
+   (if (and (= "/" curr-view) (empty? tv-current))
+      (television))
 
    ;active tv-cell
    (if (or (= "/" curr-view))
-    (if (= true logged-in)
-     (tv-cell tv-current)))
+     (if (not (empty? tv-current))
+       (tv-cell tv-current)))
 
    (if (or (= "/" curr-view))
     (if (not (empty? tv-current))
-     (if (= true logged-in)
-       (map render-item curr-comments))))
+       (map render-item curr-comments)))
 
    (if (or (= "/" curr-view))
      (if (not (empty? tv-current))
-      (if (= true logged-in)
-       (input-fields))))
+       (if (= true logged-in)
+         (input-fields))))
    ]))
 
 
@@ -1306,9 +1302,11 @@
                   (if-not auto-login-successful?
                     (do
                       (->output! "Auto-login failed")
+                      (.log js/console "auto-login failed")
                       (swap! input-state assoc-in [:inputs 0 :logged-in] false))
                     (do
                        (->output! "Auto-login success!")
+                       (.log js/console "auto-login success.")
 
                       ; (accountant/dispatch-current!)
                       ;assoc auth hash
