@@ -1145,6 +1145,42 @@
 
 
 
+(defn auto-login []
+  (->output! "Attempting auto-login ...")
+  (sente/ajax-lite "/check-login"
+              {:method :post
+               :timeout-ms 7000
+               :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
+               :params {:uid           (get-item :uid)
+                        :auth-token    (get-item :auth-key)
+                        :login-time    (get-item :login-time)}
+               :type :text}
+
+              (fn [ajax-resp]
+                (->output! (str "Auto-login response: " ajax-resp))
+                (let [{:keys [success? ?status ?error ?content ?content-type]} ajax-resp
+                      http-status (:?status ajax-resp)
+                      auto-login-successful? (= 200 http-status)
+                      stuff (cljs.reader/read-string ?content)]
+                  (if-not auto-login-successful?
+                    (do
+                      (->output! "Auto-login failed")
+                      (.log js/console "auto-login failed")
+                      (swap! input-state assoc-in [:inputs 0 :logged-in] false))
+                    (do
+                       (->output! "Auto-login success!")
+                       (.log js/console "auto-login success.")
+
+                      ; (accountant/dispatch-current!)
+                      ;assoc auth hash
+                      (swap! input-state assoc-in [:inputs 0 :token] (get-item :auth-key))
+                      (swap! input-state assoc-in [:inputs 0 :login-time] (get-item :login-time))
+                      (swap! input-state assoc-in [:inputs 0 :logged-in] true)
+                      (swap! input-state assoc-in [:inputs 0 :current-user] (get-item :uid)) ;'log user in' on client
+                      (sente/chsk-reconnect! chsk)))))))
+
+
+
 ;;;; Sente event handlers
 
 (defmulti -event-msg-handler
@@ -1167,6 +1203,7 @@
     (cond
       (= false (:ever-opened? event-title))
         (do
+          (auto-login)
           (.log js/console "Hey I'm trying to get new data yo, since :ever-opened? is false")
           (ask-server-for-blurbs)
           (ask-server-for-comments)
@@ -1282,39 +1319,7 @@
   (let [pattern #"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"]
     (and (string? email) (re-matches pattern email))))
 
-(defn auto-login []
-  (->output! "Attempting auto-login ...")
-  (sente/ajax-lite "/check-login"
-              {:method :post
-               :timeout-ms 7000
-               :headers {:X-CSRF-Token (:csrf-token @chsk-state)}
-               :params {:uid           (get-item :uid)
-                        :auth-token    (get-item :auth-key)
-                        :login-time    (get-item :login-time)}
-               :type :text}
 
-              (fn [ajax-resp]
-                (->output! (str "Auto-login response: " ajax-resp))
-                (let [{:keys [success? ?status ?error ?content ?content-type]} ajax-resp
-                      http-status (:?status ajax-resp)
-                      auto-login-successful? (= 200 http-status)
-                      stuff (cljs.reader/read-string ?content)]
-                  (if-not auto-login-successful?
-                    (do
-                      (->output! "Auto-login failed")
-                      (.log js/console "auto-login failed")
-                      (swap! input-state assoc-in [:inputs 0 :logged-in] false))
-                    (do
-                       (->output! "Auto-login success!")
-                       (.log js/console "auto-login success.")
-
-                      ; (accountant/dispatch-current!)
-                      ;assoc auth hash
-                      (swap! input-state assoc-in [:inputs 0 :token] (get-item :auth-key))
-                      (swap! input-state assoc-in [:inputs 0 :login-time] (get-item :login-time))
-                      (swap! input-state assoc-in [:inputs 0 :logged-in] true)
-                      (swap! input-state assoc-in [:inputs 0 :current-user] (get-item :uid)) ;'log user in' on client
-                      (sente/chsk-reconnect! chsk)))))))
 
 ;;;;;;;;;;;;;(if (not (empty? (get-item :auth-key)))
 
@@ -1328,8 +1333,7 @@
         (swap! input-state assoc-in [:inputs 0 :token] (get-item :auth-key))
         (swap! input-state assoc-in [:inputs 0 :login-time] (get-item :login-time))
         (swap! input-state assoc-in [:inputs 0 :current-user] (get-item :uid))
-        (swap! input-state assoc-in [:inputs 0 :logged-in] true)
-        auto-login))))
+        (swap! input-state assoc-in [:inputs 0 :logged-in] true)))))
 
 (defn start! [] (start-router!))
 
