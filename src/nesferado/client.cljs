@@ -537,7 +537,7 @@
                                  :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "n⊜nforum"]]
 
 
-      [:li [:span.sidebarbutton {:on-click (fn [_] (do
+      (if (not (empty? current-user)) [:li [:span.sidebarbutton {:on-click (fn [_] (do
                                                      (accountant/navigate! "/")
                                                      (swap! input-state assoc-in [:inputs 0 :tv-current] "")
                                                      (swap! input-state assoc-in [:inputs 0 :tv-curr-id] "")))
@@ -548,7 +548,7 @@
                            (.stopPropagation e)
                            (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
-                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ∴ preferences"]]
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ∴ preferences"]])
       (if (not (empty? current-user)) [:li [:span.sidebarbutton {:on-click (fn [_] (do
                                                      (accountant/navigate! "/submit")
                                                      (swap! input-state assoc-in [:inputs 0 :current-view] "/submit")))
