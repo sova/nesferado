@@ -698,3 +698,13 @@ textarea.profileinput {
   float: left;
   clear: left;
 }
+
+.msg {
+  float: left;
+  clear: left;
+}
+
+.msgauthor {
+  margin-right: 1em;
+  color: purple;
+}

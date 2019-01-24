@@ -179,6 +179,8 @@
 
 (def nf-comment (atom ""))
 
+(def nf-chat-input (atom ""))
+(def nf-chat-messages (atom {}))
 
 (defn get-rating [ratings-total number-of-ratings]
   (if (< number-of-ratings 6)
@@ -239,11 +241,11 @@
 ;;Accountant
 (accountant/configure-navigation!
   {:nav-handler (fn [path]
-                  (.log js/console "ac: " path)
+                 ;; (.log js/console "ac: " path)
                   ;(.log js/console (get-url-params))
                   (if (or (str/starts-with? path "?nfid") (str/starts-with? path "/?nfid"))
                     (do
-                      (.log js/console "start swith nfid busted")
+                     ;; (.log js/console "start swith nfid busted")
                       ;load it up
                       (let [url-params (get-url-params)
                             nfid (cljs.reader/parse-int (get url-params "nfid"))
@@ -259,7 +261,7 @@
                             link (:link td)
                             long-description (:details td)
                             cids (return-comment-ids-of-tv nfid)]
-                        (.log js/console nfid title contents posted-by comments)
+                     ;;   (.log js/console nfid title contents posted-by comments)
 
                         (swap! input-state assoc-in [:inputs 0 :current-view] "/")
 
@@ -538,12 +540,12 @@
 
 
       (if (not (empty? current-user)) [:li [:span.sidebarbutton {:on-click (fn [_] (do
-                                                     (accountant/navigate! "/")
+                                                     (accountant/navigate! "/chat")
                                                      (swap! input-state assoc-in [:inputs 0 :tv-current] "")
                                                      (swap! input-state assoc-in [:inputs 0 :tv-curr-id] "")))
                                  :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
-                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ top"   ]]
-      [:li [:span.sidebarbutton {:on-click
+                                 :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} "⌁ chat"   ]])
+      (if (not (empty? current-user)) [:li [:span.sidebarbutton {:on-click
                  (fn [e] (do
                            (.stopPropagation e)
                            (swap! input-state update-in [:inputs 0 :show-sidebar] not)))
@@ -571,7 +573,7 @@
                :onMouseOver  (fn [e] (set! js/document.body.style.cursor "auto"))}(str " ⌬ " current-user) ])]
 
 
-      [:li [:span.sidebarbutton.logout {
+      (if (not (empty? current-user)) [:li [:span.sidebarbutton.logout {
               :on-click (fn [e] (do
                                   (.stopPropagation e)
                                   (swap! input-state assoc-in [:inputs 0 :logged-in] false)
@@ -588,7 +590,7 @@
                                   (remove-item! :auth-key)
                                   (->output! (str "Logout Successful"))))
               :onMouseOver (fn [e] (set! js/document.body.style.cursor "pointer"))
-              :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ⇏"]]]]))
+              :onMouseOut  (fn [e] (set! js/document.body.style.cursor "auto"))} " ⇏"]])]]))
 
 (rum/defc side-bar []
   [:div#sidebar
@@ -945,6 +947,35 @@
                                      (reset! nf-comment "")))} "Comment in reply to selected."]])
 
 
+(rum/defc chat-area < rum/reactive []
+  [:form {:id "chat_arena"}
+   [:div.fullwidth {:id "chatchat"}
+    (map (fn [chat-map] [:div {:class "msg"}
+                         [:span {:class "msgauthor"} (get chat-map :author)]
+                          (get chat-map :message)]) (rum/react nf-chat-messages))]
+   [:input.fullwidth {:id "chatchatinput"
+                      :value (rum/react nf-chat-input)
+                      :on-change (fn [e] (reset! nf-chat-input (.-value (.-target e))))
+                      :placeholder "chat chat"}]
+   [:button.fullwidth {:id "chatchatsubmit"
+                       :type "button"
+                       :class "chatbutton"
+                       :on-click (fn [e]
+                                   (let [ username (get-in @input-state [:inputs 0 :current-user])
+                                          new-chat-message-map {
+                                                          :id (swap! y inc);;;client does not provide canonical id
+                                                          :message @nf-chat-input
+                                                          :author username}]
+
+                                     (if (not (= "" @nf-chat-input))
+                                       (chsk-send! [:clientsent/new-chat-message new-chat-message-map]))
+                                     (reset! nf-chat-input "")))} "Send Message"]])
+
+(rum/defc log-in-to-chat-pls []
+  [:div {:id "pls"} "please log in to chat."])
+
+
+
 (rum/defc footer []
   [:div#footer "Welcome to nonforum.  Here you will find real-time threads and discussion boards."
     [:div#foot1 "Nonforum is a place to start discussion threads based on questions or simply on a topic."]
@@ -1029,6 +1060,11 @@
    (if  (= "/donate" curr-view) (support-nf))
 
    (if  (= "/fusion" curr-view) (support-nf))
+
+   (if  (= "/chat" curr-view)
+     (if (= true logged-in)
+       (chat-area)
+       (log-in-to-chat-pls)))
 
    (if  (= "/login" curr-view)  (login-bar))
 
@@ -1123,6 +1159,21 @@
                       (reset! posts  comments-core)
                       (swap!  posts  vec))))))
 
+(defn ask-server-for-chat-messages
+  []
+
+  ;;ask for /chat messages
+  (chsk-send! [:clientsent/req-all-chat-messages  {:can-i-please-has-the "comments"}]
+               3000 ;timeout
+                (fn [chat-messages-core]
+                  (if (sente/cb-success? chat-messages-core)
+                    (do
+                      (.log js/console "callback with chat messages rcevd")
+                      (.log js/console ":cs/rac " chat-messages-core)
+
+                      (reset! nf-chat-messages chat-messages-core)
+                      (swap!  nf-chat-messages  vec))))))
+
 
 
 (defn find-tv-item [pid]
@@ -1207,6 +1258,7 @@
           (.log js/console "Hey I'm trying to get new data yo, since :ever-opened? is false")
           (ask-server-for-blurbs)
           (ask-server-for-comments)
+          (ask-server-for-chat-messages)
           )
       (= event-title :hello/client)
         (.log js/console (str "&# " new-data))
@@ -1278,6 +1330,19 @@
                 (do
                   (swap! tv-state update-in [seek-tv-state :comments] conj pid)
                   (swap! input-state update-in [:inputs 0 :tv-comments] conj pid))))))
+
+      (= event-title :serversent/new-chat-message)
+        (let [new-chat-message-map  new-data]
+          (do
+            (.log js/console (str "&# " new-chat-message-map))
+
+              ;add chat message to nf-chat atom
+              (.log js/console "adding new chat message to atom...")
+
+
+              (swap! nf-chat-messages conj new-chat-message-map)
+              (swap! nf-chat-messages vec)
+              (.log js/console "added new chat message to atom")))
 
 
 

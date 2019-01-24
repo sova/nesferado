@@ -1,3 +1,29 @@
+Jan 23
+
+so i think a chat app would be timely and nice.
+
+nonforum.com/chat ... anyone can see?
+maybe you have to be logged in to see the chat, that makes more sense.
+
+nonforum.com/chat will show the same cljs file and show the /chat view
+which is just a textarea with input box underneath, and messages sent are stored serverside
+and the last x-many messages are broadcast to users.
+
+so that's the theory anyway.
+
+i think the atom on the server will by default keep it in proper sequence,
+but we can also store with timestamp and sort by timestamp,
+which is an idea i like.
+
+
+textarea with name "chatroom" xD
+and then um... input box with send butan
+atom on server that stores :message, :author, and :timestamp
+
+and then a function that sends the last received message
+and a function      that sends the most current 50-1000 messages to freshly connected peers.
+
+
 Jan 18
 
 ; books, speeches, letters

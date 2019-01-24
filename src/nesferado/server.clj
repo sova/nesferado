@@ -195,6 +195,10 @@
                          :file-path "data/feedbacks.sova"
                          :init []))
 
+(def nf-chat (duratom :local-file
+                      :file-path "data/chat.sova"
+                      :init []))
+
 
 
 (defn create-auth-token-map [user-email]
@@ -430,6 +434,7 @@
   ;phantom routes
   (GET "/top"     ring-req (landing-pg-handler            ring-req))
   (GET "/submit"  ring-req (landing-pg-handler            ring-req))
+  (GET "/chat"  ring-req (landing-pg-handler            ring-req))
   (GET "/feedback" ring-req (landing-pg-handler            ring-req))
   (GET "/about" ring-req (landing-pg-handler            ring-req))
   (GET "/donate" ring-req (landing-pg-handler            ring-req))
@@ -563,6 +568,9 @@
 (defn get-all-comments []
   @nf-comments)
 
+(defn get-all-chat-messages []
+  @nf-chat)
+
 
 
 (defn check-if-recovery-email-exists [uid]
@@ -651,6 +659,14 @@
    ; (println "sending comments to " ?user-id)
     (when ?reply-fn
       (?reply-fn (get-all-comments))))
+
+(defmethod -event-msg-handler :clientsent/req-all-chat-messages
+  [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
+  ;  (println (str (:params ring-req)))
+   ; (println (str (:uid (:params ring-req))))
+   ; (println "sending comments to " ?user-id)
+    (when ?reply-fn
+      (?reply-fn (get-all-chat-messages))))
 
 
 
@@ -800,15 +816,30 @@
       (chsk-send! uid [:serversent/comment {:contents contents
                                             :author uid
                                             :parent-id parent-id
-                                            :id pid}]))
+                                            :id pid}]))))
 
 
+  (defmethod -event-msg-handler :clientsent/new-chat-message
+    [{:as ev-msg :keys [event id ?user-id ring-req ?reply-fn send-fn]}]
+  (let [message-map (second (:event ev-msg))
+        message (:message message-map)
+        author (:author message-map)
+        pid (swap! nf-counter inc)
+        uid (:uid (:session ring-req))
+        now (quot (System/currentTimeMillis) 1000)]
+    (do
 
-    ; broadcast comment to all peers and
-    ; broadcast alongside the comment it's updated parent id
-    ; server can hold onto up-to-date parent ids while clients update their own
+    ;(println (str "params rr " (:params ring-req)))
+    ;(println (str "session rr " (:session ring-req)))
+    (println "new message in chat from " author ", " message)
+    ;add chat to chat-messages atom
+    (swap! nf-chat conj (assoc message-map :timestamp now :id pid))
 
-    ))
+    (doseq [uid (:any @connected-uids)]
+        (chsk-send! uid [:serversent/new-chat-message {:message message
+                                                       :author uid
+                                                       :timestamp now
+                                                       :id pid}])))))
 
 (defn broadcast-blurb!
   "Broadcasts a given blurb-map (typically a fresh dbsave!) to all connected browsings"
